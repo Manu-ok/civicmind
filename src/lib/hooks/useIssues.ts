@@ -1,1 +1,94 @@
-export {};
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { collection, query, onSnapshot, where, orderBy, getDocs } from "firebase/firestore";
+import { db } from "../firebase/config";
+import { Issue } from "../types";
+import { useIssueStore } from "../stores/issueStore";
+import { calculateDistance } from "../maps/geocoding";
+
+export function useIssues() {
+  const { setIssues, filters, setLoading, setError, loading, error, issues } = useIssueStore();
+  const [localLoading, setLocalLoading] = useState(true);
+
+  const fetchIssues = useCallback(() => {
+    setLoading(true);
+    setLocalLoading(true);
+
+    try {
+      let q = collection(db, "issues");
+      const constraints: any[] = [];
+
+      if (filters.category) constraints.push(where("category", "==", filters.category));
+      if (filters.severity) constraints.push(where("severity", "==", filters.severity));
+      if (filters.status) constraints.push(where("status", "==", filters.status));
+      if (filters.ward) constraints.push(where("location.ward", "==", filters.ward));
+
+      if (constraints.length > 0) {
+        q = query(q, ...constraints) as any;
+      } else {
+        q = query(q, orderBy("reportedAt", "desc")) as any;
+      }
+
+      const unsubscribe = onSnapshot(
+        q,
+        (snapshot) => {
+          const fetchedIssues = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+            // Handle Firestore timestamps safely
+            reportedAt: doc.data().reportedAt?.toDate() || new Date(),
+          })) as Issue[];
+
+          setIssues(fetchedIssues);
+          setLocalLoading(false);
+          setLoading(false);
+          setError(null);
+        },
+        (err) => {
+          console.error("Error fetching issues:", err);
+          setError(err.message);
+          setLocalLoading(false);
+          setLoading(false);
+        }
+      );
+
+      return unsubscribe;
+    } catch (err: any) {
+      console.error("Error setting up issues listener:", err);
+      setError(err.message);
+      setLocalLoading(false);
+      setLoading(false);
+      return () => {};
+    }
+  }, [filters, setIssues, setLoading, setError]);
+
+  useEffect(() => {
+    const unsubscribe = fetchIssues();
+    return () => unsubscribe();
+  }, [fetchIssues]);
+
+  return { issues, loading: localLoading || loading, error, refetch: fetchIssues };
+}
+
+export function useNearbyIssues(lat: number | null, lng: number | null, radiusKm: number = 5) {
+  const { issues, loading, error } = useIssues();
+  const [nearbyIssues, setNearbyIssues] = useState<Issue[]>([]);
+
+  useEffect(() => {
+    if (!lat || !lng || !issues.length) {
+      setNearbyIssues([]);
+      return;
+    }
+
+    const filtered = issues.filter((issue) => {
+      if (!issue.location?.lat || !issue.location?.lng) return false;
+      const distance = calculateDistance(lat, lng, issue.location.lat, issue.location.lng);
+      return distance <= radiusKm;
+    });
+
+    setNearbyIssues(filtered);
+  }, [lat, lng, radiusKm, issues]);
+
+  return { nearbyIssues, loading, error };
+}

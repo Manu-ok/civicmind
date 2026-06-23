@@ -52,7 +52,7 @@ export async function deleteIssue(issueId: string): Promise<void> {
 
 export async function getIssues(filters?: { category?: string, severity?: string, status?: string, ward?: string, city?: string }): Promise<Issue[]> {
   try {
-    let q = query(collection(db, "issues"), where("deleted", "!=", true));
+    let q = query(collection(db, "issues"));
 
     if (filters) {
       if (filters.category) q = query(q, where("category", "==", filters.category));
@@ -64,7 +64,7 @@ export async function getIssues(filters?: { category?: string, severity?: string
 
     q = query(q, orderBy("reportedAt", "desc"));
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => doc.data() as Issue);
+    return querySnapshot.docs.map(doc => doc.data() as Issue).filter(issue => !issue.deleted);
   } catch (error: any) {
     console.error("Error fetching issues:", error);
     throw new Error(error.message || "Failed to fetch issues.");
@@ -203,14 +203,14 @@ export async function incrementUserPoints(uid: string, points: number): Promise<
 
 export async function getTopCitizens(city: string, limitCount: number): Promise<User[]> {
   try {
-    const q = query(
-      collection(db, "users"),
-      where("city", "==", city),
-      orderBy("points", "desc"),
-      limit(limitCount)
-    );
+    const q = query(collection(db, "users"));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => doc.data() as User);
+    const users = snapshot.docs.map(doc => doc.data() as User);
+    
+    return users
+      .filter(user => user.city === city)
+      .sort((a, b) => (b.points || 0) - (a.points || 0))
+      .slice(0, limitCount);
   } catch (error: any) {
     console.error("Error fetching top citizens:", error);
     throw new Error(error.message || "Failed to fetch top citizens.");
