@@ -11,6 +11,7 @@ import { IssueCard } from "@/components/issues/IssueCard";
 import { MiniMap } from "@/components/map/MiniMap";
 import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
 import { Leaderboard } from "@/components/dashboard/Leaderboard";
+import { DashboardStatSkeleton, IssueCardSkeleton } from "@/components/shared/Skeletons";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -57,10 +58,12 @@ export default function DashboardPage() {
   const { user } = useAuthStore();
   const [recentIssues, setRecentIssues] = useState<Issue[]>([]);
   const [topCitizens, setTopCitizens] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
     async function loadData() {
       try {
+        setIsLoading(true);
         const issues = await getIssues();
         // Just take the first 5 for recent
         setRecentIssues(issues.slice(0, 5));
@@ -69,6 +72,8 @@ export default function DashboardPage() {
         setTopCitizens(citizens);
       } catch (e) {
         console.error(e);
+      } finally {
+        setIsLoading(false);
       }
     }
     loadData();
@@ -130,38 +135,49 @@ export default function DashboardPage() {
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        animate="visible"
+        className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
       >
-        {[
-          { title: "Total Issues Reported", value: 1248, icon: FileText, color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20", trend: "+14%" },
-          { title: "Resolved This Month", value: 342, icon: CheckCircle2, color: "text-green-400", bg: "bg-green-500/10", border: "border-green-500/20", trend: "+28%" },
-          { title: "Active Citizens", value: 5890, icon: Users, color: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/20", trend: "+5%" },
-          { title: "Avg Resolution Time", value: 4, suffix: " days", icon: Clock, color: "text-orange-400", bg: "bg-orange-500/10", border: "border-orange-500/20", trend: "-2 days", isInverse: true }
-        ].map((stat, i) => (
-          <motion.div key={i} variants={itemVariants}>
-            <Card className="group relative overflow-hidden p-6 bg-zinc-900/50 backdrop-blur-md border-white/5 hover:border-white/20 transition-all duration-300 hover:-translate-y-1">
-              <div className={cn("absolute -top-10 -right-10 w-32 h-32 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500", stat.bg)} />
-              
-              <div className="relative z-10 flex justify-between items-start mb-4">
-                <div className={cn("p-3 rounded-2xl border", stat.bg, stat.color, stat.border)}>
-                  <stat.icon className="w-6 h-6" />
+        {isLoading ? (
+          <>
+            <DashboardStatSkeleton />
+            <DashboardStatSkeleton />
+            <DashboardStatSkeleton />
+            <DashboardStatSkeleton />
+          </>
+        ) : (
+          [
+            { label: "Total Issues Reported", value: 1248, icon: FileText, color: "text-blue-400 bg-blue-500/10", trend: "+14%" },
+            { label: "Resolved This Month", value: 342, icon: CheckCircle2, color: "text-green-400 bg-green-500/10", trend: "+28%" },
+            { label: "Active Citizens", value: 5890, icon: Users, color: "text-purple-400 bg-purple-500/10", trend: "+5%" },
+            { label: "Avg Resolution Time", value: 4, icon: Clock, color: "text-orange-400 bg-orange-500/10", trend: "-2 days" }
+          ].map((stat, i) => (
+            <motion.div key={stat.label} variants={itemVariants}>
+              <Card className="relative overflow-hidden bg-zinc-900/50 border-white/5 backdrop-blur-xl transition-all hover:bg-zinc-800/50 group">
+                <div className="p-6">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-zinc-400">{stat.label}</p>
+                    <div className={`p-2 rounded-lg ${stat.color} group-hover:scale-110 transition-transform`}>
+                      <stat.icon className={`h-5 w-5 ${stat.color.split(' ')[0]}`} />
+                    </div>
+                  </div>
+                  <div className="mt-4 flex items-baseline gap-2">
+                    <h2 className="text-3xl font-bold text-white">
+                      <AnimatedCounter value={stat.value} />
+                    </h2>
+                    {stat.trend && (
+                      <span className={`text-xs font-medium ${stat.trend.startsWith('+') ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        {stat.trend}
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className={cn(
-                  "px-2 py-1 rounded text-xs font-bold flex items-center gap-1",
-                  stat.isInverse ? "bg-green-500/10 text-green-400" : "bg-green-500/10 text-green-400"
-                )}>
-                  <TrendingUp className="w-3 h-3" /> {stat.trend}
-                </div>
-              </div>
-              
-              <div className="relative z-10">
-                <h3 className="text-zinc-400 text-sm font-medium mb-1">{stat.title}</h3>
-                <p className="text-3xl font-bold text-white">
-                  <AnimatedCounter value={stat.value} suffix={stat.suffix || ""} />
-                </p>
-              </div>
-            </Card>
-          </motion.div>
-        ))}
+                {/* Decorative bottom border */}
+                <div className={`absolute bottom-0 left-0 h-1 w-full opacity-50 ${stat.color.split(' ')[1]}`} />
+              </Card>
+            </motion.div>
+          ))
+        )}
       </motion.div>
 
       {/* SECTION 3: Two Column Layout */}
@@ -169,20 +185,34 @@ export default function DashboardPage() {
         
         {/* LEFT: Recent Issues */}
         <div className="lg:col-span-7 xl:col-span-8 space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-              <Activity className="w-6 h-6 text-primary" /> Recent Activity Near You
-            </h2>
-            <Button variant="ghost" onClick={() => router.push('/issues')} className="text-primary hover:text-primary hover:bg-primary/10">
-              View All <ChevronRight className="w-4 h-4 ml-1" />
-            </Button>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {recentIssues.map((issue, idx) => (
-              <IssueCard key={issue.id} issue={issue} index={idx} />
-            ))}
-          </div>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-lg font-bold text-white">Recent Activity</h3>
+                  <p className="text-sm text-zinc-400">Latest updates from your city</p>
+                </div>
+                <Button variant="ghost" size="sm" className="text-zinc-400 hover:text-white" onClick={() => router.push('/issues')}>
+                  View all
+                </Button>
+              </div>
+              
+              {isLoading ? (
+                <div className="space-y-4">
+                  <IssueCardSkeleton />
+                  <IssueCardSkeleton />
+                </div>
+              ) : recentIssues.length > 0 ? (
+                <div className="space-y-4">
+                  {recentIssues.slice(0, 3).map(issue => (
+                    <IssueCard key={issue.id} issue={issue} />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12 text-center bg-zinc-900/30 rounded-xl border border-white/5">
+                  <Activity className="h-10 w-10 text-zinc-600 mb-3" />
+                  <p className="text-zinc-400 font-medium">No recent activity</p>
+                  <p className="text-sm text-zinc-500 mt-1">Be the first to report an issue!</p>
+                </div>
+              )}
         </div>
 
         {/* RIGHT: Map & Actions */}

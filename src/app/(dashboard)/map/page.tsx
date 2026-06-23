@@ -9,11 +9,12 @@ import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 import { useIssues } from "@/lib/hooks/useIssues";
 import { Category, Severity } from "@/lib/types";
+import { MapSkeleton } from "@/components/shared/Skeletons";
 
 export default function MapPage() {
   const router = useRouter();
   const { filters, setFilters } = useIssueStore();
-  const { issues } = useIssues();
+  const { issues, loading } = useIssues();
   
   const [showFilters, setShowFilters] = useState(false);
 
@@ -85,7 +86,13 @@ export default function MapPage() {
       )}
 
       {/* Main Map */}
-      <CivicMap />
+      {loading ? (
+        <div className="absolute inset-0 z-0 p-4 pt-20">
+          <MapSkeleton />
+        </div>
+      ) : (
+        <CivicMap />
+      )}
 
       {/* Floating Action Button */}
       <Button 

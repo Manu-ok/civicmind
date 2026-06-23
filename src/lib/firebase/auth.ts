@@ -5,9 +5,10 @@ import {
   createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
   onAuthStateChanged,
+  deleteUser as firebaseDeleteUser,
   User as FirebaseUser
 } from "firebase/auth";
-import { doc, getDoc, setDoc, updateDoc, Timestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc, deleteDoc, Timestamp } from "firebase/firestore";
 import { auth, db } from "./config";
 import { User } from "../types";
 
@@ -95,6 +96,22 @@ export async function updateUserProfile(userId: string, data: Partial<User>): Pr
   } catch (error: any) {
     console.error("Update profile error:", error);
     throw new Error(error.message || "Failed to update user profile.");
+  }
+}
+
+export async function deleteUserAccount(): Promise<void> {
+  try {
+    const currentUser = auth.currentUser;
+    if (!currentUser) throw new Error("No authenticated user found.");
+    
+    // First delete from firestore
+    await deleteDoc(doc(db, "users", currentUser.uid));
+    
+    // Then delete auth user
+    await firebaseDeleteUser(currentUser);
+  } catch (error: any) {
+    console.error("Delete account error:", error);
+    throw new Error(error.message || "Failed to delete account.");
   }
 }
 

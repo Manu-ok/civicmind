@@ -22,6 +22,21 @@ export function AgentMessage({ message }: AgentMessageProps) {
     toast.success("Copied to clipboard");
   };
 
+  const timerRef = React.useRef<NodeJS.Timeout>();
+
+  const handleTouchStart = () => {
+    timerRef.current = setTimeout(() => {
+      handleCopy();
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate(50); // haptic feedback
+      }
+    }, 500);
+  };
+
+  const handleTouchEnd = () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+  };
+
   // Basic Markdown Parser
   const parsedContent = useMemo(() => {
     if (!isAssistant) return message.content;
@@ -67,7 +82,7 @@ export function AgentMessage({ message }: AgentMessageProps) {
         )}
 
         {/* Bubble */}
-        <div className="flex flex-col relative">
+        <div className="flex flex-col relative" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} onTouchCancel={handleTouchEnd}>
           <div
             className={cn(
               "px-5 py-4 rounded-2xl",

@@ -16,6 +16,7 @@ export interface User {
   issuesVerified: number;
   createdAt: Timestamp | Date;
   role: "citizen" | "admin";
+  isPublicProfile?: boolean;
 }
 
 export interface IssueLocation {

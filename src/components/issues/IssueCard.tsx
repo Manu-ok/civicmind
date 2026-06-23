@@ -2,8 +2,8 @@
 
 import { Issue } from "@/lib/types";
 import { formatDistanceToNow } from "date-fns";
-import { motion } from "framer-motion";
-import { MapPin, ArrowUpCircle, CheckCircle2, Loader2, MapIcon } from "lucide-react";
+import { motion, useMotionValue, useTransform } from "framer-motion";
+import { MapPin, ArrowUpCircle, CheckCircle2, Loader2, MapIcon, ThumbsUp } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { SeverityBadge } from "./SeverityBadge";
 import { cn } from "@/lib/utils";
@@ -26,14 +26,44 @@ export function IssueCard({ issue, index = 0 }: { issue: Issue; index?: number }
     }
   };
 
+  const dragX = useMotionValue(0);
+  const bgOpacity = useTransform(dragX, [-100, 0], [1, 0]);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
-      onClick={() => router.push(`/issues/${issue.id}`)}
-      className="group relative flex flex-col bg-zinc-900 border border-white/10 rounded-2xl overflow-hidden cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/20 transition-all duration-300"
+      className="relative rounded-2xl overflow-hidden bg-zinc-800"
     >
+      {/* Swipe Actions Background */}
+      <motion.div 
+        className="absolute inset-y-0 right-0 w-[120px] bg-gradient-to-l from-blue-600/40 to-transparent flex items-center justify-end pr-4 gap-3"
+        style={{ opacity: bgOpacity }}
+      >
+        <button 
+          className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-lg"
+          onClick={(e) => { e.stopPropagation(); router.push(`/verify?id=${issue.id}`); }}
+        >
+          <CheckCircle2 className="w-5 h-5" />
+        </button>
+        <button 
+          className="w-10 h-10 rounded-full bg-indigo-500 text-white flex items-center justify-center shadow-lg"
+          onClick={(e) => { e.stopPropagation(); /* TODO: upvote logic */ }}
+        >
+          <ThumbsUp className="w-5 h-5" />
+        </button>
+      </motion.div>
+
+      {/* Draggable Card Content */}
+      <motion.div
+        drag="x"
+        dragConstraints={{ left: -120, right: 0 }}
+        dragElastic={0.1}
+        style={{ x: dragX }}
+        onClick={() => router.push(`/issues/${issue.id}`)}
+        className="group relative flex flex-col bg-zinc-900 border border-white/10 rounded-2xl overflow-hidden cursor-pointer active:cursor-grabbing transition-shadow hover:shadow-2xl hover:shadow-primary/20"
+      >
       {/* Thumbnail */}
       <div className="relative h-48 w-full bg-zinc-800 overflow-hidden">
         {issue.mediaUrls && issue.mediaUrls.length > 0 ? (
@@ -91,6 +121,7 @@ export function IssueCard({ issue, index = 0 }: { issue: Issue; index?: number }
           </div>
         </div>
       </div>
+      </motion.div>
     </motion.div>
   );
 }

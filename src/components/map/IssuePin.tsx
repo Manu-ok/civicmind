@@ -9,9 +9,10 @@ interface IssuePinProps {
   issue: Issue;
   onClick: () => void;
   isActive: boolean;
+  setMarkerRef?: (marker: google.maps.marker.AdvancedMarkerElement | null, key: string) => void;
 }
 
-export function IssuePin({ issue, onClick, isActive }: IssuePinProps) {
+export function IssuePin({ issue, onClick, isActive, setMarkerRef }: IssuePinProps) {
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case "critical": return "bg-red-500 shadow-red-500/50";
@@ -36,6 +37,7 @@ export function IssuePin({ issue, onClick, isActive }: IssuePinProps) {
 
   return (
     <AdvancedMarker
+      ref={(marker) => setMarkerRef?.(marker as any, issue.id)}
       position={{ lat: issue.location.lat, lng: issue.location.lng }}
       onClick={onClick}
       zIndex={isActive ? 50 : 0}

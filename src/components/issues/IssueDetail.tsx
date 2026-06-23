@@ -6,7 +6,7 @@ import { formatDistanceToNow } from "date-fns";
 import { 
   MapPin, Clock, Brain, CheckCircle2, ChevronLeft, ChevronRight, 
   ThumbsUp, User as UserIcon, ShieldCheck, AlertTriangle, Image as ImageIcon,
-  Building, Target, ShieldAlert, Activity
+  Building, Target, ShieldAlert, Activity, Navigation, X
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -35,6 +35,7 @@ export function IssueDetail({ issue }: { issue: Issue }) {
   const [newStatus, setNewStatus] = useState<string>(issue.status);
   const [adminNote, setAdminNote] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showStreetView, setShowStreetView] = useState(false);
 
   useEffect(() => {
     if (issue.reportedBy) {
@@ -312,8 +313,7 @@ export function IssueDetail({ issue }: { issue: Issue }) {
             <StatusTimeline issue={issue} />
           </Card>
           
-          <Card className="p-1 bg-zinc-900/50 border-white/5 overflow-hidden">
-             {/* Map view snippet (non-draggable by removing standard map controls if possible, or just rendering MiniMap) */}
+          <Card className="p-1 bg-zinc-900/50 border-white/5 overflow-hidden group relative">
              <div className="relative h-48 w-full pointer-events-none">
                 {issue.location.lat && issue.location.lng ? (
                   <MiniMap initialLocation={{ lat: issue.location.lat, lng: issue.location.lng, address: issue.location.address }} />
@@ -323,6 +323,18 @@ export function IssueDetail({ issue }: { issue: Issue }) {
                   </div>
                 )}
              </div>
+             
+             {issue.location.lat && issue.location.lng && (
+               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-auto">
+                 <Button 
+                   onClick={() => setShowStreetView(true)}
+                   className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/20 shadow-xl"
+                 >
+                   <Navigation className="w-4 h-4 mr-2" />
+                   Street View
+                 </Button>
+               </div>
+             )}
           </Card>
 
           <Card className="p-6 bg-zinc-900/50 border-white/5">
@@ -382,24 +394,17 @@ export function IssueDetail({ issue }: { issue: Issue }) {
       {/* Admin Update Status Modal */}
       <AnimatePresence>
         {isAdminModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md bg-zinc-900 border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
-            >
-              <div className="p-6 border-b border-white/10">
-                <h3 className="text-xl font-bold text-white">Update Issue Status</h3>
-                <p className="text-sm text-zinc-400 mt-1">Admin Action</p>
-              </div>
-              <div className="p-6 space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-zinc-300">New Status</label>
+          <div className="fixed inset-0 z-50 flex items-center justify-center pt-20 px-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsAdminModalOpen(false)} />
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative w-full max-w-lg bg-zinc-900 border border-white/10 p-6 rounded-2xl shadow-2xl">
+              <h2 className="text-xl font-bold text-white mb-4">Update Issue Status</h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-zinc-400 block mb-1">Status</label>
                   <select 
                     value={newStatus}
                     onChange={(e) => setNewStatus(e.target.value)}
-                    className="w-full p-3 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:border-blue-500 transition-colors"
+                    className="w-full bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
                   >
                     <option value="pending">Pending</option>
                     <option value="verified">Verified</option>
@@ -407,32 +412,51 @@ export function IssueDetail({ issue }: { issue: Issue }) {
                     <option value="resolved">Resolved</option>
                   </select>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-zinc-300">Admin Note (Optional)</label>
+                <div>
+                  <label className="text-sm font-medium text-zinc-400 block mb-1">Admin Note (Internal)</label>
                   <textarea 
                     value={adminNote}
                     onChange={(e) => setAdminNote(e.target.value)}
-                    placeholder="Provide an internal or public note regarding this status update..."
-                    className="w-full p-3 h-24 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:border-blue-500 transition-colors resize-none"
+                    className="w-full bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-blue-500 min-h-[100px]"
+                    placeholder="Add notes about this update..."
                   />
                 </div>
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button variant="ghost" onClick={() => setIsAdminModalOpen(false)}>Cancel</Button>
+                  <Button onClick={handleUpdateStatus} disabled={isUpdating} className="bg-blue-600 hover:bg-blue-700">
+                    {isUpdating ? "Updating..." : "Save Update"}
+                  </Button>
+                </div>
               </div>
-              <div className="p-6 border-t border-white/10 flex gap-3 justify-end bg-black/20">
-                <Button 
-                  onClick={() => setIsAdminModalOpen(false)}
-                  variant="ghost" 
-                  className="text-zinc-400 hover:text-white"
-                  disabled={isUpdating}
-                >
-                  Cancel
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showStreetView && issue.location.lat && issue.location.lng && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/80 backdrop-blur-md" onClick={() => setShowStreetView(false)} />
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative w-full max-w-5xl h-[80vh] bg-zinc-950 border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-zinc-900/50">
+                <div className="flex items-center gap-2">
+                  <Navigation className="w-5 h-5 text-blue-400" />
+                  <h3 className="font-bold text-white">Street View</h3>
+                  <span className="text-sm text-zinc-400 hidden sm:inline-block ml-2">- {issue.location.address}</span>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => setShowStreetView(false)} className="text-zinc-400 hover:text-white rounded-full">
+                  <X className="w-5 h-5" />
                 </Button>
-                <Button 
-                  onClick={handleUpdateStatus}
-                  className="bg-blue-600 hover:bg-blue-700"
-                  disabled={isUpdating}
-                >
-                  {isUpdating ? "Updating..." : "Save Changes"}
-                </Button>
+              </div>
+              <div className="flex-1 w-full bg-zinc-900">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  allowFullScreen
+                  src={`https://www.google.com/maps/embed/v1/streetview?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&location=${issue.location.lat},${issue.location.lng}&heading=210&pitch=10&fov=90`}
+                ></iframe>
               </div>
             </motion.div>
           </div>

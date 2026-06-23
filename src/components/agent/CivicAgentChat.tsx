@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { AgentMessage as AgentMessageType } from "@/lib/types";
 import { AgentMessage } from "./AgentMessage";
+import { AgentMessageSkeleton } from "@/components/shared/Skeletons";
 import { Button } from "@/components/ui/button";
 import { Send, Mic, Trash2, Brain, Loader2 } from "lucide-react";
 import { Timestamp } from "firebase/firestore";
@@ -187,18 +188,7 @@ export function CivicAgentChat({ chatId }: CivicAgentChatProps) {
             {/* Loading Indicator */}
             {isTyping && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start">
-                <div className="flex max-w-[85%] sm:max-w-[75%] gap-4 flex-row">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-0.5 shrink-0">
-                    <div className="w-full h-full rounded-full bg-zinc-950 flex items-center justify-center">
-                      <Brain className="w-5 h-5 text-blue-400" />
-                    </div>
-                  </div>
-                  <div className="px-5 py-4 rounded-2xl bg-zinc-900 border border-white/5 rounded-tl-sm flex items-center gap-1.5 h-12">
-                    <motion.div animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0 }} className="w-2 h-2 rounded-full bg-blue-500/50" />
-                    <motion.div animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.2 }} className="w-2 h-2 rounded-full bg-blue-500/50" />
-                    <motion.div animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.4 }} className="w-2 h-2 rounded-full bg-blue-500/50" />
-                  </div>
-                </div>
+                <AgentMessageSkeleton />
               </motion.div>
             )}
             <div ref={messagesEndRef} />

@@ -15,6 +15,7 @@ import toast from "react-hot-toast";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { DashboardStatSkeleton, ChartSkeleton } from "@/components/shared/Skeletons";
 import { getIssues } from "@/lib/firebase/firestore";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { cn } from "@/lib/utils";
@@ -180,13 +181,7 @@ export default function AnalyticsPage() {
     });
   };
 
-  if (loading) {
-    return (
-      <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-      </div>
-    );
-  }
+
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-zinc-950 p-4 md:p-8 space-y-8 overflow-y-auto custom-scrollbar">
@@ -208,31 +203,40 @@ export default function AnalyticsPage() {
 
       {/* SECTION 1: KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { title: "Total Issues", value: kpis.total, icon: AlertTriangle, color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20" },
-          { title: "Resolution Rate", value: `${kpis.resolutionRate}%`, icon: CheckCircle2, color: "text-green-400", bg: "bg-green-500/10", border: "border-green-500/20" },
-          { title: "Avg Resolution", value: `${kpis.avgTime} days`, icon: Clock, color: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/20" },
-          { title: "Active Citizens", value: kpis.activeCitizens, icon: TrendingUp, color: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/20" },
-        ].map((kpi, i) => (
-          <motion.div 
-            key={i}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-          >
-            <Card className={cn("p-6 backdrop-blur-xl border-white/5", kpi.bg, kpi.border)}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-zinc-400 mb-1">{kpi.title}</p>
-                  <h3 className="text-3xl font-bold text-white">{kpi.value}</h3>
+        {loading ? (
+          <>
+            <DashboardStatSkeleton />
+            <DashboardStatSkeleton />
+            <DashboardStatSkeleton />
+            <DashboardStatSkeleton />
+          </>
+        ) : (
+          [
+            { title: "Total Issues", value: kpis.total, icon: AlertTriangle, color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20" },
+            { title: "Resolution Rate", value: `${kpis.resolutionRate}%`, icon: CheckCircle2, color: "text-green-400", bg: "bg-green-500/10", border: "border-green-500/20" },
+            { title: "Avg Resolution", value: `${kpis.avgTime} days`, icon: Clock, color: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/20" },
+            { title: "Active Citizens", value: kpis.activeCitizens, icon: TrendingUp, color: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/20" },
+          ].map((kpi, i) => (
+            <motion.div 
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+            >
+              <Card className={cn("p-6 backdrop-blur-xl border-white/5", kpi.bg, kpi.border)}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-zinc-400 mb-1">{kpi.title}</p>
+                    <h3 className="text-3xl font-bold text-white">{kpi.value}</h3>
+                  </div>
+                  <div className={cn("p-3 rounded-full bg-black/20", kpi.color)}>
+                    <kpi.icon className="w-6 h-6" />
+                  </div>
                 </div>
-                <div className={cn("p-3 rounded-full bg-black/20", kpi.color)}>
-                  <kpi.icon className="w-6 h-6" />
-                </div>
-              </div>
-            </Card>
-          </motion.div>
-        ))}
+              </Card>
+            </motion.div>
+          ))
+        )}
       </div>
 
       {/* SECTION 2: CHARTS ROW */}
@@ -241,65 +245,73 @@ export default function AnalyticsPage() {
         {/* Line Chart */}
         <Card className="p-6 bg-zinc-900/50 border-white/5 lg:col-span-2">
           <h3 className="text-lg font-bold text-white mb-6">Issues Over Time (Last 30 Days)</h3>
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={timelineData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorReported" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                  </linearGradient>
-                  <linearGradient id="colorResolved" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
-                <XAxis dataKey="name" stroke="#ffffff50" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="#ffffff50" fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#09090b', border: '1px solid #ffffff20', borderRadius: '8px' }}
-                  itemStyle={{ color: '#fff' }}
-                />
-                <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                <Area type="monotone" dataKey="Reported" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorReported)" />
-                <Area type="monotone" dataKey="Resolved" stroke="#22c55e" strokeWidth={3} fillOpacity={1} fill="url(#colorResolved)" />
-                <Area type="monotone" dataKey="InProgress" name="In Progress" stroke="#f59e0b" strokeWidth={2} fill="none" strokeDasharray="5 5" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
+          {loading ? (
+            <ChartSkeleton />
+          ) : (
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={timelineData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorReported" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorResolved" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
+                  <XAxis dataKey="date" stroke="#666" tick={{ fill: '#888' }} tickLine={false} />
+                  <YAxis stroke="#666" tick={{ fill: '#888' }} tickLine={false} axisLine={false} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#18181b', borderColor: '#333', borderRadius: '8px', color: '#fff' }}
+                    itemStyle={{ color: '#fff' }}
+                  />
+                  <Legend verticalAlign="top" height={36} />
+                  <Area type="monotone" dataKey="reported" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorReported)" name="Reported" />
+                  <Area type="monotone" dataKey="resolved" stroke="#22c55e" strokeWidth={3} fillOpacity={1} fill="url(#colorResolved)" name="Resolved" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </Card>
 
-        {/* Donut Chart */}
+        {/* Category Pie Chart */}
         <Card className="p-6 bg-zinc-900/50 border-white/5">
-          <h3 className="text-lg font-bold text-white mb-6">Category Distribution</h3>
-          <div className="h-[300px] w-full relative flex items-center justify-center">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={categoryData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={80}
-                  outerRadius={110}
-                  paddingAngle={5}
-                  dataKey="value"
-                  stroke="none"
-                >
-                  {categoryData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[entry.name] || COLORS.other} />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#09090b', border: '1px solid #ffffff20', borderRadius: '8px', textTransform: 'capitalize' }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-3xl font-bold text-white">{kpis.total}</span>
-              <span className="text-xs text-zinc-500 uppercase tracking-widest">Total</span>
+          <h3 className="text-lg font-bold text-white mb-6">Distribution by Category</h3>
+          {loading ? (
+            <ChartSkeleton />
+          ) : (
+            <div className="h-[300px] w-full flex items-center justify-center">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={categoryData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={70}
+                    outerRadius={100}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {categoryData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[entry.name as keyof typeof COLORS] || COLORS.other} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#18181b', borderColor: '#333', borderRadius: '8px' }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+              
+              {/* Custom Legend for Pie */}
+              <div className="absolute inset-0 pointer-events-none flex items-center justify-center flex-col">
+                <span className="text-3xl font-bold text-white">{kpis.total}</span>
+                <span className="text-xs text-zinc-500 uppercase tracking-wider">Total</span>
+              </div>
             </div>
-          </div>
+          )}
         </Card>
       </div>
 

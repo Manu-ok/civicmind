@@ -7,7 +7,10 @@ import { useAuthStore } from "@/lib/stores/authStore";
 import { useUIStore } from "@/lib/stores/uiStore";
 import Sidebar from "@/components/layout/Sidebar";
 import Navbar from "@/components/layout/Navbar";
+import { MobileNav } from "@/components/layout/MobileNav";
 import PageWrapper from "@/components/layout/PageWrapper";
+
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuthStore();
@@ -42,9 +45,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       >
         <Navbar />
 
+        {/* ── Demo Banner ────────────────────────────────────── */}
+        <div className="w-full bg-indigo-600/20 border-b border-indigo-500/30 px-4 py-1.5 flex items-center justify-center backdrop-blur-md sticky top-[64px] z-40 hidden md:flex">
+          <p className="text-xs font-bold text-indigo-300 tracking-wider uppercase flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
+            🎮 Demo Mode — AI features are live
+          </p>
+        </div>
+        <div className="w-full bg-indigo-600/20 border-b border-indigo-500/30 px-4 py-1.5 flex items-center justify-center backdrop-blur-md sticky top-[60px] z-40 md:hidden">
+          <p className="text-[10px] font-bold text-indigo-300 tracking-wider uppercase flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+            Demo Mode — AI features live
+          </p>
+        </div>
+
         <main className="flex-1 pb-20 md:pb-0">
-          <PageWrapper>{children}</PageWrapper>
+          <ErrorBoundary>
+            <PageWrapper>{children}</PageWrapper>
+          </ErrorBoundary>
         </main>
+        
+        <MobileNav />
       </motion.div>
     </div>
   );

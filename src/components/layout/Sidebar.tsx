@@ -19,9 +19,12 @@ import {
   Sun,
   Moon,
   Shield,
+  User,
+  Settings,
 } from "lucide-react";
 import { useUIStore } from "@/lib/stores/uiStore";
 import { useAuthStore } from "@/lib/stores/authStore";
+import { UserAvatar } from "@/components/shared/UserAvatar";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
@@ -34,10 +37,9 @@ const navItems = [
   { label: "Verify", href: "/verify", icon: CheckCircle, badge: 3 },
   { label: "Analytics", href: "/analytics", icon: BarChart2 },
   { label: "Civic Agent", href: "/agent", icon: Bot },
+  { label: "Profile", href: "/profile", icon: User },
+  { label: "Settings", href: "/settings", icon: Settings },
 ];
-
-// ── mobile bottom nav items (5 key) ────────────────────────────────
-const mobileNavItems = navItems.filter((_, i) => [0, 1, 2, 3, 6].includes(i));
 
 // ── sidebar ─────────────────────────────────────────────────────────
 export default function Sidebar() {
@@ -49,10 +51,27 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* ── DESKTOP SIDEBAR ──────────────────────────────────── */}
+      {/* Mobile Backdrop */}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={toggleSidebar}
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* ── SIDEBAR ──────────────────────────────────── */}
       <motion.aside
-        className="fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-white/[0.06] bg-zinc-950/80 backdrop-blur-2xl md:flex"
-        animate={{ width: sidebarOpen ? 256 : 72 }}
+        className="fixed inset-y-0 left-0 z-50 flex flex-col border-r border-white/[0.06] bg-zinc-950/95 backdrop-blur-2xl md:bg-zinc-950/80"
+        initial={false}
+        animate={{ 
+          width: typeof window !== "undefined" && window.innerWidth < 768 ? 256 : (sidebarOpen ? 256 : 72),
+          x: typeof window !== "undefined" && window.innerWidth < 768 ? (sidebarOpen ? 0 : "-100%") : 0
+        }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
         {/* ── logo ─────────────────────────────────────────── */}
@@ -98,15 +117,7 @@ export default function Sidebar() {
         <div className="border-t border-white/[0.06] p-3 space-y-2">
           {/* User row */}
           <div className={cn("flex items-center gap-3 rounded-xl p-2", sidebarOpen ? "" : "justify-center")}>
-            <div className="relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-blue-500 to-violet-600">
-              {user?.photoURL ? (
-                <img src={user.photoURL} alt={user.displayName} className="h-full w-full object-cover" />
-              ) : (
-                <span className="flex h-full w-full items-center justify-center text-xs font-bold text-white">
-                  {user?.displayName?.charAt(0)?.toUpperCase() || "U"}
-                </span>
-              )}
-            </div>
+            <UserAvatar user={user as any} className="h-8 w-8 text-xs" />
             <AnimatePresence>
               {sidebarOpen && (
                 <motion.div
@@ -159,40 +170,6 @@ export default function Sidebar() {
           </motion.button>
         </div>
       </motion.aside>
-
-      {/* ── MOBILE BOTTOM NAV ──────────────────────────────────── */}
-      <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-white/[0.06] bg-zinc-950/90 backdrop-blur-2xl md:hidden">
-        <div className="flex items-center justify-around px-2 py-1.5">
-          {mobileNavItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="group relative flex flex-col items-center gap-0.5 px-3 py-1.5"
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="mobile-active"
-                    className="absolute inset-0 rounded-xl bg-gradient-to-b from-blue-500/15 to-violet-500/10"
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                  />
-                )}
-                <item.icon
-                  className={cn("relative z-10 h-5 w-5 transition-colors", isActive ? "text-blue-400" : "text-zinc-500 group-hover:text-zinc-300")}
-                />
-                <span
-                  className={cn("relative z-10 text-[10px] font-medium transition-colors", isActive ? "text-blue-400" : "text-zinc-500 group-hover:text-zinc-300")}
-                >
-                  {item.label.split(" ")[0]}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-        {/* Safe area for devices with gesture bars */}
-        <div className="h-[env(safe-area-inset-bottom)]" />
-      </nav>
     </>
   );
 }
@@ -208,6 +185,9 @@ function NavItem({
   collapsed: boolean;
 }) {
   const Icon = item.icon;
+  // On mobile, force uncollapsed text
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  const showText = !collapsed || isMobile;
 
   return (
     <Link href={item.href} className="group relative block">
@@ -217,7 +197,7 @@ function NavItem({
           isActive
             ? "text-white"
             : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200",
-          collapsed ? "justify-center" : ""
+          !showText ? "justify-center" : ""
         )}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
@@ -250,41 +230,32 @@ function NavItem({
           )}
         </div>
 
-        <AnimatePresence>
-          {!collapsed && (
-            <motion.span
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -8 }}
-              transition={{ duration: 0.15 }}
-              className="relative z-10 text-sm font-medium"
-            >
-              {item.label}
-            </motion.span>
-          )}
-        </AnimatePresence>
-
-        {/* Badge */}
-        {item.badge && (
           <AnimatePresence>
-            {!collapsed ? (
+            {showText && (
               <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                exit={{ scale: 0 }}
-                className="relative z-10 ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-500/20 px-1.5 text-[10px] font-bold text-blue-400"
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: "auto" }}
+                exit={{ opacity: 0, width: 0 }}
+                transition={{ duration: 0.2 }}
+                className="whitespace-nowrap text-[13px] font-medium tracking-wide"
               >
-                {item.badge}
+                {item.label}
               </motion.span>
-            ) : (
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-blue-400 shadow-[0_0_6px_rgba(59,130,246,0.6)]"
-              />
             )}
           </AnimatePresence>
-        )}
+
+          <AnimatePresence>
+            {item.badge && showText && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0 }}
+                className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-blue-500/20 text-[10px] font-bold text-blue-400"
+              >
+                {item.badge}
+              </motion.div>
+            )}
+          </AnimatePresence>
       </motion.div>
 
       {/* Collapsed tooltip */}

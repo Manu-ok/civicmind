@@ -7,11 +7,131 @@ import { useGeolocation } from "@/lib/hooks/useGeolocation";
 import { useIssues } from "@/lib/hooks/useIssues";
 import { IssuePin } from "./IssuePin";
 import { Issue } from "@/lib/types";
-import { X, Target, Layers, ArrowRight, CheckCircle2, Flame, Map as MapIcon, Loader2 } from "lucide-react";
+import { MapIcon, Loader2, Layers, Flame } from "lucide-react";
 import { Button } from "../ui/button";
+import { MobileMapPanel } from "./MobileMapPanel";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
+import { MarkerClusterer, DefaultRenderer } from "@googlemaps/markerclusterer";
 import { useRouter } from "next/navigation";
+
+// Custom cluster renderer
+const clusterRenderer = {
+  render: ({ count, position }: any, stats: any) => {
+    // Create a generic styled marker for clusters
+    const svg = window.btoa(`
+      <svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+        <circle cx="120" cy="120" opacity=".6" r="120" fill="#3b82f6" />
+        <circle cx="120" cy="120" opacity=".8" r="90" fill="#3b82f6" />
+        <circle cx="120" cy="120" r="60" fill="#2563eb" />
+      </svg>`);
+
+    const title = `Cluster of ${count} markers`;
+    const zIndex = Number(google.maps.Marker.MAX_ZINDEX) + count;
+
+    // We can use standard DOM-based AdvancedMarkerElement or just return standard Marker
+    if (google.maps.marker?.AdvancedMarkerElement) {
+      const pinElement = new google.maps.marker.PinElement({
+        background: '#3b82f6',
+        borderColor: '#1e40af',
+        glyphColor: 'white',
+        glyph: String(count),
+        scale: 1.2
+      });
+
+      return new google.maps.marker.AdvancedMarkerElement({
+        position,
+        zIndex,
+        title,
+        content: pinElement.element,
+      });
+    }
+
+    return new google.maps.Marker({
+      position,
+      zIndex,
+      title,
+      icon: {
+        url: `data:image/svg+xml;base64,${svg}`,
+        scaledSize: new google.maps.Size(45, 45),
+      },
+      label: {
+        text: String(count),
+        color: "rgba(255,255,255,0.9)",
+        fontSize: "14px",
+        fontWeight: "bold"
+      },
+    });
+  }
+};
+
+function ClusteredMarkers({ 
+  issues, 
+  selectedIssue, 
+  setSelectedIssue,
+  showHeatmap 
+}: { 
+  issues: Issue[], 
+  selectedIssue: Issue | null, 
+  setSelectedIssue: (issue: Issue | null) => void,
+  showHeatmap: boolean
+}) {
+  const map = useMap();
+  const [markers, setMarkers] = useState<{[key: string]: google.maps.marker.AdvancedMarkerElement}>({});
+  const clusterer = useRef<MarkerClusterer | null>(null);
+
+  useEffect(() => {
+    if (!map) return;
+    if (!clusterer.current) {
+      clusterer.current = new MarkerClusterer({ map, renderer: clusterRenderer });
+      
+      google.maps.event.addListener(clusterer.current, 'click', (cluster: any) => {
+        const bounds = new google.maps.LatLngBounds();
+        cluster.markers.forEach((m: any) => {
+          if (m.position) bounds.extend(m.position);
+        });
+        map.fitBounds(bounds, { padding: 50 });
+      });
+    }
+  }, [map]);
+
+  useEffect(() => {
+    if (clusterer.current) {
+      clusterer.current.clearMarkers();
+      if (!showHeatmap) {
+        clusterer.current.addMarkers(Object.values(markers));
+      }
+    }
+  }, [markers, showHeatmap]);
+
+  const setMarkerRef = (marker: google.maps.marker.AdvancedMarkerElement | null, key: string) => {
+    if (marker && markers[key]) return;
+    if (!marker && !markers[key]) return;
+    setMarkers(prev => {
+      if (marker) {
+        return {...prev, [key]: marker};
+      } else {
+        const newMarkers = {...prev};
+        delete newMarkers[key];
+        return newMarkers;
+      }
+    });
+  };
+
+  return (
+    <>
+      {issues.map(issue => (
+        <IssuePin
+          key={issue.id}
+          issue={issue}
+          isActive={selectedIssue?.id === issue.id}
+          onClick={() => setSelectedIssue(issue)}
+          setMarkerRef={setMarkerRef}
+        />
+      ))}
+    </>
+  );
+}
 
 function HeatmapComponent({ data, visible }: { data: google.maps.LatLngLiteral[]; visible: boolean }) {
   const map = useMap();
@@ -117,15 +237,13 @@ export function CivicMap() {
             />
           )}
 
-          {/* Issues Pins */}
-          {!showHeatmap && issues.map((issue) => (
-            <IssuePin
-              key={issue.id}
-              issue={issue}
-              isActive={selectedIssue?.id === issue.id}
-              onClick={() => setSelectedIssue(issue)}
-            />
-          ))}
+          {/* Clustered Issues Pins */}
+          <ClusteredMarkers 
+            issues={issues} 
+            selectedIssue={selectedIssue} 
+            setSelectedIssue={setSelectedIssue} 
+            showHeatmap={showHeatmap}
+          />
 
           {/* Heatmap Layer */}
           <HeatmapComponent data={heatmapData} visible={showHeatmap} />
@@ -156,75 +274,10 @@ export function CivicMap() {
       </APIProvider>
 
       {/* Slide-Up Issue Panel */}
-      <AnimatePresence>
-        {selectedIssue && (
-          <motion.div
-            initial={{ y: "100%", opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: "100%", opacity: 0 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="absolute bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-[400px] z-50"
-          >
-            <div className="bg-zinc-900/95 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-2xl overflow-hidden flex flex-col gap-4">
-              <button 
-                onClick={() => setSelectedIssue(null)}
-                className="absolute top-3 right-3 p-1.5 rounded-full bg-black/20 hover:bg-black/40 text-zinc-400 transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-
-              <div className="flex gap-4">
-                {selectedIssue.mediaUrls?.[0] ? (
-                  <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0">
-                    <img src={selectedIssue.mediaUrls[0]} alt="Issue" className="w-full h-full object-cover" />
-                  </div>
-                ) : (
-                  <div className="w-20 h-20 rounded-xl bg-zinc-800 flex items-center justify-center shrink-0">
-                    <MapIcon className="w-8 h-8 text-zinc-600" />
-                  </div>
-                )}
-                
-                <div className="flex flex-col flex-1 min-w-0 pt-1">
-                  <h3 className="font-semibold text-lg leading-tight truncate text-white">{selectedIssue.title}</h3>
-                  <p className="text-sm text-zinc-400 truncate mt-1">{selectedIssue.location.address}</p>
-                  <div className="flex items-center gap-2 mt-auto pt-2">
-                    <span className={cn(
-                      "text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full",
-                      selectedIssue.severity === "critical" ? "bg-red-500/20 text-red-400" :
-                      selectedIssue.severity === "high" ? "bg-orange-500/20 text-orange-400" :
-                      selectedIssue.severity === "medium" ? "bg-yellow-500/20 text-yellow-400" :
-                      "bg-green-500/20 text-green-400"
-                    )}>
-                      {selectedIssue.severity}
-                    </span>
-                    <span className="text-[10px] text-zinc-500 uppercase font-medium">
-                      {formatDistanceToNow(selectedIssue.reportedAt as Date, { addSuffix: true })}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex gap-2 mt-1">
-                <Button 
-                  className="flex-1 bg-white text-black hover:bg-zinc-200" 
-                  onClick={() => router.push(`/issues/${selectedIssue.id}`)}
-                >
-                  View Details
-                </Button>
-                {selectedIssue.status === "pending" && (
-                  <Button 
-                    variant="default"
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white" 
-                    onClick={() => router.push(`/verify?id=${selectedIssue.id}`)}
-                  >
-                    <CheckCircle2 className="w-4 h-4 mr-2" /> Verify
-                  </Button>
-                )}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <MobileMapPanel 
+        issue={selectedIssue} 
+        onClose={() => setSelectedIssue(null)} 
+      />
     </div>
   );
 }

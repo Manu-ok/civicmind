@@ -5,9 +5,13 @@ import { IssueCard } from "@/components/issues/IssueCard";
 import { getIssues } from "@/lib/firebase/firestore";
 import { Issue } from "@/lib/types";
 import { Input } from "@/components/ui/input";
+import { IssueCardSkeleton } from "@/components/shared/Skeletons";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Search, Filter, Loader2, AlertCircle } from "lucide-react";
+import { MobileFilters } from "@/components/shared/MobileFilters";
+import { Search, Filter, Loader2, AlertCircle, MapPin, User, CheckCircle2, ShieldAlert } from "lucide-react";
+import { motion } from "framer-motion";
+import { useAuthStore } from "@/lib/stores/authStore";
 import { cn } from "@/lib/utils";
 
 const CATEGORIES = ["All", "road", "water", "electricity", "waste", "safety", "other"];
@@ -15,9 +19,12 @@ const SEVERITIES = ["All", "critical", "high", "medium", "low"];
 const STATUSES = ["All", "pending", "verified", "in_progress", "resolved"];
 
 export default function IssuesPage() {
+  const { user } = useAuthStore();
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  
+  const [quickFilter, setQuickFilter] = useState("All");
   
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [severityFilter, setSeverityFilter] = useState("All");
@@ -48,7 +55,14 @@ export default function IssuesPage() {
       const matchSeverity = severityFilter === "All" || issue.severity === severityFilter;
       const matchStatus = statusFilter === "All" || issue.status === statusFilter;
       
-      return matchSearch && matchCategory && matchSeverity && matchStatus;
+      let matchQuick = true;
+      if (quickFilter === "Critical") matchQuick = issue.severity === "critical";
+      if (quickFilter === "Verified") matchQuick = issue.status === "verified";
+      if (quickFilter === "Near Me") matchQuick = issue.city === user?.city;
+      if (quickFilter === "My Reports") matchQuick = issue.reportedBy === user?.uid;
+      if (quickFilter === "Resolved") matchQuick = issue.status === "resolved";
+
+      return matchSearch && matchCategory && matchSeverity && matchStatus && matchQuick;
     });
 
     result.sort((a, b) => {
@@ -98,11 +112,45 @@ export default function IssuesPage() {
         </div>
       </div>
 
+      {/* QUICK FILTER CHIPS */}
+      <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-2 mb-6">
+        {[
+          { id: "All", label: "All Issues", color: "bg-zinc-800 text-zinc-300" },
+          { id: "Critical", label: "Critical", icon: ShieldAlert, color: "bg-red-500/10 text-red-500 hover:bg-red-500/20" },
+          { id: "Verified", label: "Verified", icon: CheckCircle2, color: "bg-blue-500/10 text-blue-500 hover:bg-blue-500/20" },
+          { id: "Near Me", label: "Near Me", icon: MapPin, color: "bg-purple-500/10 text-purple-500 hover:bg-purple-500/20" },
+          { id: "My Reports", label: "My Reports", icon: User, color: "bg-orange-500/10 text-orange-500 hover:bg-orange-500/20" },
+          { id: "Resolved", label: "Resolved", icon: CheckCircle2, color: "bg-green-500/10 text-green-500 hover:bg-green-500/20" }
+        ].map((chip) => {
+          const isSelected = quickFilter === chip.id;
+          return (
+            <button
+              key={chip.id}
+              onClick={() => setQuickFilter(chip.id)}
+              className={cn(
+                "relative flex items-center shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300",
+                isSelected ? chip.color.split(' ')[0].replace('/10', '/20') + " " + chip.color.split(' ')[1] + " shadow-lg" : "bg-zinc-900 text-zinc-400 hover:bg-zinc-800"
+              )}
+            >
+              {isSelected && (
+                <motion.div
+                  layoutId="activeChip"
+                  className="absolute inset-0 rounded-full border border-current opacity-30"
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+              )}
+              {chip.icon && <chip.icon className={cn("w-4 h-4 mr-2", isSelected ? "" : "opacity-50")} />}
+              {chip.label}
+            </button>
+          );
+        })}
+      </div>
+
       <div className="flex flex-col lg:flex-row gap-8 items-start">
         
-        {/* Sidebar Filters */}
+        {/* Desktop Sidebar Filters */}
         {showFilters && (
-          <Card className="w-full lg:w-64 shrink-0 p-5 bg-zinc-900/50 border-white/5 space-y-6 sticky top-6">
+          <Card className="hidden lg:block w-64 shrink-0 p-5 bg-zinc-900/50 border-white/5 space-y-6 sticky top-6">
             
             <div>
               <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest mb-3">Sort By</h3>
@@ -137,15 +185,17 @@ export default function IssuesPage() {
                     key={cat}
                     onClick={() => setCategoryFilter(cat)}
                     className={cn(
-                      "px-3 py-1 rounded-full text-xs font-medium capitalize border transition-all",
-                      categoryFilter === cat ? "bg-zinc-200 text-zinc-900 border-zinc-200" : "bg-zinc-900 border-white/10 text-zinc-400 hover:border-white/30"
+                      "px-3 py-1.5 rounded-full text-sm font-medium transition-colors border",
+                      categoryFilter === cat ? "bg-primary text-primary-foreground border-primary" : "bg-zinc-900 text-zinc-400 border-white/5 hover:bg-zinc-800"
                     )}
                   >
-                    {cat}
+                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
                   </button>
                 ))}
               </div>
             </div>
+
+            <div className="h-px bg-zinc-800" />
 
             <div>
               <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest mb-3">Severity</h3>
@@ -155,16 +205,18 @@ export default function IssuesPage() {
                     key={sev}
                     onClick={() => setSeverityFilter(sev)}
                     className={cn(
-                      "px-3 py-1 rounded-full text-xs font-medium capitalize border transition-all",
-                      severityFilter === sev ? "bg-zinc-200 text-zinc-900 border-zinc-200" : "bg-zinc-900 border-white/10 text-zinc-400 hover:border-white/30"
+                      "px-3 py-1.5 rounded-full text-sm font-medium transition-colors border",
+                      severityFilter === sev ? "bg-primary text-primary-foreground border-primary" : "bg-zinc-900 text-zinc-400 border-white/5 hover:bg-zinc-800"
                     )}
                   >
-                    {sev}
+                    {sev.charAt(0).toUpperCase() + sev.slice(1)}
                   </button>
                 ))}
               </div>
             </div>
-            
+
+            <div className="h-px bg-zinc-800" />
+
             <div>
               <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest mb-3">Status</h3>
               <div className="flex flex-wrap gap-2">
@@ -173,25 +225,39 @@ export default function IssuesPage() {
                     key={stat}
                     onClick={() => setStatusFilter(stat)}
                     className={cn(
-                      "px-3 py-1 rounded-full text-xs font-medium capitalize border transition-all",
-                      statusFilter === stat ? "bg-zinc-200 text-zinc-900 border-zinc-200" : "bg-zinc-900 border-white/10 text-zinc-400 hover:border-white/30"
+                      "px-3 py-1.5 rounded-full text-sm font-medium transition-colors border",
+                      statusFilter === stat ? "bg-primary text-primary-foreground border-primary" : "bg-zinc-900 text-zinc-400 border-white/5 hover:bg-zinc-800"
                     )}
                   >
-                    {stat.replace("_", " ")}
+                    {stat.replace("_", " ").charAt(0).toUpperCase() + stat.slice(1).replace("_", " ")}
                   </button>
                 ))}
               </div>
             </div>
-
+            
           </Card>
         )}
+
+        <MobileFilters 
+          isOpen={showFilters} 
+          onClose={() => setShowFilters(false)} 
+          sortBy={sortBy} setSortBy={setSortBy}
+          categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter}
+          severityFilter={severityFilter} setSeverityFilter={setSeverityFilter}
+          statusFilter={statusFilter} setStatusFilter={setStatusFilter}
+          CATEGORIES={CATEGORIES} SEVERITIES={SEVERITIES} STATUSES={STATUSES}
+        />
 
         {/* Feed Grid */}
         <div className="flex-1 w-full">
           {loading ? (
-            <div className="h-64 flex flex-col items-center justify-center">
-              <Loader2 className="w-8 h-8 text-primary animate-spin mb-4" />
-              <p className="text-zinc-400">Loading issues...</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <IssueCardSkeleton />
+              <IssueCardSkeleton />
+              <IssueCardSkeleton />
+              <IssueCardSkeleton />
+              <IssueCardSkeleton />
+              <IssueCardSkeleton />
             </div>
           ) : filteredAndSortedIssues.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">

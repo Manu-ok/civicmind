@@ -9,7 +9,10 @@ import {
   signInWithEmail as firebaseEmailSignIn,
   signUpWithEmail as firebaseEmailSignUp,
   signOut as firebaseSignOut,
+  deleteUserAccount as firebaseDeleteUserAccount,
+  updateUserProfile,
 } from "@/lib/firebase/auth";
+import { User } from "@/lib/types";
 
 export function useAuth() {
   const { user, loading, error, setLoading, setError } = useAuthStore();
@@ -83,6 +86,35 @@ export function useAuth() {
     }
   }, [router, setLoading]);
 
+  const handleDeleteAccount = useCallback(async () => {
+    try {
+      setLoading(true);
+      await firebaseDeleteUserAccount();
+      toast.success("Account deleted successfully.");
+      router.push("/login");
+    } catch (err: any) {
+      const message = err.message || "Failed to delete account.";
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  }, [router, setLoading]);
+
+  const handleUpdateProfile = useCallback(async (data: Partial<User>) => {
+    try {
+      if (!user) throw new Error("No user logged in.");
+      setLoading(true);
+      await updateUserProfile(user.id, data);
+      useAuthStore.getState().setUser({ ...user, ...data });
+      toast.success("Profile updated successfully.");
+    } catch (err: any) {
+      const message = err.message || "Failed to update profile.";
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  }, [user, setLoading]);
+
   return {
     user,
     loading,
@@ -91,5 +123,7 @@ export function useAuth() {
     signInWithEmail: handleSignInWithEmail,
     signUpWithEmail: handleSignUpWithEmail,
     signOut: handleSignOut,
+    deleteAccount: handleDeleteAccount,
+    updateProfile: handleUpdateProfile,
   };
 }

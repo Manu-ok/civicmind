@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -18,11 +18,28 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
+export const viewport: Viewport = {
+  themeColor: "#09090b",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export const metadata: Metadata = {
   title: "CivicMind AI — AI-Powered Community Resolution",
   description:
     "Report, track, and resolve community issues with the power of AI. Join 10,000+ citizens making their communities better.",
   keywords: ["civic", "community", "AI", "issue reporting", "smart city", "resolution"],
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "CivicMind AI",
+  },
+  icons: {
+    apple: "/icon-192x192.png",
+  },
   openGraph: {
     title: "CivicMind AI",
     description: "AI-Powered Community Resolution Platform",

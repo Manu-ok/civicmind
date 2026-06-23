@@ -13,6 +13,7 @@ import {
 import { useUIStore } from "@/lib/stores/uiStore";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { NotificationCenter } from "../shared/NotificationCenter";
+import { GlobalSearch } from "../shared/GlobalSearch";
 import { useAuth } from "@/lib/hooks/useAuth";
 
 // ── route → title mapping ───────────────────────────────────────────
@@ -244,68 +245,7 @@ export default function Navbar() {
       </header>
 
       {/* ── COMMAND PALETTE / SEARCH OVERLAY ────────────────── */}
-      <AnimatePresence>
-        {searchOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
-              onClick={() => setSearchOpen(false)}
-            />
-
-            {/* Search modal */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96, y: -20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, y: -20 }}
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              className="fixed left-1/2 top-[20%] z-50 w-full max-w-lg -translate-x-1/2 overflow-hidden rounded-2xl border border-white/[0.08] bg-zinc-900/95 shadow-2xl shadow-black/50 backdrop-blur-xl"
-            >
-              {/* Search input */}
-              <div className="flex items-center gap-3 border-b border-white/[0.06] px-4">
-                <Search className="h-5 w-5 text-zinc-500" />
-                <input
-                  ref={searchRef}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search issues, locations, citizens..."
-                  className="h-14 w-full bg-transparent text-sm text-white placeholder:text-zinc-500 focus:outline-none"
-                />
-                <button
-                  onClick={() => setSearchOpen(false)}
-                  className="flex h-6 items-center rounded border border-white/[0.1] bg-white/[0.04] px-1.5 text-[10px] text-zinc-500"
-                >
-                  ESC
-                </button>
-              </div>
-
-              {/* Quick actions */}
-              <div className="px-2 py-2">
-                <p className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-                  Quick Actions
-                </p>
-                {[
-                  { label: "Report a new issue", hint: "Create" },
-                  { label: "View nearby issues on map", hint: "Navigate" },
-                  { label: "Talk to Civic Agent", hint: "AI" },
-                  { label: "View analytics dashboard", hint: "Data" },
-                ].map((item, i) => (
-                  <button
-                    key={i}
-                    className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm text-zinc-300 transition-colors hover:bg-white/[0.04]"
-                  >
-                    <span>{item.label}</span>
-                    <span className="rounded bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-zinc-500">{item.hint}</span>
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      <GlobalSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
 }
