@@ -5,16 +5,25 @@ import "regenerator-runtime/runtime";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 
 export function useVoice() {
-  const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
+  const { 
+    transcript, 
+    interimTranscript,
+    listening, 
+    resetTranscript, 
+    browserSupportsSpeechRecognition 
+  } = useSpeechRecognition();
+  
   const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const startListening = () => {
     if (!browserSupportsSpeechRecognition) {
-      console.error("Browser doesn't support speech recognition.");
+      setError("Browser doesn't support speech recognition. Please use Google Chrome.");
       return;
     }
+    setError(null);
     resetTranscript();
-    SpeechRecognition.startListening({ continuous: true });
+    SpeechRecognition.startListening({ continuous: true, language: 'en-IN' });
 
     // Auto stop after 30 seconds
     const newTimer = setTimeout(() => {
@@ -38,10 +47,12 @@ export function useVoice() {
 
   return {
     transcript,
+    interimTranscript,
     listening,
     startListening,
     stopListening,
     resetTranscript,
+    error,
     isSupported: browserSupportsSpeechRecognition,
   };
 }

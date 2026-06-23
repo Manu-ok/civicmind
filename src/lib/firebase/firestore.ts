@@ -52,19 +52,20 @@ export async function deleteIssue(issueId: string): Promise<void> {
 
 export async function getIssues(filters?: { category?: string, severity?: string, status?: string, ward?: string, city?: string }): Promise<Issue[]> {
   try {
-    let q = query(collection(db, "issues"));
+    const q = query(collection(db, "issues"), orderBy("reportedAt", "desc"));
+    const querySnapshot = await getDocs(q);
+    
+    let issues = querySnapshot.docs.map(doc => doc.data() as Issue).filter(issue => !issue.deleted);
 
     if (filters) {
-      if (filters.category) q = query(q, where("category", "==", filters.category));
-      if (filters.severity) q = query(q, where("severity", "==", filters.severity));
-      if (filters.status) q = query(q, where("status", "==", filters.status));
-      if (filters.ward) q = query(q, where("location.ward", "==", filters.ward));
-      if (filters.city) q = query(q, where("location.city", "==", filters.city));
+      if (filters.category) issues = issues.filter(i => i.category === filters.category);
+      if (filters.severity) issues = issues.filter(i => i.severity === filters.severity);
+      if (filters.status) issues = issues.filter(i => i.status === filters.status);
+      if (filters.ward) issues = issues.filter(i => i.location?.ward === filters.ward);
+      if (filters.city) issues = issues.filter(i => i.location?.city === filters.city);
     }
 
-    q = query(q, orderBy("reportedAt", "desc"));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => doc.data() as Issue).filter(issue => !issue.deleted);
+    return issues;
   } catch (error: any) {
     console.error("Error fetching issues:", error);
     throw new Error(error.message || "Failed to fetch issues.");
@@ -238,5 +239,90 @@ export async function updateAnalytics(city: string, issueData: any): Promise<voi
   } catch (error: any) {
     console.error("Error updating analytics:", error);
     throw new Error(error.message || "Failed to update analytics.");
+  }
+}
+
+// ===================
+// GAMIFICATION & POINTS
+// ===================
+
+export const POINT_VALUES = {
+  REPORT_ISSUE: 15,
+  VERIFY_ISSUE: 10,
+  VOICE_REPORT: 20,
+  ISSUE_RESOLVED: 25,
+  FIRST_OF_DAY: 5,
+};
+
+export function getBadgeForPoints(points: number): { name: string; color: string; icon: string } {
+  if (points >= 1000) return { name: "Civic Hero", color: "from-yellow-400 to-amber-600", icon: "Trophy" };
+  if (points >= 600) return { name: "Civic Guardian", color: "from-purple-400 to-indigo-600", icon: "ShieldAlert" };
+  if (points >= 300) return { name: "Civic Champion", color: "from-blue-400 to-blue-600", icon: "Star" };
+  if (points >= 100) return { name: "Civic Citizen", color: "from-green-400 to-emerald-600", icon: "CheckCircle2" };
+  return { name: "Civic Rookie", color: "from-zinc-400 to-zinc-600", icon: "Leaf" };
+}
+
+export async function updatePoints(uid: string, actionType: keyof typeof POINT_VALUES, customPoints?: number): Promise<void> {
+  try {
+    const pointsToAdd = customPoints !== undefined ? customPoints : POINT_VALUES[actionType];
+    await updateDoc(doc(db, "users", uid), { 
+      points: increment(pointsToAdd) 
+    });
+    
+    // Auto-create a notification for the earned points
+    await createNotification(uid, {
+      title: `Earned ${pointsToAdd} points!`,
+      message: `You earned points for: ${actionType.replace('_', ' ').toLowerCase()}`,
+      type: 'points',
+      createdAt: Timestamp.now(),
+      read: false
+    });
+  } catch (error: any) {
+    console.error("Error updating points:", error);
+  }
+}
+
+// ===================
+// NOTIFICATIONS
+// ===================
+
+export interface AppNotification {
+  id?: string;
+  title: string;
+  message: string;
+  type: 'points' | 'status_change' | 'nearby_issue' | 'verified' | 'system';
+  issueId?: string;
+  createdAt: Timestamp;
+  read: boolean;
+}
+
+export async function createNotification(uid: string, notification: AppNotification): Promise<void> {
+  try {
+    const notificationsRef = collection(db, "users", uid, "notifications");
+    await setDoc(doc(notificationsRef), notification);
+  } catch (error: any) {
+    console.error("Error creating notification:", error);
+  }
+}
+
+export async function markNotificationRead(uid: string, notificationId: string): Promise<void> {
+  try {
+    await updateDoc(doc(db, "users", uid, "notifications", notificationId), { read: true });
+  } catch (error: any) {
+    console.error("Error marking notification read:", error);
+  }
+}
+
+export async function markAllNotificationsRead(uid: string): Promise<void> {
+  try {
+    const notificationsRef = collection(db, "users", uid, "notifications");
+    const q = query(notificationsRef, where("read", "==", false));
+    const snapshot = await getDocs(q);
+    
+    // Warning: batch updates are better for large datasets, using loop for simplicity
+    const promises = snapshot.docs.map(doc => updateDoc(doc.ref, { read: true }));
+    await Promise.all(promises);
+  } catch (error: any) {
+    console.error("Error marking all read:", error);
   }
 }

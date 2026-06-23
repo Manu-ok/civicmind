@@ -10,6 +10,7 @@ interface AuthState {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearAuth: () => void;
+  toggleAdminMode: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -20,6 +21,12 @@ export const useAuthStore = create<AuthState>()(
     setUser: (user) => set({ user }),
     setLoading: (loading) => set({ loading }),
     setError: (error) => set({ error }),
-    clearAuth: () => set({ user: null, error: null })
+    clearAuth: () => set({ user: null, error: null }),
+    toggleAdminMode: () => set((state) => ({
+      user: state.user ? {
+        ...state.user,
+        role: state.user.role === 'admin' ? 'citizen' : 'admin'
+      } : null
+    }))
   }))
 );

@@ -9,6 +9,8 @@ import { Issue, User } from "@/lib/types";
 import { AnimatedCounter } from "@/components/shared/AnimatedCounter";
 import { IssueCard } from "@/components/issues/IssueCard";
 import { MiniMap } from "@/components/map/MiniMap";
+import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
+import { Leaderboard } from "@/components/dashboard/Leaderboard";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -291,59 +293,15 @@ export default function DashboardPage() {
         </div>
       </motion.div>
 
-      {/* SECTION 6: Community Leaderboard */}
+      {/* SECTION 6: Real-time Command Center */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="space-y-6"
+        className="grid grid-cols-1 lg:grid-cols-2 gap-8"
       >
-        <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-          <ShieldCheck className="w-6 h-6 text-yellow-400" /> Community Leaderboard
-        </h2>
-        
-        <Card className="bg-zinc-900 border-white/5 overflow-hidden">
-          <div className="divide-y divide-white/5">
-            {topCitizens.length > 0 ? topCitizens.map((citizen, idx) => {
-              const isCurrentUser = citizen.id === user?.id;
-              const rank = getRankBadge(citizen.points);
-              return (
-                <div key={citizen.id} className={cn("p-4 flex items-center gap-4 transition-colors", isCurrentUser ? "bg-primary/5" : "hover:bg-zinc-800/50")}>
-                  <div className="w-8 text-center font-bold text-zinc-500">#{idx + 1}</div>
-                  <div className="w-10 h-10 rounded-full bg-zinc-800 overflow-hidden shrink-0 border border-white/10">
-                    {citizen.photoURL ? (
-                      <img src={citizen.photoURL} alt={citizen.displayName} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-primary font-bold">
-                        {citizen.displayName.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-bold text-white flex items-center gap-2">
-                      {citizen.displayName} 
-                      {isCurrentUser && <span className="text-[10px] bg-primary text-white px-2 py-0.5 rounded-full uppercase tracking-wider">You</span>}
-                    </p>
-                    <p className="text-xs text-zinc-400">{citizen.issuesReported} reported • {citizen.issuesVerified} verified</p>
-                  </div>
-                  <div className="hidden md:block">
-                    <span className={cn("px-3 py-1 rounded-full text-xs font-bold border", rank.color)}>
-                      {rank.name}
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-200 text-lg">
-                      {citizen.points}
-                    </p>
-                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">XP</p>
-                  </div>
-                </div>
-              );
-            }) : (
-              <div className="p-8 text-center text-zinc-400">Loading top citizens...</div>
-            )}
-          </div>
-        </Card>
+        <ActivityFeed />
+        <Leaderboard />
       </motion.div>
 
     </div>

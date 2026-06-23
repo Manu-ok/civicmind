@@ -64,6 +64,7 @@ export interface Issue {
   mediaUrls: string[];
   reportedBy: string;
   reportedAt: Timestamp | Date;
+  updatedAt?: Timestamp | Date;
   aiAnalysis?: AIAnalysis;
   resolutionPlan?: ResolutionPlan;
   verifications: Verification[];

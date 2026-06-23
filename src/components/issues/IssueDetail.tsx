@@ -20,6 +20,9 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Card } from "@/components/ui/card";
 import toast from "react-hot-toast";
+import { StatusTimeline } from "./StatusTimeline";
+import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase/config";
 
 export function IssueDetail({ issue }: { issue: Issue }) {
   const router = useRouter();
@@ -28,12 +31,33 @@ export function IssueDetail({ issue }: { issue: Issue }) {
   const [reporter, setReporter] = useState<User | null>(null);
   const [upvotes, setUpvotes] = useState(issue.upvotes);
   const [hasUpvoted, setHasUpvoted] = useState(false);
+  const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
+  const [newStatus, setNewStatus] = useState<string>(issue.status);
+  const [adminNote, setAdminNote] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     if (issue.reportedBy) {
       getUserProfile(issue.reportedBy).then(setReporter);
     }
   }, [issue.reportedBy]);
+
+  const handleUpdateStatus = async () => {
+    if (!user || user.role !== "admin") return;
+    setIsUpdating(true);
+    try {
+      await updateDoc(doc(db, "issues", issue.id), {
+        status: newStatus,
+        updatedAt: serverTimestamp(),
+      });
+      toast.success("Status updated successfully");
+      setIsAdminModalOpen(false);
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   const handleUpvote = async () => {
     if (!user) {
@@ -174,14 +198,21 @@ export function IssueDetail({ issue }: { issue: Issue }) {
               </div>
             </div>
 
-            <Button 
-              onClick={handleUpvote} 
-              variant={hasUpvoted ? "default" : "outline"}
-              className={cn("gap-2", hasUpvoted ? "bg-blue-600 hover:bg-blue-700" : "bg-zinc-900 border-white/10")}
-            >
-              <ThumbsUp className={cn("w-4 h-4", hasUpvoted ? "fill-white" : "")} />
-              <span className="font-bold">{upvotes}</span>
-            </Button>
+            <div className="flex gap-2 items-center">
+              {user?.role === "admin" && (
+                <Button onClick={() => setIsAdminModalOpen(true)} variant="outline" className="bg-zinc-900 text-blue-400 border-blue-500/20 hover:bg-blue-500/20">
+                  Update Status
+                </Button>
+              )}
+              <Button 
+                onClick={handleUpvote} 
+                variant={hasUpvoted ? "default" : "outline"}
+                className={cn("gap-2", hasUpvoted ? "bg-blue-600 hover:bg-blue-700" : "bg-zinc-900 border-white/10")}
+              >
+                <ThumbsUp className={cn("w-4 h-4", hasUpvoted ? "fill-white" : "")} />
+                <span className="font-bold">{upvotes}</span>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -275,6 +306,11 @@ export function IssueDetail({ issue }: { issue: Issue }) {
 
         {/* RIGHT COLUMN: Verifications & Map */}
         <div className="space-y-8">
+
+          <Card className="p-6 bg-zinc-900/50 border-white/5">
+            <h3 className="font-bold text-lg text-white mb-2">Status Tracking</h3>
+            <StatusTimeline issue={issue} />
+          </Card>
           
           <Card className="p-1 bg-zinc-900/50 border-white/5 overflow-hidden">
              {/* Map view snippet (non-draggable by removing standard map controls if possible, or just rendering MiniMap) */}
@@ -342,6 +378,66 @@ export function IssueDetail({ issue }: { issue: Issue }) {
 
         </div>
       </div>
+
+      {/* Admin Update Status Modal */}
+      <AnimatePresence>
+        {isAdminModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-md bg-zinc-900 border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
+            >
+              <div className="p-6 border-b border-white/10">
+                <h3 className="text-xl font-bold text-white">Update Issue Status</h3>
+                <p className="text-sm text-zinc-400 mt-1">Admin Action</p>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-zinc-300">New Status</label>
+                  <select 
+                    value={newStatus}
+                    onChange={(e) => setNewStatus(e.target.value)}
+                    className="w-full p-3 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:border-blue-500 transition-colors"
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="verified">Verified</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="resolved">Resolved</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-zinc-300">Admin Note (Optional)</label>
+                  <textarea 
+                    value={adminNote}
+                    onChange={(e) => setAdminNote(e.target.value)}
+                    placeholder="Provide an internal or public note regarding this status update..."
+                    className="w-full p-3 h-24 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:border-blue-500 transition-colors resize-none"
+                  />
+                </div>
+              </div>
+              <div className="p-6 border-t border-white/10 flex gap-3 justify-end bg-black/20">
+                <Button 
+                  onClick={() => setIsAdminModalOpen(false)}
+                  variant="ghost" 
+                  className="text-zinc-400 hover:text-white"
+                  disabled={isUpdating}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleUpdateStatus}
+                  className="bg-blue-600 hover:bg-blue-700"
+                  disabled={isUpdating}
+                >
+                  {isUpdating ? "Updating..." : "Save Changes"}
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

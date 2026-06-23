@@ -4,7 +4,7 @@ import { askCivicAgent } from "@/lib/gemini/civicAgent";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { message, conversationHistory, contextIssues, userLocation } = body;
+    const { message, conversationHistory, userLocation, enrichedContext } = body;
 
     if (!message) {
       return NextResponse.json(
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     const responseText = await askCivicAgent(
       message,
       conversationHistory || [],
-      contextIssues || [],
+      enrichedContext || {},
       userLocation || { city: "Unknown", ward: "Unknown" }
     );
 

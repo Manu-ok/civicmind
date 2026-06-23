@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { geminiFlash, formatGeminiError } from "@/lib/gemini/config";
+import { genAI, formatGeminiError } from "@/lib/gemini/config";
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,13 +13,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const model = geminiFlash;
-    const systemInstruction = 
-      "Extract structured issue information from a citizen's voice report. The user has described a community problem verbally. Extract and structure this into a civic issue report. Always respond in valid JSON format only.";
+    const systemInstruction = "You are a civic issue extraction system for Indian cities. Extract structured issue data from informal voice descriptions. Be smart about inferring severity and category from context clues. Respond only in valid JSON.";
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite", systemInstruction });
 
-    const userPrompt = `Voice Transcript: "${transcript}"
+    const userPrompt = `Extract civic issue information from this voice report: '${transcript}'
     
-Extract the issue and provide a comprehensive assessment in this EXACT JSON format:
+Return the EXACT following JSON structure only:
 {
   "title": "Concise issue title (max 10 words)",
   "description": "Detailed description of the issue based on the transcript",
@@ -37,7 +36,6 @@ Extract the issue and provide a comprehensive assessment in this EXACT JSON form
     
     const result = await model.generateContent({
       contents: [{ role: "user", parts: [{ text: userPrompt }] }],
-      systemInstruction,
       generationConfig: {
         responseMimeType: "application/json",
       },

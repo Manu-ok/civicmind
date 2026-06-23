@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useUIStore } from "@/lib/stores/uiStore";
 import { useAuthStore } from "@/lib/stores/authStore";
+import { NotificationCenter } from "../shared/NotificationCenter";
 import { useAuth } from "@/lib/hooks/useAuth";
 
 // ── route → title mapping ───────────────────────────────────────────
@@ -168,57 +169,7 @@ export default function Navbar() {
         </div>
 
         {/* ── Notifications ──────────────────────────────────── */}
-        <div ref={notifRef} className="relative">
-          <motion.button
-            onClick={() => setNotifOpen(!notifOpen)}
-            className="relative flex h-9 w-9 items-center justify-center rounded-xl text-zinc-400 transition-colors hover:bg-white/[0.06] hover:text-zinc-200"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Bell className="h-[18px] w-[18px]" />
-            <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-500 px-1 text-[9px] font-bold text-white shadow-[0_0_8px_rgba(59,130,246,0.5)]">
-              5
-            </span>
-          </motion.button>
-
-          <AnimatePresence>
-            {notifOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: 4, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 4, scale: 0.98 }}
-                transition={{ duration: 0.15 }}
-                className="absolute right-0 top-full mt-2 w-80 overflow-hidden rounded-xl border border-white/[0.08] bg-zinc-900/95 shadow-2xl shadow-black/40 backdrop-blur-xl"
-              >
-                <div className="flex items-center justify-between border-b border-white/[0.06] px-4 py-3">
-                  <h3 className="text-sm font-semibold text-zinc-200">Notifications</h3>
-                  <button className="text-xs text-blue-400 hover:text-blue-300">Mark all read</button>
-                </div>
-                <div className="max-h-72 overflow-y-auto">
-                  {[
-                    { title: "Issue Verified", desc: "Pothole on MG Road was verified by 3 citizens", time: "2m ago", unread: true },
-                    { title: "AI Analysis Complete", desc: "Water leakage on 5th Cross received severity: High", time: "15m ago", unread: true },
-                    { title: "Resolution Started", desc: "BBMP marked road repair issue as in-progress", time: "1h ago", unread: false },
-                    { title: "Points Earned!", desc: "You earned 25 points for verifying an issue", time: "2h ago", unread: false },
-                    { title: "New Issue Nearby", desc: "Broken streetlight reported in your ward", time: "3h ago", unread: false },
-                  ].map((n, i) => (
-                    <div key={i} className={`flex gap-3 border-b border-white/[0.04] px-4 py-3 transition-colors hover:bg-white/[0.03] ${n.unread ? "bg-blue-500/[0.03]" : ""}`}>
-                      {n.unread && <div className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-blue-400" />}
-                      <div className={n.unread ? "" : "ml-5"}>
-                        <p className="text-sm font-medium text-zinc-200">{n.title}</p>
-                        <p className="mt-0.5 text-xs text-zinc-500">{n.desc}</p>
-                        <p className="mt-1 text-[10px] text-zinc-600">{n.time}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="border-t border-white/[0.06] px-4 py-2.5 text-center">
-                  <button className="text-xs font-medium text-blue-400 hover:text-blue-300">View all notifications</button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+        <NotificationCenter />
 
         {/* ── User avatar menu ───────────────────────────────── */}
         <div ref={userRef} className="relative">
@@ -264,6 +215,19 @@ export default function Navbar() {
                       {item.label}
                     </button>
                   ))}
+                  
+                  {/* Demo Admin Toggle */}
+                  <div className="border-t border-white/[0.06] mt-1 pt-1">
+                    <button
+                      onClick={() => useAuthStore.getState().toggleAdminMode()}
+                      className="flex w-full items-center justify-between px-4 py-2 text-sm text-zinc-300 transition-colors hover:bg-white/[0.04]"
+                    >
+                      <span>Admin Mode (Demo)</span>
+                      <div className={`w-8 h-4 rounded-full flex items-center p-0.5 transition-colors ${user?.role === 'admin' ? 'bg-blue-500' : 'bg-zinc-700'}`}>
+                        <div className={`w-3 h-3 rounded-full bg-white transition-transform ${user?.role === 'admin' ? 'translate-x-4' : 'translate-x-0'}`} />
+                      </div>
+                    </button>
+                  </div>
                 </div>
                 <div className="border-t border-white/[0.06] py-1">
                   <button

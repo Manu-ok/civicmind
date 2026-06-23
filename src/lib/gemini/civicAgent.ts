@@ -1,41 +1,33 @@
-import { geminiFlash, formatGeminiError } from "./config";
-import { Issue, AgentMessage } from "../types";
+import { genAI, formatGeminiError } from "./config";
+import { AgentMessage } from "../types";
 
 export async function askCivicAgent(
   userMessage: string,
   conversationHistory: AgentMessage[],
-  contextIssues: Issue[],
+  enrichedContext: any,
   userLocation: { city: string; ward: string }
 ): Promise<string> {
-  const model = geminiFlash;
-
-  const categoryCounts: Record<string, number> = {};
-  contextIssues.forEach((issue) => {
-    categoryCounts[issue.category] = (categoryCounts[issue.category] || 0) + 1;
-  });
-  const topCategories = Object.entries(categoryCounts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 3)
-    .map(([cat]) => cat)
-    .join(", ");
-
-  const systemInstruction = `You are CivicMind, an intelligent civic assistant for Indian communities. You have access to real-time data about community issues in the user's area. You help citizens understand local problems, suggest actions, answer questions about municipal processes, and provide insights about their community.
+  const systemInstruction = `You are CivicMind, an intelligent, world-class civic assistant for communities. You have access to real-time data about community issues in the user's area. You help citizens understand local problems, suggest actions, answer questions about municipal processes, and provide insights about their community.
 
 Current context:
-- User's city: ${userLocation.city}
-- User's ward: ${userLocation.ward}
-- Active issues nearby: ${contextIssues.length}
-- Top issue categories: ${topCategories}
+- User Location: ${userLocation.city}, Ward: ${userLocation.ward}
+- User Profile: ${enrichedContext?.userStats ? `${enrichedContext.userStats.name} (${enrichedContext.userStats.points} XP, ${enrichedContext.userStats.reported} reported, ${enrichedContext.userStats.verified} verified)` : 'Anonymous'}
+- Citywide Issues Total: ${enrichedContext?.cityStats?.totalIssues || 0}
+- Category Breakdown: ${JSON.stringify(enrichedContext?.cityStats?.categoryCounts || {})}
+- Top Unresolved Issues Nearby: ${JSON.stringify(enrichedContext?.topIssues || [])}
 
-You can:
-1. Answer questions about local issues
-2. Suggest which issues to prioritize
-3. Explain municipal processes
-4. Provide insights from the data
-5. Help draft formal complaints
-6. Explain what actions citizens can take
+Instructions:
+1. Be highly conversational, empathetic, and data-driven.
+2. Structure your answers clearly. Use **bold** for emphasis, and bulleted/numbered lists where appropriate.
+3. CRITICAL: When referring to a specific issue from the context, YOU MUST put the exact issue title in double quotes, like "Pothole on Main Street". The UI will parse this and render an interactive mini-card for the user. Do not wrap quotes around things that are not issue titles.
+4. If asked about user stats, use the User Profile context to congratulate them on their civic XP and impact.
+5. You can suggest which issues to prioritize, explain municipal processes, provide data insights, or draft formal complaints.
+6. Keep responses concise but informative. Do not ramble.`;
 
-Be conversational, helpful, and data-driven. When referring to specific issues, mention them by their title. Keep responses concise but informative.`;
+  const model = genAI.getGenerativeModel({ 
+    model: "gemini-2.5-flash-lite",
+    systemInstruction 
+  });
 
   // Map history to Gemini format
   const history = conversationHistory.map((msg) => ({
@@ -46,7 +38,6 @@ Be conversational, helpful, and data-driven. When referring to specific issues, 
   try {
     const chat = model.startChat({
       history,
-      systemInstruction,
     });
 
     const result = await chat.sendMessage(userMessage);

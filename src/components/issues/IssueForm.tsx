@@ -23,7 +23,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 
-import { useVoice } from "@/lib/hooks/useVoice";
+import { VoiceReporter } from "./VoiceReporter";
 import { MiniMap } from "@/components/map/MiniMap";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { uploadIssueMedia } from "@/lib/firebase/storage";
@@ -74,8 +74,21 @@ export function IssueForm() {
   const [duplicateCheck, setDuplicateCheck] = useState<{isDuplicate: boolean, duplicateOf: string | null, confidence: number, reason: string} | null>(null);
   const [resolutionPlan, setResolutionPlan] = useState<ResolutionPlan | null>(null);
 
-  const { transcript, listening, startListening, stopListening, resetTranscript, isSupported } = useVoice();
   const [isRecording, setIsRecording] = useState(false);
+  
+  const handleVoiceComplete = (data: any, finalTranscript: string) => {
+    setValue("transcript", finalTranscript);
+    setValue("title", data.title || "");
+    setValue("description", data.description || "");
+    setValue("category", data.category || "other");
+    setValue("severity", data.severity || "medium");
+    setValue("priorityScore", data.priorityScore || 50);
+    setValue("department", data.department || "");
+    setValue("riskAssessment", data.riskAssessment || "");
+    setValue("estimatedImpact", data.estimatedImpact || "");
+    setStep(3); // Skip AI step since VoiceReporter does it
+    toast.success("Voice report processed successfully!");
+  };
   
   const form = useForm<IssueFormValues>({
     resolver: zodResolver(issueSchema),
@@ -109,28 +122,7 @@ export function IssueForm() {
     trigger("mediaUrls");
   };
 
-  useEffect(() => {
-    if (transcript) {
-      setValue("transcript", transcript);
-    }
-  }, [transcript, setValue]);
-
-  const handleVoiceToggle = () => {
-    if (isRecording) {
-      stopListening();
-      setIsRecording(false);
-      toast.success("Voice report saved!");
-    } else {
-      if (!isSupported) {
-        toast.error("Browser doesn't support speech recognition.");
-        return;
-      }
-      resetTranscript();
-      setValue("transcript", "");
-      startListening();
-      setIsRecording(true);
-    }
-  };
+  // Voice reporter handles its own state now
 
   // STEP 2: AI Analysis
   const runAiAnalysis = async () => {
@@ -451,29 +443,9 @@ export function IssueForm() {
                     <div className="h-px bg-zinc-800 flex-1" />
                   </div>
 
-                  <div className="space-y-4">
-                    <Button 
-                      variant={isRecording ? "destructive" : "outline"} 
-                      className={cn("w-full h-14 text-lg border-white/10", isRecording && "animate-pulse shadow-lg shadow-red-500/20")} 
-                      type="button"
-                      onClick={handleVoiceToggle}
-                    >
-                      <Mic className={cn("w-5 h-5 mr-2", isRecording ? "text-white animate-bounce" : "text-blue-400")} />
-                      {isRecording ? "Stop Recording" : "Voice Report"}
-                    </Button>
-                    
-                    {values.transcript && (
-                      <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                        <p className="text-xs text-blue-400 font-bold uppercase tracking-widest mb-2 flex items-center gap-1"><Mic className="w-3 h-3"/> Transcript</p>
-                        <p className="text-sm italic text-zinc-300">"{values.transcript}"</p>
-                        {!isRecording && (
-                          <Button variant="ghost" size="sm" onClick={() => setValue("transcript", "")} className="mt-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 h-auto py-1 px-2">Clear</Button>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                  <VoiceReporter onComplete={handleVoiceComplete} />
                   
-                  {(errors.mediaUrls || errors.transcript) && (
+                  {errors.mediaUrls && !values.transcript && (
                     <p className="text-sm text-red-500 text-center font-medium">Please upload media or record a voice report to continue.</p>
                   )}
                 </div>
@@ -680,18 +652,20 @@ export function IssueForm() {
                     Back
                   </Button>
                 )}
-                <Button 
-                  className={cn("flex-[2] bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-xl shadow-blue-500/20", isSubmitting && "opacity-50 pointer-events-none")} 
-                  onClick={step === STEPS.length ? handleSubmit : handleNext}
-                >
-                  {isSubmitting ? (
-                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing...</>
-                  ) : step === STEPS.length ? (
-                    <><Send className="w-4 h-4 mr-2" /> Submit Report</>
-                  ) : (
-                    <>Next Step <ChevronRight className="w-4 h-4 ml-1" /></>
-                  )}
-                </Button>
+                {!(step === 1 && values.mediaFiles.length === 0) && (
+                  <Button 
+                    className={cn("flex-[2] bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-xl shadow-blue-500/20", isSubmitting && "opacity-50 pointer-events-none")} 
+                    onClick={step === STEPS.length ? handleSubmit : handleNext}
+                  >
+                    {isSubmitting ? (
+                      <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing...</>
+                    ) : step === STEPS.length ? (
+                      <><Send className="w-4 h-4 mr-2" /> Submit Report</>
+                    ) : (
+                      <>Next Step <ChevronRight className="w-4 h-4 ml-1" /></>
+                    )}
+                  </Button>
+                )}
               </div>
             )}
 

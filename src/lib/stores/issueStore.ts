@@ -7,6 +7,7 @@ interface IssueFilters {
   severity?: Severity;
   status?: IssueStatus;
   ward?: string;
+  searchQuery?: string;
 }
 
 interface IssueState {

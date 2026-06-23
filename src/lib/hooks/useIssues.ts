@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { collection, query, onSnapshot, where, orderBy, getDocs } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { Issue } from "../types";
+import toast from "react-hot-toast";
 import { useIssueStore } from "../stores/issueStore";
 import { calculateDistance } from "../maps/geocoding";
 
@@ -30,6 +31,8 @@ export function useIssues() {
         q = query(q, orderBy("reportedAt", "desc")) as any;
       }
 
+      let isInitialLoad = true;
+
       const unsubscribe = onSnapshot(
         q,
         (snapshot) => {
@@ -40,6 +43,42 @@ export function useIssues() {
             reportedAt: doc.data().reportedAt?.toDate() || new Date(),
           })) as Issue[];
 
+          // Handle real-time notifications via docChanges
+          if (!isInitialLoad) {
+            snapshot.docChanges().forEach((change) => {
+              const data = change.doc.data() as Issue;
+              const wardName = data.location?.ward || "Unknown Ward";
+
+              if (change.type === "added") {
+                toast(`🚨 New ${data.severity} issue reported in ${wardName}`, {
+                  icon: '🔔',
+                  style: {
+                    borderRadius: '10px',
+                    background: '#18181b',
+                    color: '#fff',
+                    border: '1px solid #3f3f46',
+                  },
+                });
+              }
+              
+              if (change.type === "modified") {
+                // If status changed to resolved
+                if (data.status === "resolved") {
+                  toast(`✅ Issue resolved in ${wardName}: ${data.title}`, {
+                    icon: '🎉',
+                    style: {
+                      borderRadius: '10px',
+                      background: '#18181b',
+                      color: '#4ade80',
+                      border: '1px solid #22c55e40',
+                    },
+                  });
+                }
+              }
+            });
+          }
+
+          isInitialLoad = false;
           setIssues(fetchedIssues);
           setLocalLoading(false);
           setLoading(false);
