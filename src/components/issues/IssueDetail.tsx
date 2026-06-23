@@ -9,12 +9,13 @@ import {
   Building, Target, ShieldAlert, Activity, Navigation, X
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 import { Issue, User } from "@/lib/types";
 import { getUserProfile, incrementUpvotes } from "@/lib/firebase/firestore";
 import { useAuthStore } from "@/lib/stores/authStore";
-import { SeverityBadge } from "./SeverityBadge";
+import { Badge } from "@/components/ui/badge";
 import { MiniMap } from "@/components/map/MiniMap";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -23,6 +24,7 @@ import toast from "react-hot-toast";
 import { StatusTimeline } from "./StatusTimeline";
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
+import { AnimatedCounter } from "@/components/shared/AnimatedCounter";
 
 export function IssueDetail({ issue }: { issue: Issue }) {
   const router = useRouter();
@@ -78,15 +80,6 @@ export function IssueDetail({ issue }: { issue: Issue }) {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch(status) {
-      case "pending": return "bg-yellow-500/20 text-yellow-500 border-yellow-500/20";
-      case "verified": return "bg-blue-500/20 text-blue-500 border-blue-500/20";
-      case "in_progress": return "bg-purple-500/20 text-purple-500 border-purple-500/20";
-      case "resolved": return "bg-green-500/20 text-green-500 border-green-500/20";
-      default: return "bg-zinc-500/20 text-zinc-400 border-zinc-500/20";
-    }
-  };
 
   return (
     <div className="w-full max-w-5xl mx-auto space-y-8 pb-20">
@@ -99,15 +92,22 @@ export function IssueDetail({ issue }: { issue: Issue }) {
           <div className="relative aspect-video rounded-2xl overflow-hidden bg-zinc-900 border border-white/10 group">
             {issue.mediaUrls && issue.mediaUrls.length > 0 ? (
               <AnimatePresence mode="wait">
-                <motion.img
+                <motion.div
                   key={currentImageIndex}
-                  src={issue.mediaUrls[currentImageIndex]}
                   initial={{ opacity: 0, scale: 1.05 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="w-full h-full object-cover"
-                />
+                  className="w-full h-full relative"
+                >
+                  <Image 
+                    src={issue.mediaUrls[currentImageIndex]} 
+                    alt="Issue media" 
+                    fill
+                    priority
+                    className="object-cover"
+                  />
+                </motion.div>
               </AnimatePresence>
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center text-zinc-600">
@@ -147,7 +147,7 @@ export function IssueDetail({ issue }: { issue: Issue }) {
                     currentImageIndex === idx ? "border-primary" : "border-transparent opacity-50 hover:opacity-100"
                   )}
                 >
-                  <img src={url} className="w-full h-full object-cover" />
+                  <Image src={url} alt={`Thumbnail ${idx}`} fill className="object-cover" />
                 </button>
               ))}
             </div>
@@ -156,19 +156,21 @@ export function IssueDetail({ issue }: { issue: Issue }) {
 
         {/* Info Area */}
         <div className="flex flex-col space-y-6">
-          <div className="flex flex-wrap gap-2 items-center">
-            <span className={cn("px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border", getStatusColor(issue.status))}>
+          <div className="flex flex-wrap gap-4 items-center">
+            <Badge variant={(issue.status === "in_progress" ? "in-progress" : issue.status) as any} className="uppercase px-3 py-1 text-xs">
               {issue.status.replace("_", " ")}
-            </span>
-            <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-zinc-800 text-zinc-300 border border-white/10">
+            </Badge>
+            <Badge variant={(issue.category || "other") as any} className="uppercase px-3 py-1 text-xs">
               {issue.category}
-            </span>
-            <SeverityBadge severity={issue.severity} />
+            </Badge>
+            <Badge variant={(issue.severity || "low") as any} className="uppercase px-3 py-1 text-xs">
+              {issue.severity}
+            </Badge>
           </div>
 
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2 leading-tight">{issue.title}</h1>
-            <p className="text-zinc-400 text-lg leading-relaxed">{issue.description}</p>
+            <h1 className="text-h1 text-white mb-2 leading-tight">{issue.title}</h1>
+            <p className="text-body leading-relaxed">{issue.description}</p>
           </div>
 
           <div className="flex flex-col gap-3 py-4 border-y border-white/5">
@@ -186,7 +188,7 @@ export function IssueDetail({ issue }: { issue: Issue }) {
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-zinc-800 overflow-hidden border border-white/10">
                 {reporter?.photoURL ? (
-                  <img src={reporter.photoURL} alt={reporter.displayName} className="w-full h-full object-cover" />
+                  <Image src={reporter.photoURL} alt={reporter.displayName} fill className="object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-primary/20 text-primary">
                     <UserIcon className="w-5 h-5" />
@@ -225,47 +227,70 @@ export function IssueDetail({ issue }: { issue: Issue }) {
           
           {/* AI Assessment */}
           {issue.aiAnalysis && (
-            <Card className="p-6 bg-gradient-to-br from-blue-900/20 to-indigo-900/10 border-blue-500/20">
-              <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                <Brain className="w-6 h-6 text-blue-400" />
-                AI Assessment
-              </h3>
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div className="p-4 rounded-xl bg-black/20 border border-white/5">
-                  <p className="text-xs text-zinc-500 mb-1">Confidence</p>
-                  <p className="text-lg font-bold text-blue-400">{issue.aiAnalysis.confidence}%</p>
+            <Card className="p-6 bg-gradient-to-br from-blue-900/20 to-indigo-900/10 border-blue-500/20 overflow-hidden shadow-glow rounded-xl">
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={{
+                  hidden: { opacity: 0 },
+                  visible: {
+                    opacity: 1,
+                    transition: { staggerChildren: 0.1 }
+                  }
+                }}
+              >
+                <h3 className="text-h3 text-white mb-6 flex items-center gap-2">
+                  <Brain className="size-6 text-blue-400" />
+                  AI Assessment
+                </h3>
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <motion.div 
+                    variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0.4 } } }}
+                    className="p-4 rounded-xl bg-black/20 border border-white/5"
+                  >
+                    <p className="text-xs text-zinc-500 mb-1">Confidence</p>
+                    <p className="text-lg font-bold text-blue-400">{issue.aiAnalysis.confidence}%</p>
+                  </motion.div>
+                  <motion.div 
+                    variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0.4 } } }}
+                    className="p-4 rounded-xl bg-black/20 border border-white/5"
+                  >
+                    <p className="text-xs text-zinc-500 mb-1">Priority</p>
+                    <p className="text-lg font-bold text-orange-400">
+                      <AnimatedCounter value={issue.priorityScore || 0} />/100
+                    </p>
+                  </motion.div>
+                  <motion.div 
+                    variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0.4 } } }}
+                    className="p-4 rounded-xl bg-black/20 border border-white/5 col-span-2"
+                  >
+                    <p className="text-xs text-zinc-500 mb-1">Assigned Dept</p>
+                    <p className="text-sm font-bold text-zinc-200 flex items-center gap-1">
+                      <Building className="w-4 h-4 text-zinc-400"/> {issue.aiAnalysis.department}
+                    </p>
+                  </motion.div>
                 </div>
-                <div className="p-4 rounded-xl bg-black/20 border border-white/5">
-                  <p className="text-xs text-zinc-500 mb-1">Priority</p>
-                  <p className="text-lg font-bold text-orange-400">{issue.priorityScore}/100</p>
-                </div>
-                <div className="p-4 rounded-xl bg-black/20 border border-white/5 col-span-2">
-                  <p className="text-xs text-zinc-500 mb-1">Assigned Dept</p>
-                  <p className="text-sm font-bold text-zinc-200 flex items-center gap-1">
-                    <Building className="w-4 h-4 text-zinc-400"/> {issue.aiAnalysis.department}
-                  </p>
-                </div>
-              </div>
 
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm font-bold text-red-400 flex items-center gap-1 mb-1">
-                    <ShieldAlert className="w-4 h-4"/> Risk Assessment
-                  </p>
-                  <p className="text-sm text-zinc-300 bg-red-500/10 p-3 rounded-lg border border-red-500/20">
-                    {issue.aiAnalysis.riskAssessment}
-                  </p>
+                <div className="space-y-4">
+                  <motion.div variants={{ hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0, transition: { type: "spring", bounce: 0.4 } } }}>
+                    <p className="text-sm font-bold text-red-400 flex items-center gap-1 mb-1">
+                      <ShieldAlert className="w-4 h-4"/> Risk Assessment
+                    </p>
+                    <p className="text-sm text-zinc-300 bg-red-500/10 p-3 rounded-lg border border-red-500/20">
+                      {issue.aiAnalysis.riskAssessment}
+                    </p>
+                  </motion.div>
+                  <motion.div variants={{ hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0, transition: { type: "spring", bounce: 0.4 } } }}>
+                    <p className="text-sm font-bold text-purple-400 flex items-center gap-1 mb-1">
+                      <Target className="w-4 h-4"/> Estimated Impact
+                    </p>
+                    <p className="text-sm text-zinc-300 bg-purple-500/10 p-3 rounded-lg border border-purple-500/20">
+                      {issue.aiAnalysis.estimatedImpact}
+                    </p>
+                  </motion.div>
                 </div>
-                <div>
-                  <p className="text-sm font-bold text-purple-400 flex items-center gap-1 mb-1">
-                    <Target className="w-4 h-4"/> Estimated Impact
-                  </p>
-                  <p className="text-sm text-zinc-300 bg-purple-500/10 p-3 rounded-lg border border-purple-500/20">
-                    {issue.aiAnalysis.estimatedImpact}
-                  </p>
-                </div>
-              </div>
+              </motion.div>
             </Card>
           )}
 
@@ -365,7 +390,7 @@ export function IssueDetail({ issue }: { issue: Issue }) {
                     </div>
                     {v.mediaUrl && (
                       <div className="w-full h-24 rounded-lg overflow-hidden relative">
-                         <img src={v.mediaUrl} className="w-full h-full object-cover" />
+                         <Image src={v.mediaUrl} alt="Verification media" fill className="object-cover" />
                          {v.isValid && (
                            <div className="absolute top-1 right-1 px-2 py-0.5 rounded bg-green-500 text-white text-[10px] font-bold">AI VALIDATED</div>
                          )}

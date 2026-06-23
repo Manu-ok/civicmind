@@ -7,6 +7,7 @@ import { Issue } from "@/lib/types";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface MobileMapPanelProps {
   issue: Issue | null;
@@ -44,8 +45,8 @@ export function MobileMapPanel({ issue, onClose }: MobileMapPanelProps) {
 
             <div className="flex gap-4">
               {issue.mediaUrls?.[0] ? (
-                <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0">
-                  <img src={issue.mediaUrls[0]} alt="Issue" className="w-full h-full object-cover" />
+                <div className="relative w-20 h-20 rounded-xl overflow-hidden shrink-0">
+                  <Image src={issue.mediaUrls[0]} alt="Issue" fill className="object-cover" />
                 </div>
               ) : (
                 <div className="w-20 h-20 rounded-xl bg-zinc-800 flex items-center justify-center shrink-0">

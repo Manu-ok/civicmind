@@ -5,22 +5,25 @@ import { formatDistanceToNow } from "date-fns";
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import { MapPin, ArrowUpCircle, CheckCircle2, Loader2, MapIcon, ThumbsUp } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { SeverityBadge } from "./SeverityBadge";
+import { GlowCard } from "../shared/GlowCard";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 export function IssueCard({ issue, index = 0 }: { issue: Issue; index?: number }) {
   const router = useRouter();
 
   const getStatusBadge = (status: string) => {
+    const variant = status === "in_progress" ? "in-progress" : status;
     switch (status) {
       case "pending":
-        return <span className="flex items-center gap-1 text-xs font-medium text-zinc-400 bg-zinc-800 px-2 py-1 rounded-md"><Loader2 className="w-3 h-3" /> Pending</span>;
+        return <Badge variant="pending" className="gap-1 uppercase"><Loader2 className="size-3" /> Pending</Badge>;
       case "verified":
-        return <span className="flex items-center gap-1 text-xs font-medium text-blue-400 bg-blue-500/20 px-2 py-1 rounded-md"><CheckCircle2 className="w-3 h-3" /> Verified</span>;
+        return <Badge variant="verified" className="gap-1 uppercase"><CheckCircle2 className="size-3" /> Verified</Badge>;
       case "in_progress":
-        return <span className="flex items-center gap-1 text-xs font-medium text-amber-400 bg-amber-500/20 px-2 py-1 rounded-md"><Loader2 className="w-3 h-3 animate-spin" /> In Progress</span>;
+        return <Badge variant="in-progress" className="gap-1 uppercase"><Loader2 className="size-3 animate-spin" /> In Progress</Badge>;
       case "resolved":
-        return <span className="flex items-center gap-1 text-xs font-medium text-green-400 bg-green-500/20 px-2 py-1 rounded-md"><CheckCircle2 className="w-3 h-3" /> Resolved</span>;
+        return <Badge variant="resolved" className="gap-1 uppercase"><CheckCircle2 className="size-3" /> Resolved</Badge>;
       default:
         return null;
     }
@@ -34,7 +37,7 @@ export function IssueCard({ issue, index = 0 }: { issue: Issue; index?: number }
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
-      className="relative rounded-2xl overflow-hidden bg-zinc-800"
+      className="relative rounded-xl overflow-hidden bg-zinc-800"
     >
       {/* Swipe Actions Background */}
       <motion.div 
@@ -62,15 +65,18 @@ export function IssueCard({ issue, index = 0 }: { issue: Issue; index?: number }
         dragElastic={0.1}
         style={{ x: dragX }}
         onClick={() => router.push(`/issues/${issue.id}`)}
-        className="group relative flex flex-col bg-zinc-900 border border-white/10 rounded-2xl overflow-hidden cursor-pointer active:cursor-grabbing transition-shadow hover:shadow-2xl hover:shadow-primary/20"
+        className="group relative flex flex-col bg-zinc-900 border border-white/10 rounded-xl overflow-hidden cursor-pointer active:cursor-grabbing transition-all duration-300 hover:shadow-glow"
       >
+      <GlowCard className="flex flex-col flex-1">
       {/* Thumbnail */}
       <div className="relative h-48 w-full bg-zinc-800 overflow-hidden">
         {issue.mediaUrls && issue.mediaUrls.length > 0 ? (
-          <img 
+          <Image 
             src={issue.mediaUrls[0]} 
             alt={issue.title} 
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+            fill
+            sizes="(max-width: 768px) 100vw, 300px"
+            className="object-cover group-hover:scale-105 transition-transform duration-500" 
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center text-zinc-600 bg-zinc-900/50">
@@ -79,48 +85,52 @@ export function IssueCard({ issue, index = 0 }: { issue: Issue; index?: number }
           </div>
         )}
 
-        {/* Category Overlay */}
         <div className="absolute top-3 left-3">
-          <span className="bg-black/60 backdrop-blur-md text-white text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10">
+          <Badge variant={(issue.category || "other") as any} className="uppercase backdrop-blur-md shadow-lg">
             {issue.category}
-          </span>
+          </Badge>
         </div>
       </div>
 
       {/* Content */}
-      <div className="flex flex-col p-5 flex-1">
-        <div className="flex justify-between items-start mb-3 gap-2">
-          <h3 className="font-bold text-lg text-zinc-100 leading-tight line-clamp-2">{issue.title}</h3>
+      <div className="flex flex-col p-6 flex-1">
+        <div className="flex justify-between items-start mb-3 gap-4">
+          <h3 className="text-h3 text-zinc-100 leading-tight line-clamp-2">{issue.title}</h3>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 mb-4 mt-auto">
-          <SeverityBadge severity={issue.severity} size="sm" />
+          <Badge variant={(issue.severity || "low") as any} className="uppercase">{issue.severity}</Badge>
           {getStatusBadge(issue.status)}
         </div>
 
-        <div className="flex items-center text-sm text-zinc-400 mb-4 line-clamp-1">
-          <MapPin className="w-4 h-4 mr-1.5 text-zinc-500 shrink-0" />
+        <div className="flex items-center text-caption mb-4 line-clamp-1">
+          <MapPin className="size-4 mr-1.5 text-zinc-500 shrink-0" />
           <span className="truncate">{issue.location.address}</span>
         </div>
 
         {/* Footer */}
         <div className="flex items-center justify-between pt-4 border-t border-white/10 mt-auto">
-          <span className="text-xs text-zinc-500 font-medium">
+          <span className="text-caption font-medium">
             {formatDistanceToNow(issue.reportedAt as Date, { addSuffix: true })}
           </span>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1 text-zinc-400">
-              <CheckCircle2 className="w-4 h-4" />
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5 text-zinc-400">
+              <CheckCircle2 className="size-4" />
               <span className="text-sm font-semibold">{issue.verificationCount || 0}</span>
             </div>
-            <div className="flex items-center gap-1 text-primary">
-              <ArrowUpCircle className="w-4 h-4" />
+            <motion.div 
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="flex items-center gap-1.5 text-primary cursor-pointer"
+            >
+              <ArrowUpCircle className="size-4" />
               <span className="text-sm font-bold">{issue.upvotes || 0}</span>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
+      </GlowCard>
       </motion.div>
     </motion.div>
   );

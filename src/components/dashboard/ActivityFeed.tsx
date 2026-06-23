@@ -76,8 +76,8 @@ export function ActivityFeed() {
   };
 
   return (
-    <div className="bg-zinc-900/50 border border-white/[0.04] rounded-2xl p-6 flex flex-col h-[500px]">
-      <h2 className="text-lg font-semibold text-zinc-100 mb-4 flex items-center gap-2">
+    <div className="bg-zinc-900/50 border border-white/[0.04] rounded-xl p-6 flex flex-col h-[500px]">
+      <h2 className="text-h3 text-zinc-100 mb-4 flex items-center gap-2">
         <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
         Live Activity Feed
       </h2>

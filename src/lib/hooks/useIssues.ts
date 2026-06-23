@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { collection, query, onSnapshot, where, orderBy, getDocs } from "firebase/firestore";
+import { collection, query, onSnapshot, where, orderBy, getDocs, limit } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { Issue } from "../types";
 import toast from "react-hot-toast";
@@ -26,9 +26,9 @@ export function useIssues() {
       if (filters.ward) constraints.push(where("location.ward", "==", filters.ward));
 
       if (constraints.length > 0) {
-        q = query(q, ...constraints) as any;
+        q = query(q, ...constraints, limit(50)) as any;
       } else {
-        q = query(q, orderBy("reportedAt", "desc")) as any;
+        q = query(q, orderBy("reportedAt", "desc"), limit(50)) as any;
       }
 
       let isInitialLoad = true;

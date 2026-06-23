@@ -52,7 +52,7 @@ export async function deleteIssue(issueId: string): Promise<void> {
 
 export async function getIssues(filters?: { category?: string, severity?: string, status?: string, ward?: string, city?: string }): Promise<Issue[]> {
   try {
-    const q = query(collection(db, "issues"), orderBy("reportedAt", "desc"));
+    const q = query(collection(db, "issues"), orderBy("reportedAt", "desc"), limit(50));
     const querySnapshot = await getDocs(q);
     
     let issues = querySnapshot.docs.map(doc => doc.data() as Issue).filter(issue => !issue.deleted);
@@ -103,6 +103,10 @@ export function subscribeToIssues(callback: (issues: Issue[]) => void, filters?:
       if (filters.status) q = query(q, where("status", "==", filters.status));
       if (filters.ward) q = query(q, where("location.ward", "==", filters.ward));
     }
+    // NOTE: To make this query work with filters, you must create Compound Indexes in Firebase:
+    // e.g., category ASC + reportedAt DESC
+    // e.g., status ASC + reportedAt DESC
+    q = query(q, orderBy("reportedAt", "desc"), limit(50));
 
     return onSnapshot(q, (snapshot: any) => {
       const issues = snapshot.docs.map((doc: any) => doc.data() as Issue);

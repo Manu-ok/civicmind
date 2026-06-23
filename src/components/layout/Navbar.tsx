@@ -15,6 +15,7 @@ import { useAuthStore } from "@/lib/stores/authStore";
 import { NotificationCenter } from "../shared/NotificationCenter";
 import { GlobalSearch } from "../shared/GlobalSearch";
 import { useAuth } from "@/lib/hooks/useAuth";
+import Image from "next/image";
 
 // ── route → title mapping ───────────────────────────────────────────
 const pageTitles: Record<string, string> = {
@@ -176,12 +177,12 @@ export default function Navbar() {
         <div ref={userRef} className="relative">
           <motion.button
             onClick={() => setUserMenuOpen(!userMenuOpen)}
-            className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-500 to-violet-600 ring-2 ring-transparent transition-all hover:ring-blue-500/30"
+            className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-500 to-violet-600 ring-2 ring-transparent transition-all hover:ring-blue-500/30"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             {user?.photoURL ? (
-              <img src={user.photoURL} alt={user.displayName} className="h-full w-full object-cover" />
+              <Image src={user.photoURL} alt={user.displayName} fill className="object-cover" />
             ) : (
               <span className="text-xs font-bold text-white">
                 {user?.displayName?.charAt(0)?.toUpperCase() || "U"}

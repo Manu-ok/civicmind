@@ -8,13 +8,14 @@ import { Issue, Verification } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ShieldCheck, MapPin, Camera, X, Loader2, Upload, AlertCircle } from "lucide-react";
-import { SeverityBadge } from "@/components/issues/SeverityBadge";
+import { Upload, ShieldCheck, MapPin, CheckCircle2, AlertCircle, Loader2, X, Camera } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
 import { useDropzone } from "react-dropzone";
 import confetti from "canvas-confetti";
 import toast from "react-hot-toast";
 import { Timestamp } from "firebase/firestore";
+import Image from "next/image";
 
 export default function VerifyPage() {
   const { user } = useAuthStore();
@@ -33,7 +34,7 @@ export default function VerifyPage() {
         const allIssues = await getIssues();
         if (user) {
           // Filter out own issues and sort by unverified first, then severity
-          let verifyList = allIssues.filter(i => i.reportedBy !== user.id && i.status !== "resolved");
+          const verifyList = allIssues.filter(i => i.reportedBy !== user.id && i.status !== "resolved");
           
           verifyList.sort((a, b) => {
             // Unverified first
@@ -181,14 +182,14 @@ export default function VerifyPage() {
               <Card key={issue.id} className="bg-zinc-900 border-white/5 overflow-hidden flex flex-col group">
                 <div className="h-40 bg-zinc-800 relative">
                   {issue.mediaUrls?.[0] ? (
-                    <img src={issue.mediaUrls[0]} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                    <Image src={issue.mediaUrls[0]} alt="Issue" fill className="object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <MapPin className="w-8 h-8 text-zinc-600" />
                     </div>
                   )}
                   <div className="absolute top-2 right-2">
-                    <SeverityBadge severity={issue.severity} size="sm" />
+                    <Badge variant={(issue.severity || "low") as any} className="uppercase">{issue.severity}</Badge>
                   </div>
                   {issue.verificationCount === 0 && (
                     <div className="absolute bottom-2 left-2 bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded">
@@ -220,7 +221,7 @@ export default function VerifyPage() {
         ) : (
           <Card className="p-8 border-dashed border-white/10 bg-zinc-900/30 text-center">
             <ShieldCheck className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-            <h3 className="text-lg font-bold text-white mb-2">You're all caught up!</h3>
+            <h3 className="text-lg font-bold text-white mb-2">You&apos;re all caught up!</h3>
             <p className="text-zinc-400">There are no pending issues in your area that need verification right now.</p>
           </Card>
         )}
@@ -250,7 +251,7 @@ export default function VerifyPage() {
                 
                 {verifyPreview ? (
                   <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-zinc-900 border border-white/10">
-                    <img src={verifyPreview} className="w-full h-full object-cover" />
+                    <Image src={verifyPreview} alt="Preview" fill unoptimized className="object-cover" />
                     <button 
                       onClick={clearFile}
                       className="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 text-white hover:bg-destructive transition-colors"

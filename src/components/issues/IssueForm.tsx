@@ -13,7 +13,7 @@ import {
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import confetti from "canvas-confetti";
+import { triggerConfetti } from "@/components/shared/ConfettiSuccess";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -23,7 +23,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 
-import { VoiceReporter } from "./VoiceReporter";
+import dynamic from "next/dynamic";
+import Image from "next/image";
+
+const VoiceReporter = dynamic(() => import("./VoiceReporter").then(mod => mod.VoiceReporter), { ssr: false });
 import { MiniMap } from "@/components/map/MiniMap";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { uploadIssueMedia } from "@/lib/firebase/storage";
@@ -298,16 +301,9 @@ export function IssueForm() {
       // 3. Update stats (We can safely call fetch or directly update if we wrote an api for it, here we assume direct is allowed or use cloud function. We'll update the issue id properly since it's temp above)
       // Note: We used "temp" for issueId in storage, ideally we create doc first then upload, but it works.
       
-      confetti({
-        particleCount: 150,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#3b82f6', '#8b5cf6', '#10b981']
-      });
-
-      toast.success("Issue Reported Successfully!");
-      setTimeout(() => router.push(`/dashboard`), 2000);
-      
+      toast.success("Issue reported successfully!");
+      triggerConfetti();
+      router.push("/dashboard");
     } catch (e: any) {
       toast.error(e.message);
       setIsSubmitting(false);
@@ -408,7 +404,7 @@ export function IssueForm() {
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         {values.mediaUrls.map((url, idx) => (
                           <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden bg-zinc-900">
-                            <img src={url} alt={`Upload ${idx}`} className="w-full h-full object-cover" />
+                            <Image src={url} alt={`Upload ${idx}`} fill className="object-cover" />
                             <button 
                               type="button"
                               onClick={(e) => { e.stopPropagation(); removeMedia(idx); }}
@@ -652,19 +648,40 @@ export function IssueForm() {
                     Back
                   </Button>
                 )}
-                {!(step === 1 && values.mediaFiles.length === 0) && (
-                  <Button 
-                    className={cn("flex-[2] bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-xl shadow-blue-500/20", isSubmitting && "opacity-50 pointer-events-none")} 
-                    onClick={step === STEPS.length ? handleSubmit : handleNext}
-                  >
-                    {isSubmitting ? (
-                      <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing...</>
-                    ) : step === STEPS.length ? (
-                      <><Send className="w-4 h-4 mr-2" /> Submit Report</>
-                    ) : (
-                      <>Next Step <ChevronRight className="w-4 h-4 ml-1" /></>
-                    )}
-                  </Button>
+                {step < 4 ? (
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1">
+                    <Button 
+                      onClick={handleNext} 
+                      className="w-full bg-white text-black hover:bg-zinc-200"
+                    >
+                      Next Step <ChevronRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </motion.div>
+                ) : (
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1">
+                    <Button 
+                      onClick={handleSubmit} 
+                      disabled={isSubmitting}
+                      className={cn(
+                        "w-full relative overflow-hidden transition-all duration-300",
+                        isSubmitting ? "bg-blue-600 cursor-not-allowed" : "bg-gradient-to-r from-blue-600 to-violet-600 hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+                      )}
+                    >
+                      {!isSubmitting && (
+                        <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                      )}
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          Submit Report <Send className="w-4 h-4 ml-2" />
+                        </>
+                      )}
+                    </Button>
+                  </motion.div>
                 )}
               </div>
             )}

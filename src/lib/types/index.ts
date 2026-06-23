@@ -58,6 +58,7 @@ export interface Issue {
   title: string;
   description: string;
   category: Category;
+  deleted?: boolean;
   severity: Severity;
   priorityScore: number;
   status: IssueStatus;

@@ -46,8 +46,8 @@ const MOCK_ISSUES: Issue[] = [
     id: "1",
     title: "Large Pothole on Main Street causing traffic jams",
     description: "Deep pothole near the intersection.",
-    location: { lat: 22.8046, lng: 86.2029, address: "Main Street, Ward 12" },
-    category: "infrastructure",
+    location: { lat: 22.8046, lng: 86.2029, address: "Main Street, Ward 12", ward: "Ward 12", city: "Jamshedpur" },
+    category: "road",
     severity: "high",
     status: "in_progress",
     mediaUrls: ["https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&q=80&w=400"],
@@ -55,13 +55,16 @@ const MOCK_ISSUES: Issue[] = [
     reportedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2), // 2 days ago
     upvotes: 45,
     verificationCount: 12,
+    priorityScore: 85,
+    verifications: [],
+    isDuplicate: false,
   },
   {
     id: "2",
     title: "Street lights not working for a week",
     description: "Complete darkness at night.",
-    location: { lat: 22.8056, lng: 86.2039, address: "Park Avenue, Ward 12" },
-    category: "utilities",
+    location: { lat: 22.8056, lng: 86.2039, address: "Park Avenue, Ward 12", ward: "Ward 12", city: "Jamshedpur" },
+    category: "electricity",
     severity: "medium",
     status: "verified",
     mediaUrls: [],
@@ -69,6 +72,9 @@ const MOCK_ISSUES: Issue[] = [
     reportedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5),
     upvotes: 23,
     verificationCount: 8,
+    priorityScore: 60,
+    verifications: [],
+    isDuplicate: false,
   }
 ];
 

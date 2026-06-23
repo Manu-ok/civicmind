@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { genAI, formatGeminiError } from "@/lib/gemini/config";
+import { isRateLimited, getCachedResponse, setCachedResponse, withRetry } from "@/lib/utils/apiOptimizer";
 
 export async function POST(req: NextRequest) {
   try {
+    if (isRateLimited(req, 10, 60000)) {
+      return NextResponse.json({ error: "Rate limit exceeded. Please try again later." }, { status: 429 });
+    }
+
     const body = await req.json();
     const { issues, city } = body;
 
@@ -11,6 +16,12 @@ export async function POST(req: NextRequest) {
         { error: "Invalid issues data" },
         { status: 400 }
       );
+    }
+
+    const cacheKey = `predict_${city || 'all'}_${issues.length}`;
+    const cached = getCachedResponse(cacheKey);
+    if (cached) {
+      return NextResponse.json({ success: true, predictions: cached, cached: true });
     }
 
     // Simplify the issues payload to fit context limits and highlight patterns
@@ -45,14 +56,17 @@ Return the predictions as a JSON array of objects in this EXACT format:
   }
 ]`;
 
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: userPrompt }] }],
-      generationConfig: {
-        responseMimeType: "application/json",
-      },
-    });
+    const getPredictions = async () => {
+      const result = await model.generateContent({
+        contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+        generationConfig: {
+          responseMimeType: "application/json",
+        },
+      });
+      return result.response.text();
+    };
 
-    let text = result.response.text();
+    let text = await withRetry(getPredictions, 1);
     // Safety: Remove markdown blocks if Gemini decides to ignore responseMimeType
     text = text.replace(/```json/gi, "").replace(/```/g, "").trim();
     
@@ -71,6 +85,8 @@ Return the predictions as a JSON array of objects in this EXACT format:
       console.error("Failed to parse Gemini JSON output:", text);
       throw new Error("Invalid JSON format from AI");
     }
+
+    setCachedResponse(cacheKey, predictions, 3600); // Cache for 1 hour
 
     return NextResponse.json({ success: true, predictions });
   } catch (error: any) {

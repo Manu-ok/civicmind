@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "react-hot-toast";
+import { AppLoader } from "@/components/shared/AppLoader";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -68,6 +69,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
+            <AppLoader />
             {children}
           </AuthProvider>
         </ThemeProvider>
@@ -76,19 +78,18 @@ export default function RootLayout({
           toastOptions={{
             duration: 4000,
             style: {
-              background: "rgba(24, 24, 27, 0.92)",
-              color: "#e4e4e7",
-              border: "1px solid rgba(255,255,255,0.06)",
-              backdropFilter: "blur(12px)",
+              background: "#18181b", // zinc-900
+              color: "#e4e4e7", // zinc-200
+              border: "1px solid #27272a", // zinc-800
               fontSize: "14px",
               borderRadius: "12px",
               boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
             },
             success: {
-              iconTheme: { primary: "#3B82F6", secondary: "#fff" },
+              iconTheme: { primary: "#22c55e", secondary: "#18181b" },
             },
             error: {
-              iconTheme: { primary: "#EF4444", secondary: "#fff" },
+              iconTheme: { primary: "#ef4444", secondary: "#18181b" },
             },
           }}
         />

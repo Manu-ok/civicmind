@@ -45,7 +45,7 @@ export default function NotFound() {
         transition={{ duration: 0.5, delay: 0.3 }}
         className="mb-8 max-w-md text-zinc-400"
       >
-        This page got lost like an unresolved civic issue! We've dispatched our digital team to investigate.
+        This page got lost like an unresolved civic issue! We&apos;ve dispatched our digital team to investigate.
       </motion.p>
 
       <motion.div

@@ -48,7 +48,7 @@ export default function IssuesPage() {
   }, []);
 
   const filteredAndSortedIssues = useMemo(() => {
-    let result = issues.filter(issue => {
+    const result = issues.filter(issue => {
       const matchSearch = issue.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           issue.description.toLowerCase().includes(searchQuery.toLowerCase());
       const matchCategory = categoryFilter === "All" || issue.category === categoryFilter;
@@ -58,8 +58,8 @@ export default function IssuesPage() {
       let matchQuick = true;
       if (quickFilter === "Critical") matchQuick = issue.severity === "critical";
       if (quickFilter === "Verified") matchQuick = issue.status === "verified";
-      if (quickFilter === "Near Me") matchQuick = issue.city === user?.city;
-      if (quickFilter === "My Reports") matchQuick = issue.reportedBy === user?.uid;
+      if (quickFilter === "Near Me") matchQuick = issue.location?.city === user?.city;
+      if (quickFilter === "My Reports") matchQuick = issue.reportedBy === user?.id;
       if (quickFilter === "Resolved") matchQuick = issue.status === "resolved";
 
       return matchSearch && matchCategory && matchSeverity && matchStatus && matchQuick;

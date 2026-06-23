@@ -53,7 +53,7 @@ export default function IssuePage() {
         </div>
         <h2 className="text-2xl font-bold text-white mb-2">Issue Not Found</h2>
         <p className="text-zinc-400 max-w-md mb-6">
-          The issue you're looking for doesn't exist, has been deleted, or you don't have permission to view it.
+          The issue you&apos;re looking for doesn&apos;t exist, has been deleted, or you don&apos;t have permission to view it.
         </p>
         <Button onClick={() => router.push('/issues')} variant="outline" className="border-white/10 bg-zinc-900">
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to Issues Feed

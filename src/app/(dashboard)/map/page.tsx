@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { CivicMap } from "@/components/map/CivicMap";
+import dynamic from "next/dynamic";
+import { MapSkeleton } from "@/components/shared/Skeletons";
+const CivicMap = dynamic(() => import("@/components/map/CivicMap").then(mod => mod.CivicMap), { ssr: false, loading: () => <MapSkeleton /> });
 import { useIssueStore } from "@/lib/stores/issueStore";
 import { Filter, Layers, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,7 +11,6 @@ import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 import { useIssues } from "@/lib/hooks/useIssues";
 import { Category, Severity } from "@/lib/types";
-import { MapSkeleton } from "@/components/shared/Skeletons";
 
 export default function MapPage() {
   const router = useRouter();

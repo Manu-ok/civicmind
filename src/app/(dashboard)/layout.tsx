@@ -10,7 +10,6 @@ import Navbar from "@/components/layout/Navbar";
 import { MobileNav } from "@/components/layout/MobileNav";
 import PageWrapper from "@/components/layout/PageWrapper";
 
-import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuthStore();
@@ -60,9 +59,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         <main className="flex-1 pb-20 md:pb-0">
-          <ErrorBoundary>
-            <PageWrapper>{children}</PageWrapper>
-          </ErrorBoundary>
+          <PageWrapper>{children}</PageWrapper>
         </main>
         
         <MobileNav />

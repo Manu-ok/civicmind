@@ -7,6 +7,8 @@ import { useAuthStore } from "@/lib/stores/authStore";
 import { getIssues, getTopCitizens, getAnalytics } from "@/lib/firebase/firestore";
 import { Issue, User } from "@/lib/types";
 import { AnimatedCounter } from "@/components/shared/AnimatedCounter";
+import { GlowCard } from "@/components/shared/GlowCard";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { IssueCard } from "@/components/issues/IssueCard";
 import { MiniMap } from "@/components/map/MiniMap";
 import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
@@ -40,7 +42,7 @@ const MOCK_PREDICTIONS = [
   { id: 5, title: "Traffic Signal Malfunction", category: "safety", prob: 15, time: "Next 24h", ward: "South Park", icon: Shield, severity: "green" },
 ];
 
-const containerVariants = {
+const containerVariants: any = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -48,7 +50,7 @@ const containerVariants = {
   }
 };
 
-const itemVariants = {
+const itemVariants: any = {
   hidden: { y: 20, opacity: 0 },
   visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 100 } }
 };
@@ -130,11 +132,8 @@ export default function DashboardPage() {
 
       {/* SECTION 1: Hero Stats Bar */}
       <motion.div 
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        variants={containerVariants} 
+        initial="hidden" 
         animate="visible"
         className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
       >
@@ -153,28 +152,30 @@ export default function DashboardPage() {
             { label: "Avg Resolution Time", value: 4, icon: Clock, color: "text-orange-400 bg-orange-500/10", trend: "-2 days" }
           ].map((stat, i) => (
             <motion.div key={stat.label} variants={itemVariants}>
-              <Card className="relative overflow-hidden bg-zinc-900/50 border-white/5 backdrop-blur-xl transition-all hover:bg-zinc-800/50 group">
-                <div className="p-6">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-zinc-400">{stat.label}</p>
-                    <div className={`p-2 rounded-lg ${stat.color} group-hover:scale-110 transition-transform`}>
-                      <stat.icon className={`h-5 w-5 ${stat.color.split(' ')[0]}`} />
+              <GlowCard className="rounded-xl h-full border border-white/5">
+                <div className="relative h-full overflow-hidden bg-zinc-900/50 backdrop-blur-xl transition-all hover:bg-zinc-800/50 group">
+                  <div className="p-6">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium text-zinc-400">{stat.label}</p>
+                      <div className={`p-2 rounded-lg ${stat.color} group-hover:scale-110 transition-transform`}>
+                        <stat.icon className={`h-5 w-5 ${stat.color.split(' ')[0]}`} />
+                      </div>
+                    </div>
+                    <div className="mt-4 flex items-baseline gap-2">
+                      <h2 className="text-3xl font-bold text-white">
+                        <AnimatedCounter value={stat.value} />
+                      </h2>
+                      {stat.trend && (
+                        <span className={`text-xs font-medium ${stat.trend.startsWith('+') ? 'text-emerald-400' : 'text-rose-400'}`}>
+                          {stat.trend}
+                        </span>
+                      )}
                     </div>
                   </div>
-                  <div className="mt-4 flex items-baseline gap-2">
-                    <h2 className="text-3xl font-bold text-white">
-                      <AnimatedCounter value={stat.value} />
-                    </h2>
-                    {stat.trend && (
-                      <span className={`text-xs font-medium ${stat.trend.startsWith('+') ? 'text-emerald-400' : 'text-rose-400'}`}>
-                        {stat.trend}
-                      </span>
-                    )}
-                  </div>
+                  {/* Decorative bottom border */}
+                  <div className={`absolute bottom-0 left-0 h-1 w-full opacity-50 ${stat.color.split(' ')[1]}`} />
                 </div>
-                {/* Decorative bottom border */}
-                <div className={`absolute bottom-0 left-0 h-1 w-full opacity-50 ${stat.color.split(' ')[1]}`} />
-              </Card>
+              </GlowCard>
             </motion.div>
           ))
         )}
@@ -207,11 +208,11 @@ export default function DashboardPage() {
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-center bg-zinc-900/30 rounded-xl border border-white/5">
-                  <Activity className="h-10 w-10 text-zinc-600 mb-3" />
-                  <p className="text-zinc-400 font-medium">No recent activity</p>
-                  <p className="text-sm text-zinc-500 mt-1">Be the first to report an issue!</p>
-                </div>
+                <EmptyState
+                  icon={Activity}
+                  title="No recent activity"
+                  description="Be the first to report an issue in your community!"
+                />
               )}
         </div>
 
@@ -239,7 +240,7 @@ export default function DashboardPage() {
             <div className="h-[300px] w-full relative rounded-xl overflow-hidden pointer-events-none">
               {/* Overlay to make it look like a snapshot */}
               <div className="absolute inset-0 z-10 bg-gradient-to-t from-zinc-900/80 via-transparent to-transparent pointer-events-none" />
-              <MiniMap />
+              <MiniMap onLocationChange={() => {}} />
               <div className="absolute bottom-4 left-4 z-20">
                 <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
                   <MapPin className="w-4 h-4 text-primary" />

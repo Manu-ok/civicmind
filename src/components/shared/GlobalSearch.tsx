@@ -3,8 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { Search, MapPin, Activity, FileText, CheckCircle2, Navigation, Clock, ShieldAlert } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Search, MapPin, Activity, FileText, CheckCircle2, Clock, ShieldAlert, AlertTriangle } from "lucide-react";
 import { getIssues } from "@/lib/firebase/firestore";
 import { Issue } from "@/lib/types";
 
@@ -128,7 +127,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
             {totalResults === 0 ? (
               <div className="py-12 text-center text-zinc-500">
                 <Search className="w-8 h-8 mx-auto mb-3 opacity-20" />
-                <p>No results found for "{query}"</p>
+                <p>No results found for &quot;{query}&quot;</p>
               </div>
             ) : (
               <>

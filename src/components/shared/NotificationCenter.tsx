@@ -14,6 +14,7 @@ export function NotificationCenter() {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const prevUnreadCount = useRef(0);
 
   useEffect(() => {
     if (!user) return;
@@ -46,6 +47,12 @@ export function NotificationCenter() {
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
+  useEffect(() => {
+    prevUnreadCount.current = unreadCount;
+  }, [unreadCount]);
+
+  const hasNew = unreadCount > prevUnreadCount.current;
+
   const handleMarkAllRead = () => {
     if (user) markAllNotificationsRead(user.id);
   };
@@ -67,17 +74,31 @@ export function NotificationCenter() {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <button 
+      <motion.button 
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 rounded-full hover:bg-zinc-800 transition-colors"
+        whileTap={{ scale: 0.95 }}
       >
-        <Bell className="w-5 h-5 text-zinc-400" />
-        {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 flex items-center justify-center w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full border-2 border-black">
-            {unreadCount > 99 ? '99+' : unreadCount}
-          </span>
-        )}
-      </button>
+        <motion.div
+          animate={hasNew ? { rotate: [0, -10, 10, -10, 10, 0] } : {}}
+          transition={{ duration: 0.5 }}
+        >
+          <Bell className="w-5 h-5 text-zinc-400" />
+        </motion.div>
+        <AnimatePresence>
+          {unreadCount > 0 && (
+            <motion.span 
+              key={unreadCount}
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              className="absolute top-0 right-0 flex items-center justify-center w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full border-2 border-black"
+            >
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </motion.button>
 
       <AnimatePresence>
         {isOpen && (
@@ -104,7 +125,7 @@ export function NotificationCenter() {
               {notifications.length === 0 ? (
                 <div className="p-8 text-center text-zinc-500 flex flex-col items-center space-y-2">
                   <Bell className="w-8 h-8 opacity-20" />
-                  <p className="text-sm">You're all caught up!</p>
+                  <p className="text-sm">You&apos;re all caught up!</p>
                 </div>
               ) : (
                 <div className="divide-y divide-zinc-800/50">

@@ -8,6 +8,7 @@ import { getBadgeForPoints } from "@/lib/firebase/firestore";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trophy, Star, ShieldAlert, CheckCircle2, Leaf } from "lucide-react";
 import { useAuthStore } from "@/lib/stores/authStore";
+import Image from "next/image";
 
 export function Leaderboard() {
   const { user: currentUser } = useAuthStore();
@@ -23,7 +24,7 @@ export function Leaderboard() {
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const users = snapshot.docs.map(doc => ({
-        uid: doc.id,
+        id: doc.id,
         ...doc.data()
       })) as User[];
       setLeaders(users);
@@ -43,8 +44,8 @@ export function Leaderboard() {
   };
 
   return (
-    <div className="bg-zinc-900/50 border border-white/[0.04] rounded-2xl p-6 flex flex-col h-[500px]">
-      <h2 className="text-lg font-semibold text-zinc-100 mb-4 flex items-center gap-2">
+    <div className="bg-zinc-900/50 border border-white/[0.04] rounded-xl p-6 flex flex-col h-[500px]">
+      <h2 className="text-h3 text-zinc-100 mb-4 flex items-center gap-2">
         <Trophy className="w-5 h-5 text-yellow-500" />
         Civic Leaderboard
       </h2>
@@ -53,12 +54,12 @@ export function Leaderboard() {
         <AnimatePresence>
           <ul className="space-y-3 relative">
             {leaders.map((leader, index) => {
-              const isCurrentUser = leader.uid === currentUser?.uid;
+              const isCurrentUser = leader.id === currentUser?.uid;
               const badge = getBadgeForPoints(leader.points || 0);
 
               return (
                 <motion.li
-                  key={leader.uid || leader.email || index}
+                  key={leader.id || leader.email || index}
                   layout
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -79,9 +80,9 @@ export function Leaderboard() {
                   </div>
                   
                   <div className="relative">
-                    <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-800 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-800 flex items-center justify-center relative">
                       {leader.photoURL ? (
-                        <img src={leader.photoURL} alt={leader.displayName} className="w-full h-full object-cover" />
+                        <Image src={leader.photoURL} alt={leader.displayName} fill className="object-cover" />
                       ) : (
                         <span className="text-sm font-bold text-zinc-400">
                           {leader.displayName?.charAt(0).toUpperCase() || "U"}

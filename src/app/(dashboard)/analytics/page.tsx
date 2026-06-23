@@ -99,8 +99,10 @@ export default function AnalyticsPage() {
       }
 
       fetched.forEach(issue => {
-        if (!issue.reportedAt?.seconds) return;
-        const d = new Date(issue.reportedAt.seconds * 1000);
+        if (!issue.reportedAt) return;
+        const d = "seconds" in issue.reportedAt 
+          ? new Date(issue.reportedAt.seconds * 1000) 
+          : new Date(issue.reportedAt);
         const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         if (timelineMap.has(dateStr)) {
           const entry = timelineMap.get(dateStr);
@@ -385,7 +387,7 @@ export default function AnalyticsPage() {
                       </div>
 
                       <p className="text-sm text-zinc-400 mb-6 italic border-l-2 border-white/10 pl-3 py-1">
-                        "{pred.basis}"
+                        &quot;{pred.basis}&quot;
                       </p>
 
                       <div className="space-y-2 mb-6">
