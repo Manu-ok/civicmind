@@ -2,31 +2,49 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { LayoutDashboard, Plus, Map, Bot, List } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Newspaper, Plus, Compass, Users, User } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const mobileNavItems = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Report", href: "/report", icon: Plus },
-  { label: "Map", href: "/map", icon: Map },
-  { label: "Issues", href: "/issues", icon: List },
-  { label: "Agent", href: "/agent", icon: Bot },
-];
+import { useAuthStore } from "@/lib/stores/authStore";
+import { useFeedStats } from "@/lib/hooks/useFeedStats";
 
 export function MobileNav() {
   const pathname = usePathname();
+  const { user } = useAuthStore();
+  const { unreadCount } = useFeedStats();
+
+  const mobileNavItems = [
+    { label: "Feed", href: "/feed", icon: Newspaper, badge: unreadCount > 0 ? (unreadCount > 99 ? "99+" : unreadCount) : undefined },
+    { label: "Explore", href: "/explore", icon: Compass },
+    { label: "Report", href: "/report", icon: Plus, isPrimary: true },
+    { label: "Circles", href: "/circles", icon: Users },
+    { label: "Profile", href: `/profile/${user?.username || 'user'}`, icon: User },
+  ];
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-[100] border-t border-white/[0.06] bg-zinc-950/90 backdrop-blur-2xl md:hidden">
-      <div className="flex items-center justify-around px-2 py-1.5">
+      <div className="flex items-center justify-around px-2 py-1.5 h-16">
         {mobileNavItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+          
+          if (item.isPrimary) {
+            return (
+              <div key={item.href} className="relative -top-5 flex flex-col items-center">
+                <Link
+                  href={item.href}
+                  className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-violet-600 shadow-lg shadow-blue-500/20 transition-transform active:scale-95"
+                >
+                  <item.icon className="h-6 w-6 text-white" />
+                </Link>
+              </div>
+            );
+          }
+
           return (
             <Link
               key={item.href}
               href={item.href}
-              className="group relative flex flex-col items-center gap-1 px-3 py-1.5 w-16"
+              className="group relative flex flex-col items-center justify-center gap-1 px-3 w-16 h-full"
             >
               {isActive && (
                 <motion.div
@@ -35,15 +53,31 @@ export function MobileNav() {
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 />
               )}
-              <item.icon
-                className={cn(
-                  "relative z-10 h-5 w-5 transition-colors",
-                  isActive ? "text-blue-400" : "text-zinc-500 group-hover:text-zinc-300"
-                )}
-              />
+              
+              <div className="relative">
+                <item.icon
+                  className={cn(
+                    "relative z-10 h-5 w-5 transition-colors",
+                    isActive ? "text-blue-400" : "text-zinc-500 group-hover:text-zinc-300"
+                  )}
+                />
+                <AnimatePresence>
+                  {item.badge && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0 }}
+                      className="absolute -top-1.5 -right-2 flex h-4 px-1 min-w-[16px] items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white shadow-lg shadow-red-500/20 z-20"
+                    >
+                      {item.badge}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+              
               <span
                 className={cn(
-                  "relative z-10 text-[10px] font-medium transition-colors",
+                  "relative z-10 text-[10px] font-medium transition-colors mt-0.5",
                   isActive ? "text-blue-400" : "text-zinc-500 group-hover:text-zinc-300"
                 )}
               >
@@ -54,7 +88,7 @@ export function MobileNav() {
               {isActive && (
                 <motion.div
                   layoutId="mobile-dot"
-                  className="absolute bottom-0.5 w-1 h-1 rounded-full bg-blue-400"
+                  className="absolute bottom-1 w-1 h-1 rounded-full bg-blue-400"
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 />
               )}

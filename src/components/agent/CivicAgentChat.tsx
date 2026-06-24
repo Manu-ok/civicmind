@@ -120,7 +120,7 @@ export function CivicAgentChat({ chatId }: CivicAgentChatProps) {
       const errorMsg: AgentMessageType = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: `Error: ${error.message || "Unknown error occurred."}`,
+        content: `Error: ${(error as any).message || "Unknown error occurred."}`,
         timestamp: new Date() as any
       };
       setMessages(prev => [...prev, errorMsg]);

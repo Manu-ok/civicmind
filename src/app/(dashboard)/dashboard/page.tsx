@@ -20,9 +20,15 @@ import { Progress } from "@/components/ui/progress";
 import { 
   AlertTriangle, MapPin, CheckCircle2, TrendingUp, Users, Clock, 
   ShieldCheck, AlertOctagon, Droplets, Zap, Trash2, Shield, MoreHorizontal,
-  Brain, FileText, Activity, ChevronRight, Target
+  Brain, FileText, Activity, ChevronRight, Target, BookOpen, Bell, ArrowRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useFollowList } from "@/lib/hooks/useFollowList";
+import { useFeed } from "@/lib/hooks/useFeed";
+import { useStories } from "@/lib/hooks/useStories";
+import { StoryRing } from "@/components/social/StoryRing";
+import { UserAvatar } from "@/components/social/UserAvatar";
+import Link from "next/link";
 
 // Mock Data for Categories & Predictions (if analytics is empty)
 const MOCK_CATEGORIES = [
@@ -62,6 +68,14 @@ export default function DashboardPage() {
   const [topCitizens, setTopCitizens] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
+  // New social hooks
+  const { users: followers } = useFollowList(user?.id || "", "followers");
+  const { users: following } = useFollowList(user?.id || "", "following");
+  const { newItemCount: unreadFeedCount } = useFeed("for-you");
+  const { storyGroups } = useStories();
+
+  const [activeUsers, setActiveUsers] = useState<any[]>([]);
+
   useEffect(() => {
     async function loadData() {
       try {
@@ -72,6 +86,21 @@ export default function DashboardPage() {
 
         const citizens = await getTopCitizens(user?.city || "Unknown", 5);
         setTopCitizens(citizens);
+
+        // Derive active users from recent issues (simulating "active now")
+        const uniqueReporters = new Map();
+        issues.slice(0, 20).forEach(issue => {
+          if (!uniqueReporters.has(issue.reportedBy)) {
+            uniqueReporters.set(issue.reportedBy, {
+              id: issue.reportedBy,
+              displayName: issue.reportedByDisplayName || "Anonymous",
+              category: issue.category,
+              ward: issue.location?.ward || "City Area",
+              timestamp: issue.reportedAt,
+            });
+          }
+        });
+        setActiveUsers(Array.from(uniqueReporters.values()).slice(0, 5));
       } catch (e) {
         console.error(e);
       } finally {
@@ -181,6 +210,68 @@ export default function DashboardPage() {
         )}
       </motion.div>
 
+      {/* SECTION 1.5: Social Stats Strip & Stories */}
+      <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-12">
+        <div className="lg:col-span-8">
+          <div className="grid gap-4 sm:grid-cols-3">
+            <GlowCard className="p-4 rounded-xl border border-white/5 bg-zinc-900/50 hover:bg-zinc-800/50 transition-all flex items-center justify-between">
+              <div>
+                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-1">Followers</p>
+                <div className="flex items-baseline gap-2">
+                  <p className="text-2xl font-bold text-white">{followers.length}</p>
+                  <span className="text-xs font-bold text-blue-400">+3 this week</span>
+                </div>
+              </div>
+              <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
+                <Users className="w-5 h-5 text-blue-400" />
+              </div>
+            </GlowCard>
+            <GlowCard className="p-4 rounded-xl border border-white/5 bg-zinc-900/50 hover:bg-zinc-800/50 transition-all flex items-center justify-between">
+              <div>
+                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-1">Following</p>
+                <p className="text-2xl font-bold text-white">{following.length}</p>
+              </div>
+              <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center">
+                <Target className="w-5 h-5 text-purple-400" />
+              </div>
+            </GlowCard>
+            <Link href="/feed">
+              <GlowCard className="p-4 rounded-xl border border-white/5 bg-zinc-900/50 hover:bg-zinc-800/50 transition-all flex items-center justify-between group h-full">
+                <div>
+                  <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-1">Unread Feed</p>
+                  <p className="text-2xl font-bold text-white group-hover:text-amber-400 transition-colors">{unreadFeedCount}</p>
+                </div>
+                <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center">
+                  <Bell className="w-5 h-5 text-amber-400" />
+                </div>
+              </GlowCard>
+            </Link>
+          </div>
+        </div>
+
+        <div className="lg:col-span-4">
+          <GlowCard className="p-4 rounded-xl border border-white/5 bg-zinc-900/50 h-full flex flex-col justify-center">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-blue-400" /> Stories from your community
+              </h3>
+              <Link href="/feed" className="text-xs text-zinc-400 hover:text-white flex items-center">
+                See all <ChevronRight className="w-3 h-3 ml-1" />
+              </Link>
+            </div>
+            <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-2">
+              {storyGroups.length > 0 ? (
+                storyGroups.slice(0, 5).map(group => (
+                  <StoryRing key={group.user.id} user={group.user} hasUnviewed={group.hasUnviewed} size="sm" onClick={() => router.push('/feed')} />
+                ))
+              ) : (
+                <p className="text-xs text-zinc-500 font-medium">No new stories right now.</p>
+              )}
+            </div>
+          </GlowCard>
+        </div>
+      </div>
+
       {/* SECTION 3: Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
@@ -232,6 +323,34 @@ export default function DashboardPage() {
               <Button onClick={() => router.push('/agent')} variant="outline" className="w-full justify-start h-14 bg-purple-500/10 text-purple-400 border-purple-500/20 hover:bg-purple-500/20 rounded-xl text-lg">
                 <Brain className="w-5 h-5 mr-3" /> Ask CivicAgent
               </Button>
+            </div>
+          </Card>
+
+          {/* Who's Active Now */}
+          <Card className="p-6 bg-zinc-900 border-white/5 space-y-4">
+            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" /> Who&apos;s Active Now
+            </h3>
+            <div className="flex flex-col gap-3">
+              {activeUsers.map(u => (
+                <div key={u.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors">
+                  <div className="relative">
+                    <UserAvatar userId={u.id} size="sm" clickable />
+                    <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-zinc-900 rounded-full" />
+                  </div>
+                  <div>
+                    <Link href={`/profile/${u.id}`} className="text-sm font-bold text-zinc-200 hover:text-blue-400 hover:underline">
+                      {u.displayName}
+                    </Link>
+                    <p className="text-xs text-zinc-500">
+                      reported <span className="text-zinc-400 capitalize">{u.category}</span> issue in <span className="text-zinc-400">{u.ward}</span>
+                    </p>
+                  </div>
+                </div>
+              ))}
+              {activeUsers.length === 0 && !isLoading && (
+                <p className="text-xs text-zinc-500">No recent activity.</p>
+              )}
             </div>
           </Card>
 

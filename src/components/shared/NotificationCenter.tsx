@@ -1,27 +1,38 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Bell, CheckCircle2, Star, ShieldAlert, Zap, MapPin } from "lucide-react";
+import { Bell, CheckCircle2, Star, ShieldAlert, Zap, MapPin, MessageSquare, ThumbsUp, UserPlus, Users, Image as ImageIcon, Check } from "lucide-react";
 import { useAuthStore } from "@/lib/stores/authStore";
-import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
+import { collection, onSnapshot, query, orderBy, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { AppNotification, markNotificationRead, markAllNotificationsRead } from "@/lib/firebase/firestore";
-import { AnimatePresence, motion } from "framer-motion";
-import { formatDistanceToNow } from "date-fns";
+import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import { formatDistanceToNow, isToday, isYesterday, isThisWeek } from "date-fns";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
+
+type CategoryFilter = "all" | "social" | "issues" | "achievements";
 
 export function NotificationCenter() {
   const { user } = useAuthStore();
+  const router = useRouter();
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [filter, setFilter] = useState<CategoryFilter>("all");
   const dropdownRef = useRef<HTMLDivElement>(null);
   const prevUnreadCount = useRef(0);
+  const isFirstLoad = useRef(true);
 
   useEffect(() => {
     if (!user) return;
 
     const q = query(
       collection(db, "users", user.id, "notifications"),
-      orderBy("createdAt", "desc")
+      orderBy("createdAt", "desc"),
+      limit(50)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -29,7 +40,35 @@ export function NotificationCenter() {
         id: doc.id,
         ...doc.data()
       })) as AppNotification[];
+      
       setNotifications(notifs);
+
+      // Handle real-time toasts
+      if (!isFirstLoad.current) {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === "added") {
+            const newNotif = change.doc.data() as AppNotification;
+            if (!newNotif.read) {
+              toast.custom((t) => (
+                <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-sm w-full bg-zinc-900 border border-white/10 shadow-2xl rounded-2xl pointer-events-auto flex items-start gap-3 p-4`}>
+                  {newNotif.actorPhotoUrl ? (
+                    <img src={newNotif.actorPhotoUrl} alt="" className="w-10 h-10 rounded-full object-cover shrink-0" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
+                      <Bell className="w-5 h-5" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-white mb-0.5">{newNotif.title}</p>
+                    <p className="text-xs text-zinc-400 line-clamp-2">{newNotif.message}</p>
+                  </div>
+                </div>
+              ), { duration: 4000 });
+            }
+          }
+        });
+      }
+      isFirstLoad.current = false;
     });
 
     return () => unsubscribe();
@@ -60,17 +99,58 @@ export function NotificationCenter() {
   const handleNotificationClick = (n: AppNotification) => {
     if (user && n.id && !n.read) markNotificationRead(user.id, n.id);
     setIsOpen(false);
+
+    // Route based on type
+    if (n.issueId) {
+      router.push(`/issues/${n.issueId}`);
+    } else if (n.actorUsername) {
+      router.push(`/profile/${n.actorUsername}`);
+    } else if (n.circleId) {
+      router.push(`/circles/${n.circleId}`);
+    }
   };
 
   const getIcon = (type: string) => {
     switch (type) {
-      case 'points': return <Star className="w-4 h-4 text-yellow-500" />;
-      case 'verified': return <CheckCircle2 className="w-4 h-4 text-blue-500" />;
-      case 'status_change': return <ShieldAlert className="w-4 h-4 text-green-500" />;
-      case 'nearby_issue': return <MapPin className="w-4 h-4 text-red-500" />;
-      default: return <Zap className="w-4 h-4 text-purple-500" />;
+      case 'points': 
+      case 'achievement': return <Star className="w-5 h-5 text-yellow-500" />;
+      case 'verified': 
+      case 'issue_resolved': return <CheckCircle2 className="w-5 h-5 text-green-500" />;
+      case 'status_change': return <ShieldAlert className="w-5 h-5 text-blue-500" />;
+      case 'nearby_issue': return <MapPin className="w-5 h-5 text-red-500" />;
+      case 'new_follower': return <UserPlus className="w-5 h-5 text-fuchsia-500" />;
+      case 'comment_on_issue':
+      case 'mention': return <MessageSquare className="w-5 h-5 text-blue-500" />;
+      case 'reaction_on_issue': return <ThumbsUp className="w-5 h-5 text-orange-500" />;
+      case 'circle_invite': return <Users className="w-5 h-5 text-violet-500" />;
+      case 'story_interaction': return <ImageIcon className="w-5 h-5 text-pink-500" />;
+      default: return <Zap className="w-5 h-5 text-purple-500" />;
     }
   };
+
+  // Filter notifications
+  const filteredNotifications = notifications.filter(n => {
+    if (filter === "all") return true;
+    if (filter === "social") return ['new_follower', 'mention', 'comment_on_issue', 'reaction_on_issue', 'story_interaction', 'circle_invite'].includes(n.type);
+    if (filter === "issues") return ['status_change', 'nearby_issue', 'verified', 'issue_resolved'].includes(n.type);
+    if (filter === "achievements") return ['points', 'achievement'].includes(n.type);
+    return true;
+  });
+
+  // Group notifications
+  const groupedNotifications = filteredNotifications.reduce((acc, notif) => {
+    const date = notif.createdAt.toDate();
+    let group = "Older";
+    if (isToday(date)) group = "Today";
+    else if (isYesterday(date)) group = "Yesterday";
+    else if (isThisWeek(date)) group = "This Week";
+
+    if (!acc[group]) acc[group] = [];
+    acc[group].push(notif);
+    return acc;
+  }, {} as Record<string, AppNotification[]>);
+
+  const groupOrder = ["Today", "Yesterday", "This Week", "Older"];
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -80,8 +160,8 @@ export function NotificationCenter() {
         whileTap={{ scale: 0.95 }}
       >
         <motion.div
-          animate={hasNew ? { rotate: [0, -10, 10, -10, 10, 0] } : {}}
-          transition={{ duration: 0.5 }}
+          animate={hasNew ? { rotate: [0, -15, 15, -15, 15, 0] } : {}}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
         >
           <Bell className="w-5 h-5 text-zinc-400" />
         </motion.div>
@@ -90,8 +170,9 @@ export function NotificationCenter() {
             <motion.span 
               key={unreadCount}
               initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
+              animate={{ scale: [1, 1.5, 1], opacity: 1 }}
               exit={{ scale: 0, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
               className="absolute top-0 right-0 flex items-center justify-center w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full border-2 border-black"
             >
               {unreadCount > 99 ? '99+' : unreadCount}
@@ -106,56 +187,127 @@ export function NotificationCenter() {
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            transition={{ duration: 0.15 }}
-            className="absolute right-0 mt-2 w-80 sm:w-96 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden z-50"
+            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+            className="absolute right-0 mt-2 w-80 sm:w-96 bg-zinc-950 border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 flex flex-col max-h-[85vh]"
           >
-            <div className="p-4 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/50">
-              <h3 className="font-semibold text-zinc-100">Notifications</h3>
+            {/* Header */}
+            <div className="p-4 border-b border-white/10 flex items-center justify-between bg-zinc-900/50 backdrop-blur-md">
+              <h3 className="font-bold text-white">Notifications</h3>
               {unreadCount > 0 && (
                 <button 
                   onClick={handleMarkAllRead}
-                  className="text-xs text-blue-400 hover:text-blue-300 transition-colors font-medium"
+                  className="text-xs font-bold text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1"
                 >
-                  Mark all read
+                  <Check className="w-3 h-3" /> Mark all read
                 </button>
               )}
             </div>
 
-            <div className="max-h-[400px] overflow-y-auto">
-              {notifications.length === 0 ? (
-                <div className="p-8 text-center text-zinc-500 flex flex-col items-center space-y-2">
-                  <Bell className="w-8 h-8 opacity-20" />
-                  <p className="text-sm">You&apos;re all caught up!</p>
+            {/* Filters */}
+            <div className="flex gap-2 p-3 border-b border-white/5 overflow-x-auto no-scrollbar">
+              {(["all", "social", "issues", "achievements"] as CategoryFilter[]).map(f => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className={cn(
+                    "px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all",
+                    filter === f ? "bg-white text-black" : "bg-zinc-900 text-zinc-400 hover:text-white"
+                  )}
+                >
+                  {f.charAt(0).toUpperCase() + f.slice(1)}
+                </button>
+              ))}
+            </div>
+
+            {/* List */}
+            <div className="overflow-y-auto flex-1 p-2 space-y-4">
+              {filteredNotifications.length === 0 ? (
+                <div className="p-8 text-center flex flex-col items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-zinc-900 flex items-center justify-center mb-3">
+                    <Bell className="w-5 h-5 text-zinc-600" />
+                  </div>
+                  <p className="text-zinc-500 text-sm font-bold">No notifications found</p>
+                  <p className="text-zinc-600 text-xs mt-1">You&apos;re all caught up!</p>
                 </div>
               ) : (
-                <div className="divide-y divide-zinc-800/50">
-                  {notifications.map((n) => (
-                    <div 
-                      key={n.id} 
-                      onClick={() => handleNotificationClick(n)}
-                      className={`p-4 flex gap-3 cursor-pointer hover:bg-zinc-800/50 transition-colors ${!n.read ? 'bg-blue-500/5' : ''}`}
-                    >
-                      <div className="mt-1 flex-shrink-0">
-                        {getIcon(n.type)}
+                groupOrder.map(group => {
+                  if (!groupedNotifications[group]) return null;
+                  return (
+                    <div key={group} className="space-y-1">
+                      <div className="px-3 py-1.5 text-xs font-bold text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-950/80 backdrop-blur-md z-10">
+                        {group}
                       </div>
-                      <div className="flex-1 space-y-1">
-                        <div className="flex justify-between items-start gap-2">
-                          <p className={`text-sm ${!n.read ? 'text-zinc-100 font-medium' : 'text-zinc-300'}`}>
-                            {n.title}
-                          </p>
-                          {!n.read && <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0 mt-1.5" />}
+                      {groupedNotifications[group].map((n) => (
+                        <div 
+                          key={n.id}
+                          onClick={() => handleNotificationClick(n)}
+                          className={cn(
+                            "relative flex items-start gap-3 p-3 rounded-xl cursor-pointer transition-colors",
+                            !n.read ? "bg-blue-500/5 hover:bg-blue-500/10" : "hover:bg-zinc-900"
+                          )}
+                        >
+                          {!n.read && (
+                            <div className="absolute left-1.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-blue-500" />
+                          )}
+                          
+                          <div className={cn("relative shrink-0 w-10 h-10 rounded-full flex items-center justify-center", !n.actorPhotoUrl && "bg-zinc-800")}>
+                            {n.actorPhotoUrl ? (
+                              <img src={n.actorPhotoUrl} alt="" className="w-full h-full rounded-full object-cover" />
+                            ) : (
+                              getIcon(n.type)
+                            )}
+                            {/* Type badge on avatar */}
+                            {n.actorPhotoUrl && (
+                              <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-zinc-900 border-2 border-zinc-950 flex items-center justify-center">
+                                {React.cloneElement(getIcon(n.type) as React.ReactElement<any>, { className: "w-3 h-3" })}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex-1 min-w-0 pr-1">
+                            <p className="text-sm text-zinc-200 line-clamp-2 leading-snug">
+                              {n.actorUsername ? (
+                                <Link href={`/profile/${n.actorUsername}`} className="font-bold text-white hover:underline mr-1" onClick={(e) => e.stopPropagation()}>
+                                  {n.actorName} <span className="text-zinc-400 font-normal">@{n.actorUsername}</span>
+                                </Link>
+                              ) : (
+                                <span className="font-bold text-white">{n.actorName || n.title} </span>
+                              )}
+                              {n.message.replace(n.actorName + ' ', '')}
+                            </p>
+                            <p className="text-[10px] text-zinc-500 mt-1 font-medium">
+                              {formatDistanceToNow(n.createdAt.toDate(), { addSuffix: true })}
+                            </p>
+                          </div>
+
+                          {/* Action area / Thumbnail */}
+                          {n.type === 'new_follower' && (
+                            <button className="shrink-0 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors">
+                              Follow
+                            </button>
+                          )}
+                          {/* We don't have issue thumbnail URL in notification yet, but we can put a placeholder */}
+                          {n.issueId && !['new_follower', 'achievement', 'circle_invite'].includes(n.type) && (
+                            <div className="shrink-0 w-12 h-12 rounded-lg bg-zinc-800 overflow-hidden ml-2 flex items-center justify-center">
+                              <MapPin className="w-4 h-4 text-zinc-600" />
+                            </div>
+                          )}
                         </div>
-                        <p className="text-xs text-zinc-400 line-clamp-2">
-                          {n.message}
-                        </p>
-                        <p className="text-[10px] text-zinc-500 font-medium">
-                          {n.createdAt ? formatDistanceToNow(n.createdAt.toDate(), { addSuffix: true }) : 'Just now'}
-                        </p>
-                      </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  );
+                })
               )}
+            </div>
+
+            {/* Footer */}
+            <div className="p-3 border-t border-white/10 bg-zinc-900/30 text-center">
+              <button 
+                onClick={() => { setIsOpen(false); router.push('/settings?tab=notifications'); }}
+                className="text-xs text-zinc-500 hover:text-white transition-colors"
+              >
+                Notification Settings
+              </button>
             </div>
           </motion.div>
         )}

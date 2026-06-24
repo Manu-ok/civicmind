@@ -22,7 +22,7 @@ export function AgentMessage({ message }: AgentMessageProps) {
     toast.success("Copied to clipboard");
   };
 
-  const timerRef = React.useRef<NodeJS.Timeout>();
+  const timerRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const handleTouchStart = () => {
     timerRef.current = setTimeout(() => {
@@ -106,7 +106,7 @@ export function AgentMessage({ message }: AgentMessageProps) {
             isAssistant ? "justify-start ml-2" : "justify-end mr-2"
           )}>
             <span className="text-[10px] text-zinc-500">
-              {format(message.timestamp?.toDate ? message.timestamp.toDate() : new Date(message.timestamp || Date.now()), 'h:mm a')}
+              {format((message.timestamp as any)?.toDate ? (message.timestamp as any).toDate() : new Date(message.timestamp as any || Date.now()), 'h:mm a')}
             </span>
             {isAssistant && (
               <button onClick={handleCopy} className="text-zinc-500 hover:text-white transition-colors">

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { onAuthStateChange } from "@/lib/firebase/auth";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { motion } from "framer-motion";
+import { expireOldStories } from "@/lib/firebase/social";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { setUser, setLoading, loading } = useAuthStore();
@@ -12,6 +13,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsubscribe = onAuthStateChange((user) => {
       setUser(user);
       setLoading(false);
+      
+      // Silently expire old stories once per session
+      if (user) {
+        expireOldStories().catch(err => console.error("Story expiry failed:", err));
+      }
     });
 
     return () => unsubscribe();

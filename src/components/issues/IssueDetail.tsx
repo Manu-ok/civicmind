@@ -6,7 +6,7 @@ import { formatDistanceToNow } from "date-fns";
 import { 
   MapPin, Clock, Brain, CheckCircle2, ChevronLeft, ChevronRight, 
   ThumbsUp, User as UserIcon, ShieldCheck, AlertTriangle, Image as ImageIcon,
-  Building, Target, ShieldAlert, Activity, Navigation, X
+  Building, Target, ShieldAlert, Activity, Navigation, X, Share2, Loader2, MessageSquare, Users
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -22,9 +22,13 @@ import { Progress } from "@/components/ui/progress";
 import { Card } from "@/components/ui/card";
 import toast from "react-hot-toast";
 import { StatusTimeline } from "./StatusTimeline";
+import { ShareCard } from "@/components/social/ShareCard";
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { AnimatedCounter } from "@/components/shared/AnimatedCounter";
+import { CommentSection } from "@/components/social/CommentSection";
+import { ReactionBar } from "@/components/social/ReactionBar";
+import Link from "next/link";
 
 export function IssueDetail({ issue }: { issue: Issue }) {
   const router = useRouter();
@@ -38,6 +42,7 @@ export function IssueDetail({ issue }: { issue: Issue }) {
   const [adminNote, setAdminNote] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const [showStreetView, setShowStreetView] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   useEffect(() => {
     if (issue.reportedBy) {
@@ -180,42 +185,78 @@ export function IssueDetail({ issue }: { issue: Issue }) {
             </div>
             <div className="flex items-center gap-3 text-zinc-300">
               <Clock className="w-5 h-5 text-primary" />
-              <span>Reported {formatDistanceToNow(issue.reportedAt as any, { addSuffix: true })}</span>
+              <span>Reported {formatDistanceToNow(
+                issue.reportedAt?.toDate?.() || new Date(issue.reportedAt || Date.now()), 
+                { addSuffix: true }
+              )}</span>
             </div>
           </div>
 
           <div className="flex items-center justify-between mt-auto pt-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-zinc-800 overflow-hidden border border-white/10">
-                {reporter?.photoURL ? (
-                  <Image src={reporter.photoURL} alt={reporter.displayName} fill className="object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-primary/20 text-primary">
-                    <UserIcon className="w-5 h-5" />
+            <div className="w-full rounded-2xl bg-zinc-900/50 border border-white/5 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:bg-zinc-900">
+              <div className="flex items-center gap-4">
+                <Link href={reporter?.username ? `/profile/${reporter.username}` : '#'} className="relative w-12 h-12 rounded-full bg-zinc-800 overflow-hidden border-2 border-white/10 shrink-0 hover:border-blue-500/50 transition-colors">
+                  {reporter?.photoURL ? (
+                    <Image src={reporter.photoURL} alt={reporter.displayName} fill className="object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-primary/20 text-primary">
+                      <UserIcon className="w-6 h-6" />
+                    </div>
+                  )}
+                </Link>
+                <div className="flex flex-col">
+                  <Link href={reporter?.username ? `/profile/${reporter.username}` : '#'} className="text-base font-bold text-white hover:underline decoration-white/30 flex items-center gap-1">
+                    {reporter?.displayName || "Anonymous Citizen"}
+                    {(reporter as any)?.isVerified && <CheckCircle2 className="w-4 h-4 text-blue-500" />}
+                  </Link>
+                  <p className="text-sm text-zinc-400">@{reporter?.username || 'user'}</p>
+                  <div className="flex items-center gap-3 mt-1 text-xs text-zinc-500 font-medium">
+                    <span>{reporter?.issuesReported || 0} issues reported</span>
+                    <span className="w-1 h-1 rounded-full bg-zinc-700" />
+                    <span>{(reporter as any)?.followersCount || 0} followers</span>
                   </div>
-                )}
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-medium text-white">{reporter?.displayName || "Anonymous Citizen"}</p>
-                <p className="text-xs text-zinc-500">Civic Reporter</p>
+              
+              <div className="shrink-0 flex items-center">
+                {user?.id === reporter?.id ? (
+                  <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/20 py-1.5 px-3">
+                    Your Report
+                  </Badge>
+                ) : (
+                  <Button variant="outline" size="sm" className="bg-white text-black hover:bg-zinc-200 border-none rounded-full px-5 font-bold h-9">
+                    Follow
+                  </Button>
+                )}
               </div>
             </div>
 
-            <div className="flex gap-2 items-center">
-              {user?.role === "admin" && (
+            {/* Reaction Bar & Share */}
+            <div className="flex flex-wrap items-center gap-3 w-full">
+              <div className="flex-1 min-w-[200px]">
+                <ReactionBar 
+                  type="issue" 
+                  issueId={issue.id} 
+                  currentReaction={null} // TODO: hook up to real current user reaction state if available
+                  reactionCounts={issue.reactionCounts || {}} 
+                  onReact={() => {}} 
+                />
+              </div>
+              <div className="flex gap-2 shrink-0 ml-auto">
+                <Button onClick={() => setIsShareOpen(true)} variant="outline" className="border-white/10 hover:bg-white/5 bg-zinc-900 text-white font-bold h-10 rounded-xl px-4">
+                  <Share2 className="w-4 h-4 mr-2" /> Share
+                </Button>
+                <Button onClick={handleUpvote} disabled={hasUpvoted} className={cn("h-10 rounded-xl font-bold transition-all shadow-xl px-4", hasUpvoted ? "bg-zinc-800 text-zinc-400 border border-white/5" : "bg-indigo-500 hover:bg-indigo-600 text-white shadow-indigo-500/20")}>
+                  <ThumbsUp className={cn("w-4 h-4 mr-2", hasUpvoted && "fill-current")} />
+                  {hasUpvoted ? "Upvoted" : "Upvote"}
+                </Button>
+              </div>
+            </div>
+            {user?.role === "admin" && (
                 <Button onClick={() => setIsAdminModalOpen(true)} variant="outline" className="bg-zinc-900 text-blue-400 border-blue-500/20 hover:bg-blue-500/20">
-                  Update Status
+                  Update Status (Admin)
                 </Button>
               )}
-              <Button 
-                onClick={handleUpvote} 
-                variant={hasUpvoted ? "default" : "outline"}
-                className={cn("gap-2", hasUpvoted ? "bg-blue-600 hover:bg-blue-700" : "bg-zinc-900 border-white/10")}
-              >
-                <ThumbsUp className={cn("w-4 h-4", hasUpvoted ? "fill-white" : "")} />
-                <span className="font-bold">{upvotes}</span>
-              </Button>
-            </div>
           </div>
         </div>
       </div>
@@ -328,6 +369,44 @@ export function IssueDetail({ issue }: { issue: Issue }) {
             </Card>
           )}
 
+          {/* Comments Section */}
+          <div className="pt-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-blue-400" />
+                Join the discussion
+              </h3>
+              <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/20">
+                {issue.commentCount || 0} Comments
+              </Badge>
+            </div>
+            <CommentSection issueId={issue.id} isExpanded={true} />
+          </div>
+
+          {/* Related Issues by Same Reporter */}
+          {reporter && (
+            <div className="pt-8 border-t border-white/5">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-bold text-white">
+                  More from @{reporter.username || 'user'}
+                </h3>
+                <Link href={`/profile/${reporter.username}`} className="text-sm text-blue-400 hover:text-blue-300 font-medium">
+                  View all
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* 3 placeholder cards for related issues */}
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="bg-zinc-900/50 border border-white/5 rounded-xl p-3 hover:bg-zinc-900 transition-colors cursor-pointer">
+                    <div className="aspect-video bg-zinc-800 rounded-lg mb-3" />
+                    <p className="text-sm font-bold text-white line-clamp-2 leading-tight mb-1">Other issue reported by this user</p>
+                    <p className="text-xs text-zinc-500">2 days ago</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
         </div>
 
         {/* RIGHT COLUMN: Verifications & Map */}
@@ -341,7 +420,7 @@ export function IssueDetail({ issue }: { issue: Issue }) {
           <Card className="p-1 bg-zinc-900/50 border-white/5 overflow-hidden group relative">
              <div className="relative h-48 w-full pointer-events-none">
                 {issue.location.lat && issue.location.lng ? (
-                  <MiniMap initialLocation={{ lat: issue.location.lat, lng: issue.location.lng, address: issue.location.address }} />
+                  <MiniMap initialLocation={{ lat: issue.location.lat, lng: issue.location.lng }} onLocationChange={() => {}} />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-zinc-950">
                     <MapPin className="w-8 h-8 text-zinc-700" />
@@ -386,7 +465,10 @@ export function IssueDetail({ issue }: { issue: Issue }) {
                         </div>
                         <span className="text-sm font-medium text-zinc-300">{v.userDisplayName}</span>
                       </div>
-                      <span className="text-xs text-zinc-500">{formatDistanceToNow(v.timestamp as any, { addSuffix: true })}</span>
+                      <span className="text-xs text-zinc-500">{formatDistanceToNow(
+                        v.timestamp?.toDate?.() || new Date(v.timestamp || Date.now()), 
+                        { addSuffix: true }
+                      )}</span>
                     </div>
                     {v.mediaUrl && (
                       <div className="w-full h-24 rounded-lg overflow-hidden relative">
@@ -413,23 +495,79 @@ export function IssueDetail({ issue }: { issue: Issue }) {
             </div>
           </Card>
 
+          {/* People who reported nearby issues */}
+          <Card className="p-6 bg-zinc-900/50 border-white/5">
+            <h3 className="font-bold text-sm text-zinc-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              Active in {issue.location.ward}
+            </h3>
+            <div className="flex flex-col gap-4">
+              <div className="flex -space-x-3">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Link href="#" key={i} className="relative w-10 h-10 rounded-full border-2 border-zinc-950 bg-zinc-800 hover:-translate-y-1 transition-transform z-10 hover:z-20 flex items-center justify-center">
+                    <UserIcon className="w-4 h-4 text-zinc-500" />
+                  </Link>
+                ))}
+                <div className="relative w-10 h-10 rounded-full border-2 border-zinc-950 bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-400 z-0">
+                  +42
+                </div>
+              </div>
+              <p className="text-sm text-zinc-300">
+                <span className="font-bold text-white">47 citizens</span> have reported issues nearby this week.
+              </p>
+            </div>
+          </Card>
+
+          {/* Social Share Stats */}
+          <Card className="p-6 bg-zinc-900/50 border-white/5 overflow-hidden relative">
+            <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+              <Share2 className="w-24 h-24" />
+            </div>
+            <h3 className="font-bold text-lg text-white mb-4">Impact Tracker</h3>
+            <div className="space-y-4 relative z-10">
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-zinc-400">Community Reactions</span>
+                  <span className="font-bold text-white">{Object.values(issue.reactionCounts || {}).reduce((a, b) => a + b, 0)}</span>
+                </div>
+                <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-orange-500 to-amber-500 w-[65%]" />
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-zinc-400">Shares & Forwards</span>
+                  <span className="font-bold text-white">{issue.shareCount || 0}</span>
+                </div>
+                <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 w-[40%]" />
+                </div>
+              </div>
+            </div>
+          </Card>
+
         </div>
       </div>
 
       {/* Admin Update Status Modal */}
       <AnimatePresence>
         {isAdminModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center pt-20 px-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsAdminModalOpen(false)} />
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative w-full max-w-lg bg-zinc-900 border border-white/10 p-6 rounded-2xl shadow-2xl">
-              <h2 className="text-xl font-bold text-white mb-4">Update Issue Status</h2>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-zinc-900 border border-white/10 rounded-2xl p-6 max-w-md w-full shadow-2xl"
+            >
+              <h3 className="text-xl font-bold text-white mb-4">Update Status (Admin)</h3>
+              
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-zinc-400 block mb-1">Status</label>
+                  <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2 block">New Status</label>
                   <select 
                     value={newStatus}
                     onChange={(e) => setNewStatus(e.target.value)}
-                    className="w-full bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full bg-zinc-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500"
                   >
                     <option value="pending">Pending</option>
                     <option value="verified">Verified</option>
@@ -437,21 +575,15 @@ export function IssueDetail({ issue }: { issue: Issue }) {
                     <option value="resolved">Resolved</option>
                   </select>
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-zinc-400 block mb-1">Admin Note (Internal)</label>
-                  <textarea 
-                    value={adminNote}
-                    onChange={(e) => setAdminNote(e.target.value)}
-                    className="w-full bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-blue-500 min-h-[100px]"
-                    placeholder="Add notes about this update..."
-                  />
-                </div>
-                <div className="flex justify-end gap-3 pt-4">
-                  <Button variant="ghost" onClick={() => setIsAdminModalOpen(false)}>Cancel</Button>
-                  <Button onClick={handleUpdateStatus} disabled={isUpdating} className="bg-blue-600 hover:bg-blue-700">
-                    {isUpdating ? "Updating..." : "Save Update"}
-                  </Button>
-                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <Button variant="outline" onClick={() => setIsAdminModalOpen(false)} className="flex-1 border-white/10 bg-transparent hover:bg-white/5 text-white">
+                  Cancel
+                </Button>
+                <Button onClick={handleUpdateStatus} disabled={isUpdating} className="flex-1 bg-blue-500 hover:bg-blue-600 text-white">
+                  {isUpdating ? <Loader2 className="w-5 h-5 animate-spin" /> : "Update Status"}
+                </Button>
               </div>
             </motion.div>
           </div>

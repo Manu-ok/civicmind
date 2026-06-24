@@ -3,12 +3,15 @@
 import { Issue } from "@/lib/types";
 import { formatDistanceToNow } from "date-fns";
 import { motion, useMotionValue, useTransform } from "framer-motion";
+import Link from "next/link";
 import { MapPin, ArrowUpCircle, CheckCircle2, Loader2, MapIcon, ThumbsUp } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { GlowCard } from "../shared/GlowCard";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
+import { useState } from "react";
+import { ShareCard } from "@/components/social/ShareCard";
 
 export function IssueCard({ issue, index = 0 }: { issue: Issue; index?: number }) {
   const router = useRouter();
@@ -31,6 +34,7 @@ export function IssueCard({ issue, index = 0 }: { issue: Issue; index?: number }
 
   const dragX = useMotionValue(0);
   const bgOpacity = useTransform(dragX, [-100, 0], [1, 0]);
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   return (
     <motion.div
@@ -52,9 +56,9 @@ export function IssueCard({ issue, index = 0 }: { issue: Issue; index?: number }
         </button>
         <button 
           className="w-10 h-10 rounded-full bg-indigo-500 text-white flex items-center justify-center shadow-lg"
-          onClick={(e) => { e.stopPropagation(); /* TODO: upvote logic */ }}
+          onClick={(e) => { e.stopPropagation(); setIsShareOpen(true); }}
         >
-          <ThumbsUp className="w-5 h-5" />
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
         </button>
       </motion.div>
 
@@ -110,8 +114,26 @@ export function IssueCard({ issue, index = 0 }: { issue: Issue; index?: number }
 
         {/* Footer */}
         <div className="flex items-center justify-between pt-4 border-t border-white/10 mt-auto">
-          <span className="text-caption font-medium">
-            {formatDistanceToNow(issue.reportedAt as Date, { addSuffix: true })}
+          <span className="text-caption font-medium flex items-center gap-1 flex-wrap">
+            {formatDistanceToNow(
+              issue.reportedAt?.toDate?.() || new Date(issue.reportedAt || Date.now()), 
+              { addSuffix: true }
+            )}
+            {(issue.reportedByUsername || issue.reportedByDisplayName) && (
+              <>
+                <span className="text-zinc-600 px-1">•</span>
+                <span className="text-zinc-500">by</span>
+                {issue.reportedByUsername ? (
+                  <Link href={`/profile/${issue.reportedByUsername}`} className="text-blue-400 hover:underline">
+                    @{issue.reportedByUsername}
+                  </Link>
+                ) : (
+                  <span className="text-zinc-400 font-medium">
+                    {issue.reportedByDisplayName || "Someone"}
+                  </span>
+                )}
+              </>
+            )}
           </span>
 
           <div className="flex items-center gap-4">
@@ -132,6 +154,12 @@ export function IssueCard({ issue, index = 0 }: { issue: Issue; index?: number }
       </div>
       </GlowCard>
       </motion.div>
+
+      <ShareCard 
+        isOpen={isShareOpen} 
+        onClose={() => setIsShareOpen(false)} 
+        issue={issue} 
+      />
     </motion.div>
   );
 }

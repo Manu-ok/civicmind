@@ -35,7 +35,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
     .filter(issue => 
       issue.title.toLowerCase().includes(query.toLowerCase()) || 
       issue.description.toLowerCase().includes(query.toLowerCase()) ||
-      issue.ward.toLowerCase().includes(query.toLowerCase())
+      (issue.location?.ward || '').toLowerCase().includes(query.toLowerCase())
     )
     .slice(0, 4);
 
@@ -180,7 +180,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                             <div className="flex items-center gap-2 mt-1 text-xs opacity-70">
                               <span className="capitalize">{issue.category}</span>
                               <span className="w-1 h-1 rounded-full bg-zinc-600" />
-                              <span>{issue.ward}</span>
+                              <span>{issue.location?.ward}</span>
                             </div>
                           </div>
                         </div>

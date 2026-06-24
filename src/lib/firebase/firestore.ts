@@ -5,6 +5,7 @@ import {
 } from "firebase/firestore";
 import { db } from "./config";
 import { Issue, User, Verification, AnalyticsData } from "../types";
+import { distributeIssueToFollowerFeeds } from "./social";
 
 // ===================
 // ISSUE FUNCTIONS
@@ -15,6 +16,12 @@ export async function createIssue(issueData: Omit<Issue, "id">): Promise<string>
     const newDocRef = doc(collection(db, "issues"));
     const issue: Issue = { ...issueData, id: newDocRef.id };
     await setDoc(newDocRef, issue);
+
+    // Distribute to followers
+    distributeIssueToFollowerFeeds(issue.reportedBy, issue).catch(e => {
+      console.error("Failed to distribute issue to followers:", e);
+    });
+
     return newDocRef.id;
   } catch (error: any) {
     console.error("Error creating issue:", error);
@@ -27,8 +34,8 @@ export async function getIssue(issueId: string): Promise<Issue | null> {
     const docSnap = await getDoc(doc(db, "issues", issueId));
     return docSnap.exists() ? (docSnap.data() as Issue) : null;
   } catch (error: any) {
-    console.error("Error fetching issue:", error);
-    throw new Error(error.message || "Failed to fetch issue.");
+    console.warn("Error fetching issue (likely missing auth on server):", error.message);
+    return null;
   }
 }
 
@@ -110,7 +117,7 @@ export function subscribeToIssues(callback: (issues: Issue[]) => void, filters?:
 
     return onSnapshot(q, (snapshot: any) => {
       const issues = snapshot.docs.map((doc: any) => doc.data() as Issue);
-      callback(issues.filter(i => !(i as any).deleted).sort((a, b) => {
+      callback(issues.filter((i: Issue) => !(i as any).deleted).sort((a: Issue, b: Issue) => {
         const timeA = (a.reportedAt as Timestamp).toMillis ? (a.reportedAt as Timestamp).toMillis() : 0;
         const timeB = (b.reportedAt as Timestamp).toMillis ? (b.reportedAt as Timestamp).toMillis() : 0;
         return timeB - timeA;
@@ -290,14 +297,31 @@ export async function updatePoints(uid: string, actionType: keyof typeof POINT_V
 // NOTIFICATIONS
 // ===================
 
+export type NotificationType = 
+  | 'points' | 'status_change' | 'nearby_issue' | 'verified' | 'system'
+  | 'new_follower' | 'mention' | 'comment_on_issue' | 'reaction_on_issue' 
+  | 'story_interaction' | 'circle_invite' | 'issue_resolved' | 'achievement';
+
 export interface AppNotification {
   id?: string;
   title: string;
   message: string;
-  type: 'points' | 'status_change' | 'nearby_issue' | 'verified' | 'system';
+  type: NotificationType;
   issueId?: string;
   createdAt: Timestamp;
   read: boolean;
+  
+  // Social Extension Fields
+  actorId?: string;
+  actorName?: string;
+  actorUsername?: string;
+  actorPhotoUrl?: string;
+  commentPreview?: string;
+  circleId?: string;
+  circleName?: string;
+  badgeName?: string;
+  reactionType?: string;
+  aggregatedCount?: number; // For reactions aggregation
 }
 
 export async function createNotification(uid: string, notification: AppNotification): Promise<void> {

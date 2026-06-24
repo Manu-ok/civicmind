@@ -49,7 +49,9 @@ export async function signUpWithEmail(email: string, password: string, displayNa
       issuesReported: 0,
       issuesVerified: 0,
       createdAt: Timestamp.now(),
-      role: "citizen"
+      role: "citizen",
+      username: null,
+      hasCompletedOnboarding: false
     };
     
     await setDoc(doc(db, "users", fbUser.uid), newUser);
@@ -133,7 +135,9 @@ async function handleUserDocument(fbUser: FirebaseUser): Promise<User> {
       issuesReported: 0,
       issuesVerified: 0,
       createdAt: Timestamp.now(),
-      role: "citizen"
+      role: "citizen",
+      username: null,
+      hasCompletedOnboarding: false
     };
     await setDoc(userRef, newUser);
     return newUser;

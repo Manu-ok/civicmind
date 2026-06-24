@@ -68,7 +68,10 @@ export function MobileMapPanel({ issue, onClose }: MobileMapPanelProps) {
                     {issue.severity}
                   </span>
                   <span className="text-[10px] text-zinc-500 uppercase font-medium">
-                    {formatDistanceToNow(issue.reportedAt as Date, { addSuffix: true })}
+                    {formatDistanceToNow(
+                      issue.reportedAt?.toDate?.() || new Date(issue.reportedAt || Date.now()), 
+                      { addSuffix: true }
+                    )}
                   </span>
                 </div>
               </div>

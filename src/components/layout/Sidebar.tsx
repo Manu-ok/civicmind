@@ -21,24 +21,45 @@ import {
   Shield,
   User,
   Settings,
+  Newspaper,
+  Compass,
+  Users
 } from "lucide-react";
 import { useUIStore } from "@/lib/stores/uiStore";
 import { useAuthStore } from "@/lib/stores/authStore";
-import { UserAvatar } from "@/components/shared/UserAvatar";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { useFeedStats } from "@/lib/hooks/useFeedStats";
+import { useStories } from "@/lib/hooks/useStories";
+import { StoryRing } from "@/components/social/StoryRing";
 import { cn } from "@/lib/utils";
 
 // ── nav config ──────────────────────────────────────────────────────
-const navItems = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Report Issue", href: "/report", icon: Plus },
-  { label: "Live Map", href: "/map", icon: Map },
-  { label: "Issues", href: "/issues", icon: List },
-  { label: "Verify", href: "/verify", icon: CheckCircle, badge: 3 },
-  { label: "Analytics", href: "/analytics", icon: BarChart2 },
-  { label: "Civic Agent", href: "/agent", icon: Bot },
-  { label: "Profile", href: "/profile", icon: User },
-  { label: "Settings", href: "/settings", icon: Settings },
+const navGroups = [
+  {
+    title: "Main",
+    items: [
+      { label: "Feed", href: "/feed", icon: Newspaper, primary: true },
+      { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+      { label: "Explore", href: "/explore", icon: Compass },
+      { label: "Live Map", href: "/map", icon: Map },
+    ]
+  },
+  {
+    title: "Civic Actions",
+    items: [
+      { label: "Report Issue", href: "/report", icon: Plus },
+      { label: "Issues", href: "/issues", icon: List },
+      { label: "Verify", href: "/verify", icon: CheckCircle },
+    ]
+  },
+  {
+    title: "Community",
+    items: [
+      { label: "Circles", href: "/circles", icon: Users },
+      { label: "Analytics", href: "/analytics", icon: BarChart2 },
+      { label: "Civic Agent", href: "/agent", icon: Bot },
+    ]
+  }
 ];
 
 // ── sidebar ─────────────────────────────────────────────────────────
@@ -48,6 +69,9 @@ export default function Sidebar() {
   const { theme, setTheme } = useTheme();
   const { user } = useAuthStore();
   const { signOut } = useAuth();
+  const { unreadCount } = useFeedStats();
+  const { myStories } = useStories();
+  const hasUnviewedStories = myStories.length > 0 && myStories.some(s => !s.viewedBy.includes(user?.id || ''));
 
   return (
     <>
@@ -99,42 +123,62 @@ export default function Sidebar() {
         </div>
 
         {/* ── navigation ───────────────────────────────────── */}
-        <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-            return (
-              <NavItem
-                key={item.href}
-                item={item}
-                isActive={isActive}
-                collapsed={!sidebarOpen}
-              />
-            );
-          })}
+        <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-4 no-scrollbar">
+          {navGroups.map((group) => (
+            <div key={group.title} className="space-y-1">
+              {sidebarOpen && (
+                <div className="px-3 text-xs font-bold uppercase tracking-wider text-zinc-500 mb-2 mt-2">
+                  {group.title}
+                </div>
+              )}
+              {group.items.map((item) => {
+                const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                // Provide the feed badge if this is the Feed item
+                const badge = item.href === "/feed" && unreadCount > 0 
+                  ? (unreadCount > 99 ? "99+" : unreadCount) 
+                  : undefined;
+
+                return (
+                  <NavItem
+                    key={item.href}
+                    item={{...item, badge}}
+                    isActive={isActive}
+                    collapsed={!sidebarOpen}
+                  />
+                );
+              })}
+            </div>
+          ))}
         </nav>
 
         {/* ── bottom section ───────────────────────────────── */}
         <div className="border-t border-white/[0.06] p-3 space-y-2">
           {/* User row */}
-          <div className={cn("flex items-center gap-3 rounded-xl p-2", sidebarOpen ? "" : "justify-center")}>
-            <UserAvatar user={user as any} className="h-8 w-8 text-xs" />
+          <Link href={`/profile/${user?.username || 'user'}`} className={cn("flex items-center gap-3 rounded-xl p-2 hover:bg-white/[0.04] transition-colors cursor-pointer", sidebarOpen ? "" : "justify-center")}>
+            <div className="shrink-0 scale-75 origin-left">
+              <StoryRing 
+                user={user as any} 
+                hasUnviewed={hasUnviewedStories}
+              />
+            </div>
             <AnimatePresence>
               {sidebarOpen && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="min-w-0 flex-1"
+                  className="min-w-0 flex-1 -ml-2"
                 >
-                  <p className="truncate text-sm font-medium text-zinc-200">{user?.displayName || "User"}</p>
-                  <div className="flex items-center gap-1 text-xs text-amber-400">
+                  <p className="truncate text-sm font-bold text-white leading-none mb-1">{user?.displayName || "User"}</p>
+                  <p className="truncate text-xs text-zinc-500 leading-none mb-1.5">@{user?.username || "user"}</p>
+                  <div className="flex items-center gap-1 text-[10px] font-bold text-amber-400 bg-amber-500/10 w-fit px-1.5 py-0.5 rounded-md">
                     <Sparkles className="h-3 w-3" />
                     <span>{user?.points ?? 0} pts</span>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </Link>
 
           {/* Action buttons row */}
           <div className={cn("flex gap-1", sidebarOpen ? "" : "flex-col items-center")}>
@@ -180,7 +224,7 @@ function NavItem({
   isActive,
   collapsed,
 }: {
-  item: (typeof navItems)[number];
+  item: any;
   isActive: boolean;
   collapsed: boolean;
 }) {
@@ -250,10 +294,18 @@ function NavItem({
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0 }}
-                className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-blue-500/20 text-[10px] font-bold text-blue-400"
+                className="ml-auto flex h-5 px-2 min-w-[20px] items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-lg shadow-red-500/20"
               >
                 {item.badge}
               </motion.div>
+            )}
+            {item.badge && !showText && (
+               <motion.div
+               initial={{ opacity: 0, scale: 0 }}
+               animate={{ opacity: 1, scale: 1 }}
+               exit={{ opacity: 0, scale: 0 }}
+               className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500 shadow-lg shadow-red-500/50"
+             />
             )}
           </AnimatePresence>
       </motion.div>

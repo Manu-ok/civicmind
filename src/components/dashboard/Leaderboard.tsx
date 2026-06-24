@@ -9,6 +9,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Trophy, Star, ShieldAlert, CheckCircle2, Leaf } from "lucide-react";
 import { useAuthStore } from "@/lib/stores/authStore";
 import Image from "next/image";
+import Link from "next/link";
+import { UserAvatar } from "@/components/social/UserAvatar";
+import { FollowButton } from "@/components/social/FollowButton";
+import { Users } from "lucide-react";
 
 export function Leaderboard() {
   const { user: currentUser } = useAuthStore();
@@ -54,7 +58,7 @@ export function Leaderboard() {
         <AnimatePresence>
           <ul className="space-y-3 relative">
             {leaders.map((leader, index) => {
-              const isCurrentUser = leader.id === currentUser?.uid;
+              const isCurrentUser = leader.id === currentUser?.id;
               const badge = getBadgeForPoints(leader.points || 0);
 
               return (
@@ -80,17 +84,9 @@ export function Leaderboard() {
                   </div>
                   
                   <div className="relative">
-                    <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-800 flex items-center justify-center relative">
-                      {leader.photoURL ? (
-                        <Image src={leader.photoURL} alt={leader.displayName} fill className="object-cover" />
-                      ) : (
-                        <span className="text-sm font-bold text-zinc-400">
-                          {leader.displayName?.charAt(0).toUpperCase() || "U"}
-                        </span>
-                      )}
-                    </div>
+                    <UserAvatar user={leader as any} size="md" clickable={true} showStoryRing={false} />
                     {index < 3 && (
-                      <div className="absolute -top-2 -right-2">
+                      <div className="absolute -top-2 -right-2 z-10">
                         <Trophy className={`w-5 h-5 ${
                           index === 0 ? 'text-yellow-400' : 
                           index === 1 ? 'text-zinc-300' : 'text-amber-600'
@@ -99,28 +95,44 @@ export function Leaderboard() {
                     )}
                   </div>
 
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-zinc-100 truncate">
+                  <div className="flex-1 min-w-0 flex flex-col">
+                    <Link href={`/profile/${leader.username || 'user'}`} className="text-sm font-semibold text-zinc-100 truncate hover:underline">
                       {leader.displayName} {isCurrentUser && "(You)"}
-                    </p>
+                    </Link>
+                    {leader.username && (
+                      <span className="text-xs text-zinc-500 truncate">@{leader.username}</span>
+                    )}
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-gradient-to-r ${badge.color}`}>
                         {getBadgeIcon(badge.icon)}
                         {badge.name}
                       </span>
+                      {!isCurrentUser && (leader as any).followersCount !== undefined && (
+                        <span className="text-[10px] font-medium text-zinc-500 flex items-center gap-1">
+                          <Users className="w-3 h-3" />
+                          {(leader as any).followersCount} followers
+                        </span>
+                      )}
                     </div>
                   </div>
 
-                  <div className="text-right">
-                    <motion.div 
-                      key={leader.points}
-                      initial={{ scale: 1.5, color: '#4ade80' }}
-                      animate={{ scale: 1, color: '#f4f4f5' }}
-                      className="text-lg font-bold"
-                    >
-                      {leader.points || 0}
-                    </motion.div>
-                    <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Points</p>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <motion.div 
+                        key={leader.points}
+                        initial={{ scale: 1.5, color: '#4ade80' }}
+                        animate={{ scale: 1, color: '#f4f4f5' }}
+                        className="text-lg font-bold"
+                      >
+                        {leader.points || 0}
+                      </motion.div>
+                      <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Points</p>
+                    </div>
+                    {!isCurrentUser && (
+                      <div className="ml-2">
+                        <FollowButton targetUserId={leader.id} targetUsername={leader.username || "user"} size="sm" variant="outline" showIcon={false} />
+                      </div>
+                    )}
                   </div>
                 </motion.li>
               );

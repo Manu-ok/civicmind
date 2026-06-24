@@ -24,7 +24,7 @@ export function useAuth() {
       setError(null);
       await firebaseGoogleSignIn();
       toast.success("Welcome to CivicMind AI!");
-      router.push("/dashboard");
+      router.push("/feed");
     } catch (err: any) {
       const message = err.message || "Google sign-in failed.";
       setError(message);
@@ -41,7 +41,7 @@ export function useAuth() {
         setError(null);
         await firebaseEmailSignIn(email, password);
         toast.success("Welcome back!");
-        router.push("/dashboard");
+        router.push("/feed");
       } catch (err: any) {
         const message = err.message || "Email sign-in failed.";
         setError(message);
@@ -60,7 +60,7 @@ export function useAuth() {
         setError(null);
         await firebaseEmailSignUp(email, password, displayName);
         toast.success("Account created! Welcome to CivicMind AI!");
-        router.push("/dashboard");
+        router.push("/feed");
       } catch (err: any) {
         const message = err.message || "Sign-up failed.";
         setError(message);

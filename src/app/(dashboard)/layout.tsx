@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { useUIStore } from "@/lib/stores/uiStore";
@@ -15,16 +15,31 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { user, loading } = useAuthStore();
   const { sidebarOpen } = useUIStore();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.replace("/login");
+    if (!loading) {
+      if (!user) {
+        router.replace("/login");
+      } else if (!user.hasCompletedOnboarding && pathname !== "/onboarding") {
+        router.replace("/onboarding");
+      } else if (user.hasCompletedOnboarding && pathname === "/onboarding") {
+        router.replace("/feed");
+      }
     }
-  }, [user, loading, router]);
+  }, [user, loading, pathname, router]);
 
   // Show nothing while checking auth
   if (loading || !user) {
     return null;
+  }
+
+  if (pathname === "/onboarding") {
+    return (
+      <div className="min-h-screen bg-background">
+        <PageWrapper>{children}</PageWrapper>
+      </div>
+    );
   }
 
   return (

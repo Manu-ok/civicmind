@@ -19,7 +19,7 @@ import Image from "next/image";
 
 // ── route → title mapping ───────────────────────────────────────────
 const pageTitles: Record<string, string> = {
-  "/dashboard": "Dashboard",
+  "/feed": "Feed",
   "/report": "Report Issue",
   "/map": "Live Map",
   "/issues": "Issues",

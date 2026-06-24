@@ -48,6 +48,9 @@ export const metadata: Metadata = {
   },
 };
 
+import { FCMProvider } from "@/components/shared/FCMProvider";
+import { AchievementOverlay } from "@/components/social/AchievementOverlay";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -68,10 +71,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AuthProvider>
-            <AppLoader />
-            {children}
-          </AuthProvider>
+            <AuthProvider>
+              <AppLoader />
+              <FCMProvider />
+              <AchievementOverlay />
+              {children}
+            </AuthProvider>
         </ThemeProvider>
         <Toaster
           position="top-right"

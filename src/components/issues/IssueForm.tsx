@@ -94,7 +94,7 @@ export function IssueForm() {
   };
   
   const form = useForm<IssueFormValues>({
-    resolver: zodResolver(issueSchema),
+    resolver: zodResolver(issueSchema) as any,
     defaultValues: { mediaUrls: [], mediaFiles: [], priorityScore: 0 },
     mode: "onChange"
   });
@@ -280,20 +280,26 @@ export function IssueForm() {
         },
         mediaUrls: uploadedUrls,
         reportedBy: user.id,
+        reportedByUsername: user.username || undefined,
+        reportedByDisplayName: user.displayName || undefined,
         reportedAt: Timestamp.now(),
         aiAnalysis: {
           detectedIssue: values.title,
           confidence: 95,
-          department: values.department,
-          riskAssessment: values.riskAssessment,
-          estimatedImpact: values.estimatedImpact,
+          department: values.department || "",
+          riskAssessment: values.riskAssessment || "",
+          estimatedImpact: values.estimatedImpact || "",
           processingTime: 1200
         },
         resolutionPlan: resolutionPlan || undefined,
         verifications: [],
         verificationCount: 0,
         upvotes: 1,
-        isDuplicate: false
+        isDuplicate: false,
+        commentCount: 0,
+        reactionCounts: { heart: 0, fire: 0, thumbsUp: 0, sad: 0, angry: 0, clap: 0 },
+        shareCount: 0,
+        storyCount: 0
       };
 
       const newId = await createIssue(issueData);
@@ -316,7 +322,7 @@ export function IssueForm() {
     try {
       // Logic to upvote existing issue would go here (e.g. upvoteIssue(duplicateCheck.duplicateOf, user.id))
       toast.success("Successfully joined the existing issue!");
-      confetti({ particleCount: 100, spread: 60, origin: { y: 0.6 } });
+      triggerConfetti();
       setTimeout(() => router.push(`/issues/${duplicateCheck.duplicateOf}`), 2000);
     } catch (e: any) {
       toast.error(e.message);

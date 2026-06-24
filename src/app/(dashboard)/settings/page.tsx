@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { useTheme } from "next-themes";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { uploadProfileMedia } from "@/lib/firebase/storage";
-import { UserAvatar } from "@/components/shared/UserAvatar";
+import { UserAvatar } from "@/components/social/UserAvatar";
 import toast from "react-hot-toast";
 
 export default function SettingsPage() {

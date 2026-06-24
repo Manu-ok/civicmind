@@ -6,13 +6,74 @@ import { db } from "@/lib/firebase/config";
 import { Issue } from "@/lib/types";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatDistanceToNow } from "date-fns";
+import Link from "next/link";
 import { AlertTriangle, Droplets, Zap, ShieldAlert, CheckCircle2, Trash2, MapPin } from "lucide-react";
+import { UserAvatar } from "@/components/social/UserAvatar";
+import { getUserProfile } from "@/lib/firebase/firestore";
 
 interface ActivityEvent {
   id: string;
   type: 'reported' | 'resolved';
   issue: Issue;
   timestamp: Date;
+}
+
+function FeedItemRow({ event, isRecent }: { event: ActivityEvent; isRecent: boolean }) {
+  const [username, setUsername] = useState<string | null>(event.issue.reportedByUsername || null);
+
+  useEffect(() => {
+    if (!username && event.issue.reportedBy) {
+      getUserProfile(event.issue.reportedBy).then(user => {
+        if (user?.username) setUsername(user.username);
+      });
+    }
+  }, [event.issue.reportedBy, username]);
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: -20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      className={`p-4 rounded-xl border transition-all duration-500 ${
+        isRecent 
+          ? 'bg-blue-500/10 border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.1)]' 
+          : 'bg-zinc-800/30 border-white/[0.04]'
+      }`}
+    >
+      <div className="flex items-start gap-3">
+        <UserAvatar userId={event.issue.reportedBy} size="sm" clickable showStoryRing={false} />
+        
+        <div className="flex-1 min-w-0">
+          <p className="text-sm text-zinc-200">
+            {event.type === 'resolved' ? (
+              <span>Issue resolved: <Link href={`/issues/${event.issue.id}`} className="font-medium text-white hover:text-blue-400 hover:underline">{event.issue.title}</Link></span>
+            ) : (
+              <span>
+                <Link href={username ? `/profile/${username}` : `/profile/${event.issue.reportedByUsername || event.issue.reportedBy}`} className="text-blue-400 hover:underline font-medium">
+                  {username ? `@${username}` : (event.issue.reportedByUsername || "Someone")}
+                </Link>
+                {" "}reported <Link href={`/issues/${event.issue.id}`} className="font-medium text-white hover:text-blue-400 hover:underline">{event.issue.title}</Link> in <span className="font-medium text-white capitalize">{event.issue.location?.ward || 'Unknown'}</span>
+              </span>
+            )}
+          </p>
+          <div className="flex items-center gap-2 mt-1">
+            <span className={`inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-bold ${
+              event.type === 'resolved' ? 'text-green-400' : 'text-zinc-500'
+            }`}>
+              {event.type === 'resolved' ? (
+                <><CheckCircle2 className="w-3 h-3" /> Resolved</>
+              ) : (
+                <>New Report</>
+              )}
+            </span>
+            <span className="text-xs text-zinc-500 font-medium">
+              • {formatDistanceToNow(event.timestamp, { addSuffix: true })}
+            </span>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
 }
 
 export function ActivityFeed() {
@@ -88,38 +149,7 @@ export function ActivityFeed() {
             const isRecent = (new Date().getTime() - event.timestamp.getTime()) < 5 * 60 * 1000;
 
             return (
-              <motion.div
-                key={event.id}
-                initial={{ opacity: 0, y: -20, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                layout
-                className={`p-4 rounded-xl border transition-all duration-500 ${
-                  isRecent 
-                    ? 'bg-blue-500/10 border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.1)]' 
-                    : 'bg-zinc-800/30 border-white/[0.04]'
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <div className={`mt-0.5 p-2 rounded-full ${event.type === 'resolved' ? 'bg-green-500/20' : 'bg-zinc-800'}`}>
-                    {event.type === 'resolved' ? <CheckCircle2 className="w-4 h-4 text-green-400" /> : getCategoryIcon(event.issue.category)}
-                  </div>
-                  
-                  <div className="flex-1">
-                    <p className="text-sm text-zinc-200">
-                      {event.type === 'resolved' ? (
-                        <span>Issue resolved: <span className="font-medium text-white">{event.issue.title}</span></span>
-                      ) : (
-                        <span>
-                          Someone reported a <span className="font-medium text-white capitalize">{event.issue.category}</span> issue in <span className="font-medium text-white">{event.issue.location?.ward || 'Unknown'}</span>
-                        </span>
-                      )}
-                    </p>
-                    <p className="text-xs text-zinc-500 mt-1 font-medium">
-                      {formatDistanceToNow(event.timestamp, { addSuffix: true })}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
+              <FeedItemRow key={event.id} event={event} isRecent={isRecent} />
             );
           })}
         </AnimatePresence>

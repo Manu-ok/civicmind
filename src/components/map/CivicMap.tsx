@@ -90,7 +90,7 @@ function ClusteredMarkers({
         cluster.markers.forEach((m: any) => {
           if (m.position) bounds.extend(m.position);
         });
-        map.fitBounds(bounds, { padding: 50 });
+        map.fitBounds(bounds, 50);
       });
     }
   }, [map]);
@@ -142,7 +142,7 @@ function HeatmapComponent({ data, visible }: { data: google.maps.LatLngLiteral[]
     if (!visualization || !map) return;
     
     if (!heatmap) {
-      const newHeatmap = new visualization.HeatmapLayer({
+      const newHeatmap = new (visualization.HeatmapLayer as any)({
         radius: 30,
         opacity: 0.8,
         gradient: [
@@ -171,10 +171,10 @@ function HeatmapComponent({ data, visible }: { data: google.maps.LatLngLiteral[]
     
     if (visible && data.length > 0) {
       const heatMapData = data.map(pos => new google.maps.LatLng(pos.lat, pos.lng));
-      heatmap.setData(heatMapData);
-      heatmap.setMap(map);
+      (heatmap as any).setData(heatMapData);
+      (heatmap as any).setMap(map);
     } else {
-      heatmap.setMap(null);
+      (heatmap as any).setMap(null);
     }
   }, [heatmap, data, visible, map]);
 
