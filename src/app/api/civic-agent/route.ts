@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
 
     if (!message) {
       return NextResponse.json(
-        { error: "Message is required" },
+        { success: false, error: "Message is required" },
         { status: 400 }
       );
     }
@@ -20,11 +20,11 @@ export async function POST(req: NextRequest) {
       userLocation || { city: "Unknown", ward: "Unknown" }
     );
 
-    return NextResponse.json({ success: true, response: responseText });
+    return NextResponse.json({ success: true, data: responseText, response: responseText });
   } catch (error: any) {
     console.error("API Error - Civic Agent:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to get agent response" },
+      { success: false, error: error.message || "Failed to get agent response" },
       { status: 500 }
     );
   }

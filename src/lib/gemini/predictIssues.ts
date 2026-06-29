@@ -1,4 +1,4 @@
-import { geminiPro, formatGeminiError } from "./config";
+import { geminiPro, formatGeminiError, cleanJSON } from "./config";
 import { Issue } from "../types";
 
 export async function generatePredictions(
@@ -62,8 +62,10 @@ Respond in this EXACT JSON format, returning an array of prediction objects:
       },
     });
 
-    const text = result.response.text();
-    return JSON.parse(text);
+    const text = cleanJSON(result.response.text());
+    const jsonMatch = text.match(/\[[\s\S]*\]/); // Array expected
+    if (!jsonMatch) throw new Error("Invalid JSON response from AI");
+    return JSON.parse(jsonMatch[0]);
   } catch (error) {
     throw new Error(formatGeminiError(error));
   }

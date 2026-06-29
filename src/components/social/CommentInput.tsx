@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 import { useState } from "react";
 import { useAuthStore } from "@/lib/stores/authStore";
@@ -45,11 +46,11 @@ export function CommentInput({ onSubmit, placeholder = "Share your thoughts... U
 
   return (
     <div className="flex gap-3">
-      <div className="w-10 h-10 rounded-full bg-zinc-900 shrink-0 overflow-hidden border border-white/5 hidden sm:block">
+      <div className="w-10 h-10 rounded-full bg-white dark:bg-zinc-900 shrink-0 overflow-hidden border border-white/5 hidden sm:block">
         {user?.photoURL ? (
-          <img src={user.photoURL} alt="" className="w-full h-full object-cover" />
+          <Image fill src={user.photoURL} alt="" className="w-full h-full object-cover" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center font-bold text-zinc-500">
+          <div className="w-full h-full flex items-center justify-center font-bold text-slate-500 dark:text-zinc-500">
             {user?.displayName?.charAt(0) || "U"}
           </div>
         )}
@@ -67,7 +68,7 @@ export function CommentInput({ onSubmit, placeholder = "Share your thoughts... U
         <div className="absolute right-2 bottom-2 flex items-center gap-1">
           <div className="relative">
             <button 
-              className="p-1.5 text-zinc-500 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
+              className="p-1.5 text-slate-500 dark:text-zinc-500 hover:text-white hover:bg-slate-100 dark:bg-zinc-800 rounded-lg transition-colors"
               onClick={() => setShowEmojis(!showEmojis)}
             >
               <Smile className="w-4 h-4" />
@@ -79,7 +80,7 @@ export function CommentInput({ onSubmit, placeholder = "Share your thoughts... U
                   initial={{ opacity: 0, scale: 0.9, y: 10 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.9, y: 10 }}
-                  className="absolute bottom-full right-0 mb-2 bg-zinc-800 border border-white/10 rounded-xl p-2 shadow-2xl grid grid-cols-5 gap-1 z-10"
+                  className="absolute bottom-full right-0 mb-2 bg-slate-100 dark:bg-zinc-800 border border-white/10 rounded-xl p-2 shadow-2xl grid grid-cols-5 gap-1 z-10"
                 >
                   {EMOJIS.map(emoji => (
                     <button 
@@ -97,7 +98,7 @@ export function CommentInput({ onSubmit, placeholder = "Share your thoughts... U
           
           <button 
             className={`p-1.5 rounded-lg flex items-center justify-center transition-all ${
-              content.trim() && !isSubmitting ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20" : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+              content.trim() && !isSubmitting ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20" : "bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-500 cursor-not-allowed"
             }`}
             onClick={handleSubmit}
             disabled={!content.trim() || isSubmitting}

@@ -26,7 +26,7 @@ export function MobileMapPanel({ issue, onClose }: MobileMapPanelProps) {
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed inset-x-0 bottom-0 z-[80] rounded-t-3xl border-t border-white/[0.08] bg-zinc-950/95 p-6 shadow-2xl backdrop-blur-xl md:absolute md:bottom-4 md:right-4 md:left-auto md:w-[400px] md:rounded-2xl md:border md:pb-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+            className="fixed inset-x-0 bottom-0 z-[80] rounded-t-3xl border-t border-white/[0.08] bg-slate-50 dark:bg-zinc-950/95 p-6 shadow-2xl backdrop-blur-xl md:absolute md:bottom-4 md:right-4 md:left-auto md:w-[400px] md:rounded-2xl md:border md:pb-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
             drag="y"
             dragConstraints={{ top: 0, bottom: 0 }}
             onDragEnd={(e, info) => {
@@ -34,11 +34,11 @@ export function MobileMapPanel({ issue, onClose }: MobileMapPanelProps) {
             }}
           >
             {/* Drag Handle for Mobile */}
-            <div className="mx-auto mb-6 h-1 w-12 rounded-full bg-zinc-800 md:hidden" />
+            <div className="mx-auto mb-6 h-1 w-12 rounded-full bg-slate-100 dark:bg-zinc-800 md:hidden" />
 
             <button 
               onClick={onClose}
-              className="absolute top-4 right-4 p-1.5 rounded-full bg-black/20 hover:bg-black/40 text-zinc-400 transition-colors hidden md:block"
+              className="absolute top-4 right-4 p-1.5 rounded-full bg-black/20 hover:bg-black/40 text-slate-500 dark:text-zinc-400 transition-colors hidden md:block"
             >
               <X className="w-4 h-4" />
             </button>
@@ -49,14 +49,14 @@ export function MobileMapPanel({ issue, onClose }: MobileMapPanelProps) {
                   <Image src={issue.mediaUrls[0]} alt="Issue" fill className="object-cover" />
                 </div>
               ) : (
-                <div className="w-20 h-20 rounded-xl bg-zinc-800 flex items-center justify-center shrink-0">
+                <div className="w-20 h-20 rounded-xl bg-slate-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
                   <MapIcon className="w-8 h-8 text-zinc-600" />
                 </div>
               )}
               
               <div className="flex flex-col flex-1 min-w-0 pt-1">
                 <h3 className="font-semibold text-lg leading-tight truncate text-white">{issue.title}</h3>
-                <p className="text-sm text-zinc-400 truncate mt-1">{issue.location.address}</p>
+                <p className="text-sm text-slate-500 dark:text-zinc-400 truncate mt-1">{issue.location.address}</p>
                 <div className="flex items-center gap-2 mt-auto pt-2">
                   <span className={cn(
                     "text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full",
@@ -67,7 +67,7 @@ export function MobileMapPanel({ issue, onClose }: MobileMapPanelProps) {
                   )}>
                     {issue.severity}
                   </span>
-                  <span className="text-[10px] text-zinc-500 uppercase font-medium">
+                  <span className="text-[10px] text-slate-500 dark:text-zinc-500 uppercase font-medium">
                     {formatDistanceToNow(
                       issue.reportedAt?.toDate?.() || new Date(issue.reportedAt || Date.now()), 
                       { addSuffix: true }

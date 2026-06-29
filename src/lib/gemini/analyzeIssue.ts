@@ -1,4 +1,4 @@
-import { getVisionModel, formatGeminiError } from "./config";
+import { getVisionModel, formatGeminiError, cleanJSON } from "./config";
 import { AIAnalysis } from "../types";
 
 export async function analyzeIssueFromMedia(
@@ -43,8 +43,10 @@ export async function analyzeIssueFromMedia(
         },
       });
 
-      const text = result.response.text();
-      const parsed = JSON.parse(text);
+      const text = cleanJSON(result.response.text());
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error("Invalid JSON response from AI");
+      const parsed = JSON.parse(jsonMatch[0]);
       const processingTime = Date.now() - startTime;
 
       return {

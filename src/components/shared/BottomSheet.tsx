@@ -50,13 +50,13 @@ export function BottomSheet({ isOpen, onClose, children }: BottomSheetProps) {
                 onClose();
               }
             }}
-            className="fixed bottom-0 left-0 right-0 z-[101] bg-zinc-950 border-t border-white/10 rounded-t-3xl shadow-2xl md:hidden overflow-hidden max-h-[90vh] flex flex-col"
+            className="fixed bottom-0 left-0 right-0 z-[101] bg-slate-50 dark:bg-zinc-950 border-t border-white/10 rounded-t-3xl shadow-2xl md:hidden overflow-hidden max-h-[90vh] flex flex-col"
           >
             <div 
               className="w-full pt-3 pb-2 flex justify-center touch-none"
               onPointerDown={(e) => dragControls.start(e)}
             >
-              <div className="w-12 h-1.5 bg-zinc-700 rounded-full cursor-grab active:cursor-grabbing" />
+              <div className="w-12 h-1.5 bg-slate-200 dark:bg-zinc-700 rounded-full cursor-grab active:cursor-grabbing" />
             </div>
             <div className="overflow-y-auto px-4 pb-8 max-h-[calc(90vh-32px)]">
               {children}

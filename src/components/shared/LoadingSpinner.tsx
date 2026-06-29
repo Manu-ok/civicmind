@@ -9,7 +9,7 @@ interface LoadingSpinnerProps {
 
 export function InlineSpinner({ className }: LoadingSpinnerProps) {
   return (
-    <Loader2 className={`h-4 w-4 animate-spin text-zinc-400 ${className}`} />
+    <Loader2 className={`h-4 w-4 animate-spin text-slate-500 dark:text-zinc-400 ${className}`} />
   );
 }
 

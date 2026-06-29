@@ -151,7 +151,7 @@ export function CivicAgentChat({ chatId }: CivicAgentChatProps) {
             >
               <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
               <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-0.5 relative z-10 shadow-2xl shadow-blue-500/20">
-                <div className="w-full h-full rounded-full bg-zinc-950 flex items-center justify-center">
+                <div className="w-full h-full rounded-full bg-slate-50 dark:bg-zinc-950 flex items-center justify-center">
                   <Brain className="w-12 h-12 text-blue-400" />
                 </div>
               </div>
@@ -159,7 +159,7 @@ export function CivicAgentChat({ chatId }: CivicAgentChatProps) {
 
             <div>
               <h2 className="text-3xl font-bold text-white mb-4">How can I help your community today?</h2>
-              <p className="text-zinc-400">I have real-time access to civic issues, analytics, and resolution plans for your ward.</p>
+              <p className="text-slate-500 dark:text-zinc-400">I have real-time access to civic issues, analytics, and resolution plans for your ward.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
@@ -172,9 +172,9 @@ export function CivicAgentChat({ chatId }: CivicAgentChatProps) {
                 <button
                   key={i}
                   onClick={() => setInput(suggestion)}
-                  className="p-4 text-left rounded-xl bg-zinc-900 border border-white/5 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all group"
+                  className="p-4 text-left rounded-xl bg-white dark:bg-zinc-900 border border-white/5 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all group"
                 >
-                  <p className="text-sm text-zinc-300 group-hover:text-blue-400 transition-colors">{suggestion}</p>
+                  <p className="text-sm text-slate-600 dark:text-zinc-300 group-hover:text-blue-400 transition-colors">{suggestion}</p>
                 </button>
               ))}
             </div>
@@ -197,9 +197,9 @@ export function CivicAgentChat({ chatId }: CivicAgentChatProps) {
       </div>
 
       {/* Input Area */}
-      <div className="p-4 md:p-6 bg-zinc-950 border-t border-white/10 z-10 shrink-0">
-        <div className="max-w-4xl mx-auto relative flex items-end gap-2 bg-zinc-900 rounded-2xl border border-white/10 p-2 focus-within:border-blue-500/50 focus-within:ring-1 focus-within:ring-blue-500/50 transition-all">
-          <Button variant="ghost" size="icon" className="shrink-0 rounded-xl text-zinc-400 hover:text-white h-12 w-12 hover:bg-zinc-800">
+      <div className="p-4 md:p-6 bg-slate-50 dark:bg-zinc-950 border-t border-white/10 z-10 shrink-0">
+        <div className="max-w-4xl mx-auto relative flex items-end gap-2 bg-white dark:bg-zinc-900 rounded-2xl border border-white/10 p-2 focus-within:border-blue-500/50 focus-within:ring-1 focus-within:ring-blue-500/50 transition-all">
+          <Button variant="ghost" size="icon" className="shrink-0 rounded-xl text-slate-500 dark:text-zinc-400 hover:text-white h-12 w-12 hover:bg-slate-100 dark:bg-zinc-800">
             <Mic className="w-5 h-5" />
           </Button>
           
@@ -208,12 +208,12 @@ export function CivicAgentChat({ chatId }: CivicAgentChatProps) {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask CivicAgent anything..."
-            className="w-full max-h-32 min-h-[48px] bg-transparent border-0 focus:ring-0 resize-none text-white placeholder:text-zinc-500 py-3 px-2 custom-scrollbar"
+            className="w-full max-h-32 min-h-[48px] bg-transparent border-0 focus:ring-0 resize-none text-white placeholder:text-slate-500 dark:text-zinc-500 py-3 px-2 custom-scrollbar"
             rows={Math.min(4, input.split("\n").length || 1)}
           />
 
           {input.length > 0 && (
-            <Button variant="ghost" size="icon" onClick={() => setInput("")} className="shrink-0 text-zinc-500 hover:text-zinc-300 h-12 w-10">
+            <Button variant="ghost" size="icon" onClick={() => setInput("")} className="shrink-0 text-slate-500 dark:text-zinc-500 hover:text-slate-600 dark:text-zinc-300 h-12 w-10">
               <Trash2 className="w-4 h-4" />
             </Button>
           )}
@@ -224,7 +224,7 @@ export function CivicAgentChat({ chatId }: CivicAgentChatProps) {
             size="icon"
             className={cn(
               "shrink-0 rounded-xl h-12 w-12 transition-all",
-              input.trim() ? "bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20" : "bg-zinc-800 text-zinc-500"
+              input.trim() ? "bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20" : "bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-500"
             )}
           >
             <Send className="w-5 h-5" />

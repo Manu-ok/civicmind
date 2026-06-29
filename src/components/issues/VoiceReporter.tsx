@@ -105,7 +105,7 @@ export function VoiceReporter({ onComplete }: VoiceReporterProps) {
   }
 
   return (
-    <div className="w-full relative overflow-hidden rounded-3xl border border-white/5 bg-zinc-950 p-8 shadow-2xl flex flex-col items-center justify-center min-h-[400px]">
+    <div className="w-full relative overflow-hidden rounded-3xl border border-white/5 bg-slate-50 dark:bg-zinc-950 p-8 shadow-2xl flex flex-col items-center justify-center min-h-[400px]">
       
       {/* Background Glow */}
       <div className={cn(
@@ -126,12 +126,12 @@ export function VoiceReporter({ onComplete }: VoiceReporterProps) {
           >
             <button
               onClick={handleStart}
-              className="group relative w-32 h-32 rounded-full bg-zinc-900 border-4 border-zinc-800 flex items-center justify-center hover:border-blue-500 hover:shadow-[0_0_40px_rgba(59,130,246,0.3)] transition-all duration-300"
+              className="group relative w-32 h-32 rounded-full bg-white dark:bg-zinc-900 border-4 border-slate-200 dark:border-zinc-800 flex items-center justify-center hover:border-blue-500 hover:shadow-[0_0_40px_rgba(59,130,246,0.3)] transition-all duration-300"
             >
-              <Mic className="w-12 h-12 text-zinc-400 group-hover:text-blue-400 transition-colors" />
+              <Mic className="w-12 h-12 text-slate-500 dark:text-zinc-400 group-hover:text-blue-400 transition-colors" />
             </button>
             <h3 className="mt-8 text-xl font-bold text-white">Voice Report</h3>
-            <p className="text-zinc-500 mt-2">Tap to describe the issue naturally</p>
+            <p className="text-slate-500 dark:text-zinc-500 mt-2">Tap to describe the issue naturally</p>
           </motion.div>
         )}
 
@@ -196,7 +196,7 @@ export function VoiceReporter({ onComplete }: VoiceReporterProps) {
 
             <div className="w-full mt-8 p-4 bg-black/40 rounded-xl border border-white/5 min-h-[80px]">
               <p className="text-sm font-bold text-red-400 uppercase tracking-widest mb-2">Live Transcript</p>
-              <p className="text-zinc-300 italic text-center">
+              <p className="text-slate-600 dark:text-zinc-300 italic text-center">
                 {interimTranscript || transcript || "Listening..."}
               </p>
             </div>
@@ -216,7 +216,7 @@ export function VoiceReporter({ onComplete }: VoiceReporterProps) {
               <Loader2 className="w-10 h-10 text-blue-400 animate-spin" />
             </div>
             <h3 className="text-xl font-bold text-white mb-2">AI is analyzing...</h3>
-            <p className="text-zinc-400 text-center max-w-sm">
+            <p className="text-slate-500 dark:text-zinc-400 text-center max-w-sm">
               Extracting civic category, severity, and exact location details from your voice.
             </p>
           </motion.div>
@@ -238,16 +238,16 @@ export function VoiceReporter({ onComplete }: VoiceReporterProps) {
 
             <Card className="bg-black/40 border-green-500/20 p-5 mb-8 space-y-4">
               <div>
-                <p className="text-xs font-bold text-zinc-500 uppercase">Issue Title</p>
+                <p className="text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase">Issue Title</p>
                 <p className="text-lg text-white font-medium">{extractedData.title}</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs font-bold text-zinc-500 uppercase">Category</p>
+                  <p className="text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase">Category</p>
                   <p className="text-blue-400 capitalize">{extractedData.category}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-zinc-500 uppercase">Severity</p>
+                  <p className="text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase">Severity</p>
                   <p className={cn("capitalize", 
                     extractedData.severity === 'critical' ? 'text-red-400' :
                     extractedData.severity === 'high' ? 'text-orange-400' :

@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
 
     if (!transcript) {
       return NextResponse.json(
-        { error: "Transcript is required" },
+        { success: false, error: "Transcript is required" },
         { status: 400 }
       );
     }
@@ -42,20 +42,22 @@ Return the EXACT following JSON structure only:
     });
 
     const text = result.response.text();
-    const parsed = JSON.parse(text);
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error("Invalid JSON response from AI");
+    const parsed = JSON.parse(jsonMatch[0]);
     const processingTime = Date.now() - startTime;
+
+    const analysisResult = { ...parsed, processingTime };
 
     return NextResponse.json({ 
       success: true, 
-      analysis: {
-        ...parsed,
-        processingTime
-      }
+      data: analysisResult,
+      analysis: analysisResult
     });
   } catch (error: any) {
     console.error("API Error - Voice to Issue:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to process voice report" },
+      { success: false, error: error.message || "Failed to process voice report" },
       { status: 500 }
     );
   }

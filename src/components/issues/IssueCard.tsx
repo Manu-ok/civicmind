@@ -41,7 +41,7 @@ export function IssueCard({ issue, index = 0 }: { issue: Issue; index?: number }
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
-      className="relative rounded-xl overflow-hidden bg-zinc-800"
+      className="relative rounded-xl overflow-hidden bg-slate-100 dark:bg-zinc-800"
     >
       {/* Swipe Actions Background */}
       <motion.div 
@@ -69,11 +69,11 @@ export function IssueCard({ issue, index = 0 }: { issue: Issue; index?: number }
         dragElastic={0.1}
         style={{ x: dragX }}
         onClick={() => router.push(`/issues/${issue.id}`)}
-        className="group relative flex flex-col bg-zinc-900 border border-white/10 rounded-xl overflow-hidden cursor-pointer active:cursor-grabbing transition-all duration-300 hover:shadow-glow"
+        className="group relative flex flex-col bg-white dark:bg-zinc-900 border border-white/10 rounded-xl overflow-hidden cursor-pointer active:cursor-grabbing transition-all duration-300 hover:shadow-glow"
       >
       <GlowCard className="flex flex-col flex-1">
       {/* Thumbnail */}
-      <div className="relative h-48 w-full bg-zinc-800 overflow-hidden">
+      <div className="relative h-48 w-full bg-slate-100 dark:bg-zinc-800 overflow-hidden">
         {issue.mediaUrls && issue.mediaUrls.length > 0 ? (
           <Image 
             src={issue.mediaUrls[0]} 
@@ -83,7 +83,7 @@ export function IssueCard({ issue, index = 0 }: { issue: Issue; index?: number }
             className="object-cover group-hover:scale-105 transition-transform duration-500" 
           />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center text-zinc-600 bg-zinc-900/50">
+          <div className="w-full h-full flex flex-col items-center justify-center text-zinc-600 bg-white dark:bg-zinc-900/50">
             <MapIcon className="w-12 h-12 mb-2 opacity-50" />
             <span className="text-xs uppercase tracking-widest font-bold opacity-50">No Image</span>
           </div>
@@ -108,7 +108,7 @@ export function IssueCard({ issue, index = 0 }: { issue: Issue; index?: number }
         </div>
 
         <div className="flex items-center text-caption mb-4 line-clamp-1">
-          <MapPin className="size-4 mr-1.5 text-zinc-500 shrink-0" />
+          <MapPin className="size-4 mr-1.5 text-slate-500 dark:text-zinc-500 shrink-0" />
           <span className="truncate">{issue.location.address}</span>
         </div>
 
@@ -122,13 +122,13 @@ export function IssueCard({ issue, index = 0 }: { issue: Issue; index?: number }
             {(issue.reportedByUsername || issue.reportedByDisplayName) && (
               <>
                 <span className="text-zinc-600 px-1">•</span>
-                <span className="text-zinc-500">by</span>
+                <span className="text-slate-500 dark:text-zinc-500">by</span>
                 {issue.reportedByUsername ? (
                   <Link href={`/profile/${issue.reportedByUsername}`} className="text-blue-400 hover:underline">
                     @{issue.reportedByUsername}
                   </Link>
                 ) : (
-                  <span className="text-zinc-400 font-medium">
+                  <span className="text-slate-500 dark:text-zinc-400 font-medium">
                     {issue.reportedByDisplayName || "Someone"}
                   </span>
                 )}
@@ -137,7 +137,7 @@ export function IssueCard({ issue, index = 0 }: { issue: Issue; index?: number }
           </span>
 
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5 text-zinc-400">
+            <div className="flex items-center gap-1.5 text-slate-500 dark:text-zinc-400">
               <CheckCircle2 className="size-4" />
               <span className="text-sm font-semibold">{issue.verificationCount || 0}</span>
             </div>

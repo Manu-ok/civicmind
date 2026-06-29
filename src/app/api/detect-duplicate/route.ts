@@ -8,17 +8,17 @@ export async function POST(req: NextRequest) {
 
     if (!newIssue || !nearbyIssues) {
       return NextResponse.json(
-        { error: "Missing required parameters" },
+        { success: false, error: "Missing required parameters" },
         { status: 400 }
       );
     }
 
     const result = await checkForDuplicates(newIssue, nearbyIssues);
-    return NextResponse.json({ success: true, result });
+    return NextResponse.json({ success: true, data: result, result });
   } catch (error: any) {
     console.error("API Error - Detect Duplicate:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to detect duplicates" },
+      { success: false, error: error.message || "Failed to detect duplicates" },
       { status: 500 }
     );
   }

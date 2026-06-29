@@ -1,7 +1,10 @@
 "use client";
+import Image from "next/image";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/shared/Logo";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, X, AlertCircle, Upload, ChevronRight, CheckCircle2 } from "lucide-react";
 import confetti from "canvas-confetti";
@@ -76,37 +79,43 @@ export default function OnboardingPage() {
     }
   }, [step, user, city, ward]);
 
-  useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
+  const checkUsername = useCallback(
+    (name: string) => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      setIsChecking(true);
+      debounceRef.current = setTimeout(async () => {
+        try {
+          const result = await checkUsernameAvailability(name);
+          setIsAvailable(result.available);
+          setUsernameError(result.reason);
+          if (result.suggestions) {
+            setSuggestions(result.suggestions);
+          }
+        } catch (err) {
+          console.error(err);
+          setIsAvailable(false);
+          setUsernameError("Error checking username");
+        } finally {
+          setIsChecking(false);
+        }
+      }, 500);
+    },
+    []
+  );
 
+  useEffect(() => {
     if (username.length < 3) {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
       setIsAvailable(null);
       setUsernameError(null);
       return;
     }
-
-    setIsChecking(true);
-    debounceRef.current = setTimeout(async () => {
-      try {
-        const result = await checkUsernameAvailability(username);
-        setIsAvailable(result.available);
-        setUsernameError(result.reason);
-        if (result.suggestions) {
-          setSuggestions(result.suggestions);
-        }
-      } catch (err) {
-        console.error(err);
-        setIsAvailable(false);
-        setUsernameError("Error checking username");
-      } finally {
-        setIsChecking(false);
-      }
-    }, 500);
-
+    checkUsername(username);
+    
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [username]);
+  }, [username, checkUsername]);
 
   const goToNextStep = () => {
     setDirection(1);
@@ -190,7 +199,7 @@ export default function OnboardingPage() {
           ))}
         </div>
 
-        <div className="relative overflow-hidden bg-slate-900/50 backdrop-blur-xl border border-slate-800/50 p-6 md:p-10 rounded-[2rem] shadow-2xl">
+        <div className="relative overflow-hidden bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-xl border border-slate-800/50 p-6 md:p-10 rounded-[2rem] shadow-2xl">
           <AnimatePresence mode="wait" custom={direction}>
             
             {/* STEP 1: USERNAME */}
@@ -205,10 +214,8 @@ export default function OnboardingPage() {
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 className="flex flex-col gap-6"
               >
-                <div className="text-center mb-2">
-                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl mx-auto mb-6 flex items-center justify-center font-bold text-2xl text-white shadow-lg shadow-blue-500/20">
-                    CM
-                  </div>
+                <div className="text-center mb-2 flex flex-col items-center">
+                  <Logo variant="full" size="lg" animated className="mb-6" />
                   <h1 className="text-3xl md:text-4xl font-black mb-3 text-white tracking-tight">Choose your @username</h1>
                   <p className="text-slate-400">This is how the community will know you. Choose wisely.</p>
                 </div>
@@ -221,7 +228,7 @@ export default function OnboardingPage() {
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s/g, ''))}
-                    className="w-full bg-slate-950/50 border-2 border-slate-800 rounded-2xl py-4 pl-12 pr-14 text-xl font-bold text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:bg-slate-900/80 transition-all shadow-inner"
+                    className="w-full bg-slate-100/50 dark:bg-slate-950/50 border-2 border-slate-800 rounded-2xl py-4 pl-12 pr-14 text-xl font-bold text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:bg-slate-900/80 transition-all shadow-inner"
                     placeholder="username"
                     maxLength={30}
                   />
@@ -325,7 +332,7 @@ export default function OnboardingPage() {
                   <div className="relative group cursor-pointer">
                     <div className="w-28 h-28 rounded-full bg-slate-800 border-4 border-slate-700/50 overflow-hidden flex items-center justify-center transition-transform group-hover:scale-105">
                       {user.photoURL ? (
-                        <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
+                        <Image fill src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
                       ) : (
                         <span className="text-4xl font-black text-slate-500">{displayName.charAt(0)}</span>
                       )}
@@ -343,7 +350,7 @@ export default function OnboardingPage() {
                       type="text"
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
-                      className="w-full bg-slate-950/50 border border-slate-800 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-blue-500 focus:bg-slate-900/80 transition-all"
+                      className="w-full bg-slate-100/50 dark:bg-slate-950/50 border border-slate-800 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-blue-500 focus:bg-slate-900/80 transition-all"
                     />
                   </div>
 
@@ -357,7 +364,7 @@ export default function OnboardingPage() {
                       onChange={(e) => setBio(e.target.value)}
                       maxLength={160}
                       rows={3}
-                      className="w-full bg-slate-950/50 border border-slate-800 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-blue-500 focus:bg-slate-900/80 resize-none transition-all"
+                      className="w-full bg-slate-100/50 dark:bg-slate-950/50 border border-slate-800 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-blue-500 focus:bg-slate-900/80 resize-none transition-all"
                       placeholder="Passionate about clean streets and green parks..."
                     />
                   </div>
@@ -369,7 +376,7 @@ export default function OnboardingPage() {
                         type="text"
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
-                        className="w-full bg-slate-950/50 border border-slate-800 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-blue-500 focus:bg-slate-900/80 transition-all"
+                        className="w-full bg-slate-100/50 dark:bg-slate-950/50 border border-slate-800 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-blue-500 focus:bg-slate-900/80 transition-all"
                         placeholder="e.g. Mumbai"
                       />
                     </div>
@@ -379,7 +386,7 @@ export default function OnboardingPage() {
                         type="text"
                         value={ward}
                         onChange={(e) => setWard(e.target.value)}
-                        className="w-full bg-slate-950/50 border border-slate-800 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-blue-500 focus:bg-slate-900/80 transition-all"
+                        className="w-full bg-slate-100/50 dark:bg-slate-950/50 border border-slate-800 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-blue-500 focus:bg-slate-900/80 transition-all"
                         placeholder="e.g. Andheri West"
                       />
                     </div>
@@ -421,7 +428,7 @@ export default function OnboardingPage() {
                   <p className="text-slate-400">Follow some active citizens in {city || "your area"} to get your feed started.</p>
                 </div>
 
-                <div className="bg-slate-950/50 rounded-2xl border border-slate-800/50 p-2 space-y-1 max-h-[240px] overflow-y-auto custom-scrollbar">
+                <div className="bg-slate-100/50 dark:bg-slate-950/50 rounded-2xl border border-slate-800/50 p-2 space-y-1 max-h-[240px] overflow-y-auto custom-scrollbar">
                   {suggestedUsers.length === 0 ? (
                     <div className="p-8 text-center flex flex-col items-center gap-3">
                       <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
@@ -431,7 +438,7 @@ export default function OnboardingPage() {
                     suggestedUsers.map(su => (
                       <div key={su.id} className="flex items-center justify-between p-3 hover:bg-slate-800/50 rounded-xl transition-colors">
                         <div className="flex items-center gap-3">
-                          <img src={su.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${su.displayName}`} alt={su.displayName} className="w-10 h-10 rounded-full border border-slate-700" />
+                          <Image fill src={su.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${su.displayName}`} alt={su.displayName} className="w-10 h-10 rounded-full border border-slate-700" />
                           <div>
                             <div className="font-bold text-sm text-white flex items-center gap-1.5">
                               {su.displayName}

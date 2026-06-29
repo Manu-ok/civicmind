@@ -1,5 +1,5 @@
 import { db } from "@/lib/firebase/config";
-import { writeBatch, doc, collection, Timestamp } from "firebase/firestore";
+import { writeBatch, doc, collection, Timestamp, getDoc } from "firebase/firestore";
 import { User, Issue, AnalyticsData, PredictionData, IssueLocation, AIAnalysis, SocialUser, FollowRelation, FeedItem, Story, Circle, CircleMember, Comment } from "@/lib/types";
 
 const JAMSHEDPUR_CENTER = { lat: 22.8046, lng: 86.2029 };
@@ -117,6 +117,12 @@ const ISSUES_TEMPLATES = [
 
 export async function seedDemoData(city: string = "Jamshedpur", currentUserId: string) {
   try {
+    const analyticsRef = doc(db, "analytics", city);
+    const analyticsDoc = await getDoc(analyticsRef);
+    if (analyticsDoc.exists()) {
+      return { success: true, message: "Demo data is already seeded." };
+    }
+
     const batch = writeBatch(db);
 
     // Add current user to DEMO_USERS to seed their data

@@ -62,7 +62,7 @@ export function useAuth() {
         toast.success("Account created! Welcome to CivicMind AI!");
         router.push("/feed");
       } catch (err: any) {
-        const message = err.message || "Sign-up failed.";
+        const message = err.message || "Email sign-up failed.";
         setError(message);
         toast.error(message);
       } finally {
@@ -71,6 +71,29 @@ export function useAuth() {
     },
     [router, setLoading, setError]
   );
+
+  const handleSignInAsDemo = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      await firebaseEmailSignIn("demo@civicmind.com", "Demo!123");
+      toast.success("Welcome to Demo Mode!");
+      router.push("/feed");
+    } catch (err: any) {
+      // If user doesn't exist, try creating it
+      try {
+        await firebaseEmailSignUp("demo@civicmind.com", "Demo!123", "Demo Civic");
+        toast.success("Demo account created. Welcome!");
+        router.push("/feed");
+      } catch (signupErr: any) {
+        const message = signupErr.message || "Demo sign-in failed.";
+        setError(message);
+        toast.error(message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [router, setLoading, setError]);
 
   const handleSignOut = useCallback(async () => {
     try {
@@ -122,6 +145,7 @@ export function useAuth() {
     signInWithGoogle: handleSignInWithGoogle,
     signInWithEmail: handleSignInWithEmail,
     signUpWithEmail: handleSignUpWithEmail,
+    signInAsDemo: handleSignInAsDemo,
     signOut: handleSignOut,
     deleteAccount: handleDeleteAccount,
     updateProfile: handleUpdateProfile,

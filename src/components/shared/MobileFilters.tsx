@@ -47,18 +47,18 @@ export function MobileFilters({
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed inset-x-0 bottom-0 z-[70] max-h-[85vh] overflow-y-auto rounded-t-3xl border-t border-white/[0.08] bg-zinc-950 p-6 shadow-2xl md:hidden"
+            className="fixed inset-x-0 bottom-0 z-[70] max-h-[85vh] overflow-y-auto rounded-t-3xl border-t border-white/[0.08] bg-slate-50 dark:bg-zinc-950 p-6 shadow-2xl md:hidden"
             drag="y"
             dragConstraints={{ top: 0, bottom: 0 }}
             onDragEnd={(e, info) => {
               if (info.offset.y > 100) onClose();
             }}
           >
-            <div className="mx-auto mb-6 h-1 w-12 rounded-full bg-zinc-800" />
+            <div className="mx-auto mb-6 h-1 w-12 rounded-full bg-slate-100 dark:bg-zinc-800" />
             
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-white">Filters</h2>
-              <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full text-zinc-400">
+              <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full text-slate-500 dark:text-zinc-400">
                 <X className="h-5 w-5" />
               </Button>
             </div>
@@ -66,7 +66,7 @@ export function MobileFilters({
             <div className="space-y-8 pb-20">
               {/* Sort By */}
               <div>
-                <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest mb-3">Sort By</h3>
+                <h3 className="text-sm font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-widest mb-3">Sort By</h3>
                 <div className="grid grid-cols-2 gap-2">
                   {[
                     { id: "newest", label: "Newest First" },
@@ -79,7 +79,7 @@ export function MobileFilters({
                       onClick={() => setSortBy(s.id as any)}
                       className={cn(
                         "text-left px-3 py-2.5 rounded-xl text-sm transition-colors border",
-                        sortBy === s.id ? "bg-primary/20 text-primary border-primary/30 font-medium" : "bg-zinc-900 text-zinc-400 border-white/5 hover:bg-zinc-800"
+                        sortBy === s.id ? "bg-primary/20 text-primary border-primary/30 font-medium" : "bg-white dark:bg-zinc-900 text-slate-500 dark:text-zinc-400 border-white/5 hover:bg-slate-100 dark:bg-zinc-800"
                       )}
                     >
                       {s.label}
@@ -90,7 +90,7 @@ export function MobileFilters({
 
               {/* Category */}
               <div>
-                <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest mb-3">Category</h3>
+                <h3 className="text-sm font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-widest mb-3">Category</h3>
                 <div className="flex flex-wrap gap-2">
                   {CATEGORIES.map(cat => (
                     <button
@@ -98,7 +98,7 @@ export function MobileFilters({
                       onClick={() => setCategoryFilter(cat)}
                       className={cn(
                         "px-3 py-1.5 rounded-full text-sm font-medium transition-colors border",
-                        categoryFilter === cat ? "bg-primary text-primary-foreground border-primary" : "bg-zinc-900 text-zinc-400 border-white/5 hover:bg-zinc-800"
+                        categoryFilter === cat ? "bg-primary text-primary-foreground border-primary" : "bg-white dark:bg-zinc-900 text-slate-500 dark:text-zinc-400 border-white/5 hover:bg-slate-100 dark:bg-zinc-800"
                       )}
                     >
                       {cat.charAt(0).toUpperCase() + cat.slice(1)}
@@ -109,7 +109,7 @@ export function MobileFilters({
 
               {/* Severity */}
               <div>
-                <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest mb-3">Severity</h3>
+                <h3 className="text-sm font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-widest mb-3">Severity</h3>
                 <div className="flex flex-wrap gap-2">
                   {SEVERITIES.map(sev => (
                     <button
@@ -117,7 +117,7 @@ export function MobileFilters({
                       onClick={() => setSeverityFilter(sev)}
                       className={cn(
                         "px-3 py-1.5 rounded-full text-sm font-medium transition-colors border",
-                        severityFilter === sev ? "bg-primary text-primary-foreground border-primary" : "bg-zinc-900 text-zinc-400 border-white/5 hover:bg-zinc-800"
+                        severityFilter === sev ? "bg-primary text-primary-foreground border-primary" : "bg-white dark:bg-zinc-900 text-slate-500 dark:text-zinc-400 border-white/5 hover:bg-slate-100 dark:bg-zinc-800"
                       )}
                     >
                       {sev.charAt(0).toUpperCase() + sev.slice(1)}
@@ -128,7 +128,7 @@ export function MobileFilters({
 
               {/* Status */}
               <div>
-                <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest mb-3">Status</h3>
+                <h3 className="text-sm font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-widest mb-3">Status</h3>
                 <div className="flex flex-wrap gap-2">
                   {STATUSES.map(stat => (
                     <button
@@ -136,7 +136,7 @@ export function MobileFilters({
                       onClick={() => setStatusFilter(stat)}
                       className={cn(
                         "px-3 py-1.5 rounded-full text-sm font-medium transition-colors border",
-                        statusFilter === stat ? "bg-primary text-primary-foreground border-primary" : "bg-zinc-900 text-zinc-400 border-white/5 hover:bg-zinc-800"
+                        statusFilter === stat ? "bg-primary text-primary-foreground border-primary" : "bg-white dark:bg-zinc-900 text-slate-500 dark:text-zinc-400 border-white/5 hover:bg-slate-100 dark:bg-zinc-800"
                       )}
                     >
                       {stat.replace("_", " ").charAt(0).toUpperCase() + stat.slice(1).replace("_", " ")}
@@ -146,7 +146,7 @@ export function MobileFilters({
               </div>
             </div>
             
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-zinc-950 border-t border-white/10 md:hidden pb-[max(1rem,env(safe-area-inset-bottom))]">
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-slate-50 dark:bg-zinc-950 border-t border-white/10 md:hidden pb-[max(1rem,env(safe-area-inset-bottom))]">
                <Button onClick={onClose} className="w-full h-12 rounded-xl text-lg font-bold">Apply Filters</Button>
             </div>
           </motion.div>

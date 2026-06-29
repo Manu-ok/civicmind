@@ -5,7 +5,7 @@ import { isRateLimited, getCachedResponse, setCachedResponse, withRetry } from "
 export async function POST(req: NextRequest) {
   try {
     if (isRateLimited(req, 10, 60000)) {
-      return NextResponse.json({ error: "Rate limit exceeded. Please try again later." }, { status: 429 });
+      return NextResponse.json({ success: false, error: "Rate limit exceeded. Please try again later." }, { status: 429 });
     }
 
     const body = await req.json();
@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
 
     if (!issues || !Array.isArray(issues)) {
       return NextResponse.json(
-        { error: "Invalid issues data" },
+        { success: false, error: "Invalid issues data" },
         { status: 400 }
       );
     }
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     const cacheKey = `predict_${city || 'all'}_${issues.length}`;
     const cached = getCachedResponse(cacheKey);
     if (cached) {
-      return NextResponse.json({ success: true, predictions: cached, cached: true });
+      return NextResponse.json({ success: true, data: cached, predictions: cached, cached: true });
     }
 
     // Simplify the issues payload to fit context limits and highlight patterns
@@ -88,11 +88,11 @@ Return the predictions as a JSON array of objects in this EXACT format:
 
     setCachedResponse(cacheKey, predictions, 3600); // Cache for 1 hour
 
-    return NextResponse.json({ success: true, predictions });
+    return NextResponse.json({ success: true, data: predictions, predictions });
   } catch (error: any) {
     console.error("API Error - Predict Issues:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to generate predictions" },
+      { success: false, error: error.message || "Failed to generate predictions" },
       { status: 500 }
     );
   }

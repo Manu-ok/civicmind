@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { Mail, Lock, User, ArrowRight, Loader2, Eye, EyeOff, Zap, Shield, BarChart3 } from "lucide-react";
+import { Logo } from "@/components/shared/Logo";
 
 // ── animation variants ──────────────────────────────────────────────
 const containerVariants: Variants = {
@@ -68,7 +69,7 @@ function GoogleIcon() {
 // ── feature pill ────────────────────────────────────────────────────
 function FeaturePill({ icon: Icon, label }: { icon: React.ElementType; label: string }) {
   return (
-    <div className="flex items-center gap-1.5 rounded-full border border-white/5 bg-white/[0.03] px-3 py-1 text-[11px] text-zinc-400">
+    <div className="flex items-center gap-1.5 rounded-full border border-white/5 bg-white/[0.03] px-3 py-1 text-[11px] text-slate-500 dark:text-zinc-400">
       <Icon className="h-3 w-3 text-blue-400" />
       {label}
     </div>
@@ -77,7 +78,7 @@ function FeaturePill({ icon: Icon, label }: { icon: React.ElementType; label: st
 
 // ── main login card ─────────────────────────────────────────────────
 export default function LoginCard() {
-  const { signInWithGoogle, signInWithEmail, signUpWithEmail, loading, error } = useAuth();
+  const { signInWithGoogle, signInWithEmail, signUpWithEmail, signInAsDemo, loading, error } = useAuth();
 
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -101,7 +102,7 @@ export default function LoginCard() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-zinc-950 px-4">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-50 dark:bg-zinc-950 px-4">
       {/* ── animated background orbs ─────────────────────────── */}
       <FloatingOrb className="left-[-10%] top-[-5%] h-[500px] w-[500px] bg-blue-600/[0.07]" delay={0} />
       <FloatingOrb className="right-[-8%] top-[30%] h-[400px] w-[400px] bg-violet-600/[0.07]" delay={3} />
@@ -124,25 +125,18 @@ export default function LoginCard() {
         {/* Glow ring behind card */}
         <div className="pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-br from-blue-500/20 via-transparent to-violet-500/20 opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-100" />
 
-        <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.03] shadow-2xl shadow-black/40 backdrop-blur-xl">
+        <div className="relative overflow-hidden rounded-2xl border border-slate-200 dark:border-white/[0.06] bg-white/[0.03] shadow-2xl shadow-black/40 backdrop-blur-xl">
           {/* Top gradient line */}
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
 
           <div className="px-8 pb-8 pt-10">
             {/* ── brand ────────────────────────────────────── */}
-            <motion.div variants={itemVariants} className="mb-8 text-center">
-              <motion.div
-                className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-violet-600 shadow-lg shadow-blue-500/25"
-                whileHover={{ scale: 1.05, rotate: 3 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Shield className="h-7 w-7 text-white" />
-              </motion.div>
-
-              <h1 className="bg-gradient-to-r from-white via-blue-100 to-violet-200 bg-clip-text text-3xl font-bold tracking-tight text-transparent">
+            <motion.div variants={itemVariants} className="mb-8 flex flex-col items-center text-center">
+              <Logo variant="icon" size="lg" animated />
+              <h2 className="mt-4 text-2xl font-bold tracking-tight text-white">
                 CivicMind AI
-              </h1>
-              <p className="mt-1.5 text-sm text-zinc-400">
+              </h2>
+              <p className="mt-1.5 text-sm text-slate-500 dark:text-zinc-400">
                 AI-Powered Community Resolution
               </p>
             </motion.div>
@@ -155,7 +149,7 @@ export default function LoginCard() {
             </motion.div>
 
             {/* ── google sign in ───────────────────────────── */}
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants} className="space-y-3">
               <button
                 type="button"
                 onClick={signInWithGoogle}
@@ -165,12 +159,22 @@ export default function LoginCard() {
                 {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <GoogleIcon />}
                 Continue with Google
               </button>
+              
+              <button
+                type="button"
+                onClick={signInAsDemo}
+                disabled={loading}
+                className="flex w-full items-center justify-center gap-3 rounded-xl border border-violet-500/30 bg-violet-500/10 px-4 py-3 text-sm font-medium text-violet-300 transition-all duration-200 hover:border-violet-500/50 hover:bg-violet-500/20 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Zap className="h-5 w-5" />}
+                Quick Demo Login
+              </button>
             </motion.div>
 
             {/* ── divider ──────────────────────────────────── */}
             <motion.div variants={itemVariants} className="my-6 flex items-center gap-3">
               <div className="h-px flex-1 bg-white/[0.06]" />
-              <span className="text-xs text-zinc-500">or</span>
+              <span className="text-xs text-slate-500 dark:text-zinc-500">or</span>
               <div className="h-px flex-1 bg-white/[0.06]" />
             </motion.div>
 
@@ -229,7 +233,7 @@ export default function LoginCard() {
                         type="button"
                         tabIndex={-1}
                         onClick={() => setShowPassword(!showPassword)}
-                        className="text-zinc-500 transition-colors hover:text-zinc-300"
+                        className="text-slate-500 dark:text-zinc-500 transition-colors hover:text-slate-600 dark:text-zinc-300"
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
@@ -276,7 +280,7 @@ export default function LoginCard() {
 
             {/* ── toggle + demo ─────────────────────────────── */}
             <motion.div variants={itemVariants} className="mt-6 space-y-3 text-center">
-              <p className="text-sm text-zinc-500">
+              <p className="text-sm text-slate-500 dark:text-zinc-500">
                 {isSignUp ? "Already have an account?" : "Don\u2019t have an account?"}{" "}
                 <button
                   type="button"
@@ -290,7 +294,7 @@ export default function LoginCard() {
               <button
                 type="button"
                 onClick={handleDemo}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-white/[0.08] px-3 py-1.5 text-xs text-zinc-500 transition-all hover:border-blue-500/30 hover:text-zinc-300"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-white/[0.08] px-3 py-1.5 text-xs text-slate-500 dark:text-zinc-500 transition-all hover:border-blue-500/30 hover:text-slate-600 dark:text-zinc-300"
               >
                 <Zap className="h-3 w-3 text-amber-400" />
                 Quick Demo Mode
@@ -303,9 +307,9 @@ export default function LoginCard() {
             variants={itemVariants}
             className="border-t border-white/[0.04] bg-white/[0.02] px-8 py-4 text-center"
           >
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-slate-500 dark:text-zinc-500">
               Join{" "}
-              <span className="font-medium text-zinc-300">10,000+</span>{" "}
+              <span className="font-medium text-slate-600 dark:text-zinc-300">10,000+</span>{" "}
               citizens making their communities better
             </p>
           </motion.div>
@@ -342,10 +346,10 @@ function InputField({
       className={`flex items-center gap-3 rounded-xl border px-4 py-3 transition-all duration-200 ${
         focused
           ? "border-blue-500/40 bg-blue-500/[0.04] shadow-[0_0_15px_-3px_rgba(59,130,246,0.15)]"
-          : "border-white/[0.06] bg-white/[0.03] hover:border-white/[0.1]"
+          : "border-slate-200 dark:border-white/[0.06] bg-white/[0.03] hover:border-white/[0.1]"
       }`}
     >
-      <Icon className={`h-4 w-4 flex-shrink-0 transition-colors ${focused ? "text-blue-400" : "text-zinc-500"}`} />
+      <Icon className={`h-4 w-4 flex-shrink-0 transition-colors ${focused ? "text-blue-400" : "text-slate-500 dark:text-zinc-500"}`} />
       <input
         type={type}
         placeholder={placeholder}
@@ -353,7 +357,7 @@ function InputField({
         onChange={(e) => onChange(e.target.value)}
         onFocus={onFocus}
         onBlur={onBlur}
-        className="w-full bg-transparent text-sm text-white placeholder:text-zinc-500 focus:outline-none"
+        className="w-full bg-transparent text-sm text-white placeholder:text-slate-500 dark:text-zinc-500 focus:outline-none"
         autoComplete={type === "password" ? "current-password" : type === "email" ? "email" : "name"}
       />
       {suffix}

@@ -47,7 +47,7 @@ export function AgentMessage({ message }: AgentMessageProps) {
       if (block.match(/^(\d+\.|-|\*)\s/m)) {
         const items = block.split('\n').map(line => line.replace(/^(\d+\.|-|\*)\s/, ''));
         return (
-          <ul key={i} className="list-disc list-inside space-y-1 mb-4 text-zinc-300">
+          <ul key={i} className="list-disc list-inside space-y-1 mb-4 text-slate-600 dark:text-zinc-300">
             {items.map((item, j) => (
               <li key={j} dangerouslySetInnerHTML={{ __html: parseInline(item) }} />
             ))}
@@ -57,7 +57,7 @@ export function AgentMessage({ message }: AgentMessageProps) {
       
       // Default Paragraph
       return (
-        <p key={i} className="mb-4 text-zinc-300 leading-relaxed">
+        <p key={i} className="mb-4 text-slate-600 dark:text-zinc-300 leading-relaxed">
           {parseInlineToNodes(block, router)}
         </p>
       );
@@ -75,7 +75,7 @@ export function AgentMessage({ message }: AgentMessageProps) {
         {/* Avatar */}
         {isAssistant && (
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-0.5 shrink-0 shadow-lg shadow-blue-500/20">
-            <div className="w-full h-full rounded-full bg-zinc-950 flex items-center justify-center">
+            <div className="w-full h-full rounded-full bg-slate-50 dark:bg-zinc-950 flex items-center justify-center">
               <Brain className="w-5 h-5 text-blue-400" />
             </div>
           </div>
@@ -87,7 +87,7 @@ export function AgentMessage({ message }: AgentMessageProps) {
             className={cn(
               "px-5 py-4 rounded-2xl",
               isAssistant
-                ? "bg-zinc-900 border border-white/5 rounded-tl-sm shadow-xl"
+                ? "bg-white dark:bg-zinc-900 border border-white/5 rounded-tl-sm shadow-xl"
                 : "bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-tr-sm shadow-lg shadow-blue-500/20"
             )}
           >
@@ -105,11 +105,11 @@ export function AgentMessage({ message }: AgentMessageProps) {
             "flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity",
             isAssistant ? "justify-start ml-2" : "justify-end mr-2"
           )}>
-            <span className="text-[10px] text-zinc-500">
+            <span className="text-[10px] text-slate-500 dark:text-zinc-500">
               {format((message.timestamp as any)?.toDate ? (message.timestamp as any).toDate() : new Date(message.timestamp as any || Date.now()), 'h:mm a')}
             </span>
             {isAssistant && (
-              <button onClick={handleCopy} className="text-zinc-500 hover:text-white transition-colors">
+              <button onClick={handleCopy} className="text-slate-500 dark:text-zinc-500 hover:text-white transition-colors">
                 <Copy className="w-3 h-3" />
               </button>
             )}

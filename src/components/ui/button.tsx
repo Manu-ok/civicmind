@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
@@ -14,10 +14,10 @@ const buttonVariants = cva(
         destructive:
           "bg-red-600 text-white shadow-sm hover:bg-red-700",
         outline:
-          "border border-zinc-700 bg-transparent shadow-sm hover:bg-zinc-800 hover:text-zinc-100 text-zinc-300",
+          "border border-slate-300 dark:border-zinc-700 bg-transparent shadow-sm hover:bg-slate-100 dark:bg-zinc-800 hover:text-zinc-100 text-slate-600 dark:text-zinc-300",
         secondary:
-          "bg-zinc-800 text-zinc-200 border border-zinc-700 shadow-sm hover:bg-zinc-700",
-        ghost: "hover:bg-zinc-800 hover:text-zinc-100 text-zinc-300",
+          "bg-slate-100 dark:bg-zinc-800 text-zinc-200 border border-slate-300 dark:border-zinc-700 shadow-sm hover:bg-slate-200 dark:bg-zinc-700",
+        ghost: "hover:bg-slate-100 dark:bg-zinc-800 hover:text-zinc-100 text-slate-600 dark:text-zinc-300",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

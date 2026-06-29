@@ -61,7 +61,7 @@ export function AchievementOverlay() {
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.8, y: -50, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className="bg-zinc-900 border border-white/10 p-8 rounded-3xl shadow-2xl flex flex-col items-center max-w-sm w-[90%] pointer-events-auto text-center relative overflow-hidden"
+            className="bg-white dark:bg-zinc-900 border border-white/10 p-8 rounded-3xl shadow-2xl flex flex-col items-center max-w-sm w-[90%] pointer-events-auto text-center relative overflow-hidden"
           >
             {/* Background glow */}
             <div className={`absolute inset-0 opacity-20 ${activeAchievement.color} blur-3xl`} />
@@ -72,7 +72,7 @@ export function AchievementOverlay() {
               transition={{ type: "spring", delay: 0.2, stiffness: 200, damping: 15 }}
               className={`w-24 h-24 rounded-full flex items-center justify-center mb-6 relative z-10 shadow-lg ${activeAchievement.color}`}
             >
-              <div className="absolute inset-1 bg-zinc-900 rounded-full flex items-center justify-center">
+              <div className="absolute inset-1 bg-white dark:bg-zinc-900 rounded-full flex items-center justify-center">
                 <span className="text-5xl">{activeAchievement.icon}</span>
               </div>
             </motion.div>
@@ -85,7 +85,7 @@ export function AchievementOverlay() {
             >
               <h2 className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2">Level Up!</h2>
               <h3 className="text-2xl font-black text-white mb-2">{activeAchievement.title}</h3>
-              <p className="text-zinc-400 text-sm">{activeAchievement.description}</p>
+              <p className="text-slate-500 dark:text-zinc-400 text-sm">{activeAchievement.description}</p>
             </motion.div>
 
             <motion.button

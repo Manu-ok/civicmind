@@ -50,11 +50,11 @@ export function MiniMap({ onLocationChange, initialLocation }: MiniMapProps) {
   const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
 
   if (geoLoading && !initialLocation) {
-    return <div className="h-[300px] w-full rounded-xl bg-zinc-900 flex items-center justify-center text-zinc-500 animate-pulse">Detecting your location...</div>;
+    return <div className="h-[300px] w-full rounded-xl bg-white dark:bg-zinc-900 flex items-center justify-center text-slate-500 dark:text-zinc-500 animate-pulse">Detecting your location...</div>;
   }
 
   if (!API_KEY) {
-    return <div className="h-[300px] w-full rounded-xl bg-zinc-900 flex items-center justify-center text-red-400 p-4 text-center">Google Maps API Key is missing. Add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to .env.local</div>;
+    return <div className="h-[300px] w-full rounded-xl bg-white dark:bg-zinc-900 flex items-center justify-center text-red-400 p-4 text-center">Google Maps API Key is missing. Add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to .env.local</div>;
   }
 
   return (
@@ -87,8 +87,8 @@ export function MiniMap({ onLocationChange, initialLocation }: MiniMapProps) {
           </Map>
         </APIProvider>
       </div>
-      <div className="text-sm text-muted-foreground p-3 bg-zinc-900 rounded-lg border border-border">
-        <span className="font-medium text-zinc-300">Selected Location:</span> {addressPreview}
+      <div className="text-sm text-muted-foreground p-3 bg-white dark:bg-zinc-900 rounded-lg border border-border">
+        <span className="font-medium text-slate-600 dark:text-zinc-300">Selected Location:</span> {addressPreview}
       </div>
     </div>
   );

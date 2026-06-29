@@ -14,7 +14,7 @@ export function FullPageError({ message = "An unexpected error occurred.", onRet
         <AlertOctagon className="h-16 w-16 text-red-500" />
       </div>
       <h2 className="mb-2 text-2xl font-bold text-white">Something went wrong</h2>
-      <p className="mb-8 max-w-md text-zinc-400">{message}</p>
+      <p className="mb-8 max-w-md text-slate-500 dark:text-zinc-400">{message}</p>
       
       {onRetry && (
         <Button 

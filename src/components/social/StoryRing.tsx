@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 import { SocialUser } from "@/lib/types";
 import { Plus } from "lucide-react";
@@ -59,17 +60,17 @@ export function StoryRing({
 
         {/* Static add button ring */}
         {isAdd && (
-          <div className="absolute inset-0 rounded-full bg-zinc-800 p-[2px]">
+          <div className="absolute inset-0 rounded-full bg-slate-100 dark:bg-zinc-800 p-[2px]">
             <div className="w-full h-full rounded-full bg-background" />
           </div>
         )}
 
         {/* Avatar Image (Static, not rotating) */}
-        <div className="absolute inset-[2.5px] rounded-full overflow-hidden border-2 border-background bg-zinc-800 flex items-center justify-center">
+        <div className="absolute inset-[2.5px] rounded-full overflow-hidden border-2 border-background bg-slate-100 dark:bg-zinc-800 flex items-center justify-center">
           {user?.photoURL ? (
-            <img src={user.photoURL} alt="" className="w-full h-full object-cover" />
+            <Image fill src={user.photoURL} alt="" className="w-full h-full object-cover" />
           ) : (
-            <span className="font-bold text-zinc-500">
+            <span className="font-bold text-slate-500 dark:text-zinc-500">
               {user?.displayName?.charAt(0) || "U"}
             </span>
           )}
@@ -87,7 +88,7 @@ export function StoryRing({
       </div>
 
       {showUsername && (
-        <span className="text-[10px] md:text-xs font-semibold text-zinc-400 w-16 truncate text-center group-hover:text-white transition-colors duration-200 ease-in-out">
+        <span className="text-[10px] md:text-xs font-semibold text-slate-500 dark:text-zinc-400 w-16 truncate text-center group-hover:text-white transition-colors duration-200 ease-in-out">
           {isAdd ? "Add Story" : user?.username}
         </span>
       )}

@@ -50,9 +50,9 @@ export function NotificationCenter() {
             const newNotif = change.doc.data() as AppNotification;
             if (!newNotif.read) {
               toast.custom((t) => (
-                <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-sm w-full bg-zinc-900 border border-white/10 shadow-2xl rounded-2xl pointer-events-auto flex items-start gap-3 p-4`}>
+                <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-sm w-full bg-white dark:bg-zinc-900 border border-white/10 shadow-2xl rounded-2xl pointer-events-auto flex items-start gap-3 p-4`}>
                   {newNotif.actorPhotoUrl ? (
-                    <img src={newNotif.actorPhotoUrl} alt="" className="w-10 h-10 rounded-full object-cover shrink-0" />
+                    <Image fill src={newNotif.actorPhotoUrl} alt="" className="w-10 h-10 rounded-full object-cover shrink-0" />
                   ) : (
                     <div className="w-10 h-10 rounded-full bg-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
                       <Bell className="w-5 h-5" />
@@ -60,7 +60,7 @@ export function NotificationCenter() {
                   )}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-white mb-0.5">{newNotif.title}</p>
-                    <p className="text-xs text-zinc-400 line-clamp-2">{newNotif.message}</p>
+                    <p className="text-xs text-slate-500 dark:text-zinc-400 line-clamp-2">{newNotif.message}</p>
                   </div>
                 </div>
               ), { duration: 4000 });
@@ -156,14 +156,14 @@ export function NotificationCenter() {
     <div className="relative" ref={dropdownRef}>
       <motion.button 
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-full hover:bg-zinc-800 transition-colors"
+        className="relative p-2 rounded-full hover:bg-slate-100 dark:bg-zinc-800 transition-colors"
         whileTap={{ scale: 0.95 }}
       >
         <motion.div
           animate={hasNew ? { rotate: [0, -15, 15, -15, 15, 0] } : {}}
           transition={{ duration: 0.5, ease: "easeInOut" }}
         >
-          <Bell className="w-5 h-5 text-zinc-400" />
+          <Bell className="w-5 h-5 text-slate-500 dark:text-zinc-400" />
         </motion.div>
         <AnimatePresence>
           {unreadCount > 0 && (
@@ -188,10 +188,10 @@ export function NotificationCenter() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            className="absolute right-0 mt-2 w-80 sm:w-96 bg-zinc-950 border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 flex flex-col max-h-[85vh]"
+            className="absolute right-0 mt-2 w-80 sm:w-96 bg-slate-50 dark:bg-zinc-950 border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 flex flex-col max-h-[85vh]"
           >
             {/* Header */}
-            <div className="p-4 border-b border-white/10 flex items-center justify-between bg-zinc-900/50 backdrop-blur-md">
+            <div className="p-4 border-b border-white/10 flex items-center justify-between bg-white dark:bg-zinc-900/50 backdrop-blur-md">
               <h3 className="font-bold text-white">Notifications</h3>
               {unreadCount > 0 && (
                 <button 
@@ -211,7 +211,7 @@ export function NotificationCenter() {
                   onClick={() => setFilter(f)}
                   className={cn(
                     "px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all",
-                    filter === f ? "bg-white text-black" : "bg-zinc-900 text-zinc-400 hover:text-white"
+                    filter === f ? "bg-white text-black" : "bg-white dark:bg-zinc-900 text-slate-500 dark:text-zinc-400 hover:text-white"
                   )}
                 >
                   {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -223,10 +223,10 @@ export function NotificationCenter() {
             <div className="overflow-y-auto flex-1 p-2 space-y-4">
               {filteredNotifications.length === 0 ? (
                 <div className="p-8 text-center flex flex-col items-center justify-center">
-                  <div className="w-12 h-12 rounded-full bg-zinc-900 flex items-center justify-center mb-3">
+                  <div className="w-12 h-12 rounded-full bg-white dark:bg-zinc-900 flex items-center justify-center mb-3">
                     <Bell className="w-5 h-5 text-zinc-600" />
                   </div>
-                  <p className="text-zinc-500 text-sm font-bold">No notifications found</p>
+                  <p className="text-slate-500 dark:text-zinc-500 text-sm font-bold">No notifications found</p>
                   <p className="text-zinc-600 text-xs mt-1">You&apos;re all caught up!</p>
                 </div>
               ) : (
@@ -234,7 +234,7 @@ export function NotificationCenter() {
                   if (!groupedNotifications[group]) return null;
                   return (
                     <div key={group} className="space-y-1">
-                      <div className="px-3 py-1.5 text-xs font-bold text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-950/80 backdrop-blur-md z-10">
+                      <div className="px-3 py-1.5 text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-wider sticky top-0 bg-slate-50 dark:bg-zinc-950/80 backdrop-blur-md z-10">
                         {group}
                       </div>
                       {groupedNotifications[group].map((n) => (
@@ -243,22 +243,22 @@ export function NotificationCenter() {
                           onClick={() => handleNotificationClick(n)}
                           className={cn(
                             "relative flex items-start gap-3 p-3 rounded-xl cursor-pointer transition-colors",
-                            !n.read ? "bg-blue-500/5 hover:bg-blue-500/10" : "hover:bg-zinc-900"
+                            !n.read ? "bg-blue-500/5 hover:bg-blue-500/10" : "hover:bg-white dark:bg-zinc-900"
                           )}
                         >
                           {!n.read && (
                             <div className="absolute left-1.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-blue-500" />
                           )}
                           
-                          <div className={cn("relative shrink-0 w-10 h-10 rounded-full flex items-center justify-center", !n.actorPhotoUrl && "bg-zinc-800")}>
+                          <div className={cn("relative shrink-0 w-10 h-10 rounded-full flex items-center justify-center", !n.actorPhotoUrl && "bg-slate-100 dark:bg-zinc-800")}>
                             {n.actorPhotoUrl ? (
-                              <img src={n.actorPhotoUrl} alt="" className="w-full h-full rounded-full object-cover" />
+                              <Image fill src={n.actorPhotoUrl} alt="" className="w-full h-full rounded-full object-cover" />
                             ) : (
                               getIcon(n.type)
                             )}
                             {/* Type badge on avatar */}
                             {n.actorPhotoUrl && (
-                              <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-zinc-900 border-2 border-zinc-950 flex items-center justify-center">
+                              <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-white dark:bg-zinc-900 border-2 border-zinc-950 flex items-center justify-center">
                                 {React.cloneElement(getIcon(n.type) as React.ReactElement<any>, { className: "w-3 h-3" })}
                               </div>
                             )}
@@ -268,14 +268,14 @@ export function NotificationCenter() {
                             <p className="text-sm text-zinc-200 line-clamp-2 leading-snug">
                               {n.actorUsername ? (
                                 <Link href={`/profile/${n.actorUsername}`} className="font-bold text-white hover:underline mr-1" onClick={(e) => e.stopPropagation()}>
-                                  {n.actorName} <span className="text-zinc-400 font-normal">@{n.actorUsername}</span>
+                                  {n.actorName} <span className="text-slate-500 dark:text-zinc-400 font-normal">@{n.actorUsername}</span>
                                 </Link>
                               ) : (
                                 <span className="font-bold text-white">{n.actorName || n.title} </span>
                               )}
                               {n.message.replace(n.actorName + ' ', '')}
                             </p>
-                            <p className="text-[10px] text-zinc-500 mt-1 font-medium">
+                            <p className="text-[10px] text-slate-500 dark:text-zinc-500 mt-1 font-medium">
                               {formatDistanceToNow(n.createdAt.toDate(), { addSuffix: true })}
                             </p>
                           </div>
@@ -288,7 +288,7 @@ export function NotificationCenter() {
                           )}
                           {/* We don't have issue thumbnail URL in notification yet, but we can put a placeholder */}
                           {n.issueId && !['new_follower', 'achievement', 'circle_invite'].includes(n.type) && (
-                            <div className="shrink-0 w-12 h-12 rounded-lg bg-zinc-800 overflow-hidden ml-2 flex items-center justify-center">
+                            <div className="shrink-0 w-12 h-12 rounded-lg bg-slate-100 dark:bg-zinc-800 overflow-hidden ml-2 flex items-center justify-center">
                               <MapPin className="w-4 h-4 text-zinc-600" />
                             </div>
                           )}
@@ -301,10 +301,10 @@ export function NotificationCenter() {
             </div>
 
             {/* Footer */}
-            <div className="p-3 border-t border-white/10 bg-zinc-900/30 text-center">
+            <div className="p-3 border-t border-white/10 bg-white dark:bg-zinc-900/30 text-center">
               <button 
                 onClick={() => { setIsOpen(false); router.push('/settings?tab=notifications'); }}
-                className="text-xs text-zinc-500 hover:text-white transition-colors"
+                className="text-xs text-slate-500 dark:text-zinc-500 hover:text-white transition-colors"
               >
                 Notification Settings
               </button>

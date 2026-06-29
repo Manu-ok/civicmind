@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 import { useState, useRef, useEffect } from 'react';
 import { getFollowing, getSuggestedUsers } from '@/lib/firebase/social';
@@ -133,23 +134,23 @@ export function MentionInput({ value, onChange, onSubmit, placeholder, autoFocus
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        className="w-full min-h-[44px] bg-zinc-900 border border-white/5 rounded-2xl px-4 py-3 text-sm text-white resize-none focus:outline-none focus:border-blue-500/50 transition-colors shadow-inner"
+        className="w-full min-h-[44px] bg-white dark:bg-zinc-900 border border-white/5 rounded-2xl px-4 py-3 text-sm text-white resize-none focus:outline-none focus:border-blue-500/50 transition-colors shadow-inner"
         rows={1}
       />
 
       {showDropdown && users.length > 0 && (
-        <div className="absolute bottom-full left-0 mb-2 w-64 bg-zinc-800 border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
+        <div className="absolute bottom-full left-0 mb-2 w-64 bg-slate-100 dark:bg-zinc-800 border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
           {users.map((u, i) => (
             <div 
               key={u.id}
               onClick={() => insertMention(u)}
-              className={`flex items-center gap-2 p-2.5 cursor-pointer transition-colors ${i === selectedIndex ? 'bg-blue-500/20' : 'hover:bg-zinc-700/50'}`}
+              className={`flex items-center gap-2 p-2.5 cursor-pointer transition-colors ${i === selectedIndex ? 'bg-blue-500/20' : 'hover:bg-slate-200 dark:bg-zinc-700/50'}`}
             >
-              <div className="w-8 h-8 rounded-full bg-zinc-900 shrink-0 overflow-hidden border border-white/5">
+              <div className="w-8 h-8 rounded-full bg-white dark:bg-zinc-900 shrink-0 overflow-hidden border border-white/5">
                 {u.photoURL ? (
-                  <img src={u.photoURL} alt="" className="w-full h-full object-cover" />
+                  <Image fill src={u.photoURL} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-xs font-bold text-zinc-500">
+                  <div className="w-full h-full flex items-center justify-center text-xs font-bold text-slate-500 dark:text-zinc-500">
                     {u.displayName.charAt(0)}
                   </div>
                 )}
@@ -159,7 +160,7 @@ export function MentionInput({ value, onChange, onSubmit, placeholder, autoFocus
                   <span className="text-sm font-bold text-white truncate">{u.displayName}</span>
                   {u.isVerified && <CheckCircle2 className="w-3.5 h-3.5 text-blue-500 shrink-0" />}
                 </div>
-                <div className="text-xs text-zinc-400 truncate">@{u.username}</div>
+                <div className="text-xs text-slate-500 dark:text-zinc-400 truncate">@{u.username}</div>
               </div>
             </div>
           ))}

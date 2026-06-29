@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 import { useState, useEffect, useRef } from "react";
 import { StoryGroup } from "@/lib/hooks/useStories";
@@ -95,7 +96,7 @@ export function StoryViewer({ groups, initialGroupIndex, onClose, onMarkViewed }
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
         className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center sm:p-4"
       >
-        <div className="relative w-full max-w-[400px] h-full sm:h-[800px] sm:max-h-[90vh] bg-zinc-900 sm:rounded-xl sm:border sm:border-zinc-800 overflow-hidden shadow-2xl flex flex-col">
+        <div className="relative w-full max-w-[400px] h-full sm:h-[800px] sm:max-h-[90vh] bg-white dark:bg-zinc-900 sm:rounded-xl sm:border sm:border-slate-200 dark:border-zinc-800 overflow-hidden shadow-2xl flex flex-col">
           
           {/* Progress Bars */}
           <div className="absolute top-0 left-0 right-0 z-20 flex gap-1 p-2 pt-3">
@@ -114,9 +115,9 @@ export function StoryViewer({ groups, initialGroupIndex, onClose, onMarkViewed }
           {/* Header */}
           <div className="absolute top-0 left-0 right-0 z-20 p-4 pt-6 flex items-center justify-between bg-gradient-to-b from-black/60 to-transparent">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-800 border border-white/20">
+              <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-100 dark:bg-zinc-800 border border-white/20">
                 {currentGroup.user.photoURL ? (
-                  <img src={currentGroup.user.photoURL} alt="" className="w-full h-full object-cover" />
+                  <Image fill src={currentGroup.user.photoURL} alt="" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center font-bold text-xs">{currentGroup.user.displayName.charAt(0)}</div>
                 )}
@@ -159,9 +160,9 @@ export function StoryViewer({ groups, initialGroupIndex, onClose, onMarkViewed }
           </motion.div>
 
           {/* Content */}
-          <div className="relative flex-1 bg-zinc-950 flex items-center justify-center">
+          <div className="relative flex-1 bg-slate-50 dark:bg-zinc-950 flex items-center justify-center">
             {currentStory.mediaUrl ? (
-               <img src={currentStory.mediaUrl} alt="" className="w-full h-full object-cover" />
+               <Image fill src={currentStory.mediaUrl} alt="" className="w-full h-full object-cover" />
             ) : (
                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-900 to-violet-900 p-8 text-center">
                  {currentStory.type === "resolved" && <CheckCircle2 className="w-24 h-24 text-green-500 mb-6 mx-auto opacity-80" />}

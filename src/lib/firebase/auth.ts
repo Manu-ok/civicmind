@@ -12,6 +12,18 @@ import { doc, getDoc, setDoc, updateDoc, deleteDoc, Timestamp } from "firebase/f
 import { auth, db } from "./config";
 import { User } from "../types";
 
+function getAuthErrorMessage(error: any): string {
+  const code = error?.code || "";
+  if (code === "auth/popup-closed-by-user") return "Sign in cancelled";
+  if (code === "auth/network-request-failed") return "Network error. Check connection";
+  if (code === "auth/too-many-requests") return "Too many attempts. Try again later";
+  if (code === "auth/user-not-found" || code === "auth/wrong-password") return "Invalid email or password";
+  if (code === "auth/email-already-in-use") return "Email is already registered";
+  if (code === "auth/weak-password") return "Password is too weak";
+  if (code === "auth/invalid-credential") return "Invalid credentials provided";
+  return error?.message || "Authentication failed.";
+}
+
 export async function signInWithGoogle(): Promise<User> {
   try {
     const provider = new GoogleAuthProvider();
@@ -19,7 +31,7 @@ export async function signInWithGoogle(): Promise<User> {
     return await handleUserDocument(result.user);
   } catch (error: any) {
     console.error("Google sign in error:", error);
-    throw new Error(error.message || "Failed to sign in with Google.");
+    throw new Error(getAuthErrorMessage(error));
   }
 }
 
@@ -29,7 +41,7 @@ export async function signInWithEmail(email: string, password: string): Promise<
     return await handleUserDocument(result.user);
   } catch (error: any) {
     console.error("Email sign in error:", error);
-    throw new Error(error.message || "Failed to sign in with email.");
+    throw new Error(getAuthErrorMessage(error));
   }
 }
 
@@ -58,7 +70,7 @@ export async function signUpWithEmail(email: string, password: string, displayNa
     return newUser;
   } catch (error: any) {
     console.error("Sign up error:", error);
-    throw new Error(error.message || "Failed to sign up.");
+    throw new Error(getAuthErrorMessage(error));
   }
 }
 
@@ -122,7 +134,9 @@ async function handleUserDocument(fbUser: FirebaseUser): Promise<User> {
   const userSnap = await getDoc(userRef);
   
   if (userSnap.exists()) {
-    return userSnap.data() as User;
+    // Update lastLoginAt
+    await updateDoc(userRef, { lastLoginAt: Timestamp.now() });
+    return { ...userSnap.data(), lastLoginAt: Timestamp.now() } as unknown as User;
   } else {
     const newUser: User = {
       id: fbUser.uid,
@@ -137,8 +151,9 @@ async function handleUserDocument(fbUser: FirebaseUser): Promise<User> {
       createdAt: Timestamp.now(),
       role: "citizen",
       username: null,
-      hasCompletedOnboarding: false
-    };
+      hasCompletedOnboarding: false,
+      lastLoginAt: Timestamp.now()
+    } as User;
     await setDoc(userRef, newUser);
     return newUser;
   }

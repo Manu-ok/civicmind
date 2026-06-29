@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 import { useState, useRef } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -99,13 +100,13 @@ export function ShareCard({ isOpen, onClose, issue }: ShareCardProps) {
       {/* Header Tabs */}
       <div className="flex items-center border-b border-white/5">
         <button 
-          className={`flex-1 py-4 text-sm font-semibold transition-colors duration-200 ease-in-out ${activeTab === 'quick' ? 'text-white border-b-2 border-blue-500' : 'text-zinc-500 hover:text-zinc-300'}`}
+          className={`flex-1 py-4 text-sm font-semibold transition-colors duration-200 ease-in-out ${activeTab === 'quick' ? 'text-white border-b-2 border-blue-500' : 'text-slate-500 dark:text-zinc-500 hover:text-slate-600 dark:text-zinc-300'}`}
           onClick={() => setActiveTab('quick')}
         >
           Quick Share
         </button>
         <button 
-          className={`flex-1 py-4 text-sm font-semibold transition-colors duration-200 ease-in-out ${activeTab === 'card' ? 'text-white border-b-2 border-blue-500' : 'text-zinc-500 hover:text-zinc-300'}`}
+          className={`flex-1 py-4 text-sm font-semibold transition-colors duration-200 ease-in-out ${activeTab === 'card' ? 'text-white border-b-2 border-blue-500' : 'text-slate-500 dark:text-zinc-500 hover:text-slate-600 dark:text-zinc-300'}`}
           onClick={() => setActiveTab('card')}
         >
           Civic Card
@@ -121,39 +122,39 @@ export function ShareCard({ isOpen, onClose, issue }: ShareCardProps) {
                 <div className="w-12 h-12 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-colors duration-200 ease-in-out">
                   <Share2 className="w-5 h-5" />
                 </div>
-                <span className="text-xs font-semibold text-zinc-400 group-hover:text-white">Share</span>
+                <span className="text-xs font-semibold text-slate-500 dark:text-zinc-400 group-hover:text-white">Share</span>
               </button>
               <button onClick={handleCopyLink} className="flex flex-col items-center gap-2 group min-h-[44px]">
-                <div className="w-12 h-12 rounded-full bg-zinc-800 text-zinc-400 flex items-center justify-center group-hover:bg-zinc-700 transition-colors duration-200 ease-in-out">
+                <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 flex items-center justify-center group-hover:bg-slate-200 dark:bg-zinc-700 transition-colors duration-200 ease-in-out">
                   <Link2 className="w-5 h-5" />
                 </div>
-                <span className="text-xs font-semibold text-zinc-400 group-hover:text-white">Copy</span>
+                <span className="text-xs font-semibold text-slate-500 dark:text-zinc-400 group-hover:text-white">Copy</span>
               </button>
               
               <a href={`whatsapp://send?text=${encodeURIComponent(shareText + ' ' + url)}`} className="flex flex-col items-center gap-2 group min-h-[44px]">
                 <div className="w-12 h-12 rounded-full bg-[#25D366]/10 text-[#25D366] flex items-center justify-center group-hover:bg-[#25D366] group-hover:text-white transition-colors duration-200 ease-in-out">
                   <span className="text-xl">💬</span>
                 </div>
-                <span className="text-xs font-semibold text-zinc-400 group-hover:text-white">WhatsApp</span>
+                <span className="text-xs font-semibold text-slate-500 dark:text-zinc-400 group-hover:text-white">WhatsApp</span>
               </a>
 
               <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`} target="_blank" rel="noreferrer" className="flex flex-col items-center gap-2 group min-h-[44px]">
                 <div className="w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center group-hover:bg-white group-hover:text-black transition-colors duration-200 ease-in-out">
                   <span className="text-xl">𝕏</span>
                 </div>
-                <span className="text-xs font-semibold text-zinc-400 group-hover:text-white">X</span>
+                <span className="text-xs font-semibold text-slate-500 dark:text-zinc-400 group-hover:text-white">X</span>
               </a>
             </div>
 
-            <div className="bg-zinc-900 rounded-xl p-2 flex items-center gap-3 border border-zinc-800 min-h-[44px]">
-              <div className="bg-zinc-800 p-2 rounded-lg text-zinc-400">
+            <div className="bg-white dark:bg-zinc-900 rounded-xl p-2 flex items-center gap-3 border border-slate-200 dark:border-zinc-800 min-h-[44px]">
+              <div className="bg-slate-100 dark:bg-zinc-800 p-2 rounded-lg text-slate-500 dark:text-zinc-400">
                 <Link2 className="w-4 h-4" />
               </div>
               <input 
                 type="text" 
                 readOnly 
                 value={url} 
-                className="bg-transparent border-none outline-none text-sm text-zinc-300 flex-1 min-w-0"
+                className="bg-transparent border-none outline-none text-sm text-slate-600 dark:text-zinc-300 flex-1 min-w-0"
               />
               <button 
                 onClick={handleCopyLink}
@@ -182,7 +183,7 @@ export function ShareCard({ isOpen, onClose, issue }: ShareCardProps) {
             >
               <div 
                 ref={cardRef}
-                className="w-full aspect-[4/5] bg-zinc-950 border border-white/10 rounded-2xl overflow-hidden relative shadow-2xl flex flex-col origin-bottom"
+                className="w-full aspect-[4/5] bg-slate-50 dark:bg-zinc-950 border border-white/10 rounded-2xl overflow-hidden relative shadow-2xl flex flex-col origin-bottom"
               >
                 <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px]" />
               <div className="absolute bottom-0 left-0 w-64 h-64 bg-fuchsia-500/10 rounded-full blur-[80px]" />
@@ -203,9 +204,9 @@ export function ShareCard({ isOpen, onClose, issue }: ShareCardProps) {
                 <div className="text-blue-400 font-semibold text-sm uppercase tracking-wider mb-2">{issue.category}</div>
                 <h2 className="text-2xl font-bold text-white leading-tight mb-4">{issue.title}</h2>
                 
-                <div className="w-full h-32 rounded-xl bg-zinc-900 border border-zinc-800 overflow-hidden mb-4 shrink-0">
+                <div className="w-full h-32 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 overflow-hidden mb-4 shrink-0">
                   {issue.mediaUrls && issue.mediaUrls.length > 0 ? (
-                    <img src={issue.mediaUrls[0]} alt="" className="w-full h-full object-cover" />
+                    <Image fill src={issue.mediaUrls[0]} alt="" className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-tr from-blue-900/40 to-violet-900/40 flex items-center justify-center">
                       <AlertTriangle className="w-8 h-8 text-white/20" />
@@ -213,7 +214,7 @@ export function ShareCard({ isOpen, onClose, issue }: ShareCardProps) {
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 text-zinc-300 font-medium mb-auto">
+                <div className="flex items-center gap-2 text-slate-600 dark:text-zinc-300 font-medium mb-auto">
                   <MapPin className="w-4 h-4 text-blue-500" />
                   {issue.location || issue.ward}
                 </div>
@@ -221,7 +222,7 @@ export function ShareCard({ isOpen, onClose, issue }: ShareCardProps) {
 
               <div className="p-5 bg-black/40 backdrop-blur-md border-t border-white/5 flex items-end justify-between relative z-10 mt-auto">
                 <div>
-                  <div className="text-zinc-500 text-[10px] uppercase font-semibold tracking-wider mb-1">Reported By</div>
+                  <div className="text-slate-500 dark:text-zinc-500 text-[10px] uppercase font-semibold tracking-wider mb-1">Reported By</div>
                   <div className="text-white font-semibold text-sm mb-2">@{issue.reporter?.username || 'user'}</div>
                   <div className="text-blue-400 text-xs font-semibold">Join the community at civicmind.ai</div>
                 </div>
@@ -229,7 +230,7 @@ export function ShareCard({ isOpen, onClose, issue }: ShareCardProps) {
                   <div className="bg-white p-1 rounded-lg">
                     <QrCode className="w-12 h-12 text-black" />
                   </div>
-                  <span className="text-[8px] font-semibold text-zinc-500 uppercase">Scan to View</span>
+                  <span className="text-[8px] font-semibold text-slate-500 dark:text-zinc-500 uppercase">Scan to View</span>
                 </div>
               </div>
             </div>
@@ -251,7 +252,7 @@ export function ShareCard({ isOpen, onClose, issue }: ShareCardProps) {
               <button 
                 onClick={handleCopyImage}
                 disabled={isExporting}
-                className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors duration-200 ease-in-out disabled:opacity-50 min-h-[44px]"
+                className="flex-1 bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:bg-zinc-700 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors duration-200 ease-in-out disabled:opacity-50 min-h-[44px]"
               >
                 <Copy className="w-4 h-4" /> Copy
               </button>
@@ -266,7 +267,7 @@ export function ShareCard({ isOpen, onClose, issue }: ShareCardProps) {
     <>
       <div className="hidden md:block">
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-          <DialogContent className="sm:max-w-[425px] bg-zinc-900 border border-zinc-800 text-white p-0 overflow-hidden rounded-xl">
+          <DialogContent className="sm:max-w-[425px] bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-white p-0 overflow-hidden rounded-xl">
             {Content}
           </DialogContent>
         </Dialog>

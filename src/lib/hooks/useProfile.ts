@@ -14,7 +14,7 @@ export function useProfile(username: string) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const isOwnProfile = currentUser?.username === username;
+  const isOwnProfile = profile ? currentUser?.id === profile.id : false;
 
   useEffect(() => {
     let mounted = true;

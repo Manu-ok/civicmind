@@ -37,7 +37,7 @@ const MOCK_CATEGORIES = [
   { id: "electricity", label: "Power", icon: Zap, color: "bg-yellow-500", text: "text-yellow-500", count: 64, total: 350, trend: "+2%" },
   { id: "waste", label: "Waste", icon: Trash2, color: "bg-green-500", text: "text-green-500", count: 42, total: 350, trend: "-10%" },
   { id: "safety", label: "Safety", icon: Shield, color: "bg-purple-500", text: "text-purple-500", count: 28, total: 350, trend: "+5%" },
-  { id: "other", label: "Other", icon: MoreHorizontal, color: "bg-zinc-500", text: "text-zinc-500", count: 6, total: 350, trend: "0%" },
+  { id: "other", label: "Other", icon: MoreHorizontal, color: "bg-zinc-500", text: "text-slate-500 dark:text-zinc-500", count: 6, total: 350, trend: "0%" },
 ];
 
 const MOCK_PREDICTIONS = [
@@ -114,7 +114,7 @@ export default function DashboardPage() {
     if (points > 500) return { name: "Civic Hero", color: "text-yellow-400 bg-yellow-500/20 border-yellow-500/30" };
     if (points > 200) return { name: "Civic Guardian", color: "text-purple-400 bg-purple-500/20 border-purple-500/30" };
     if (points > 50) return { name: "Active Citizen", color: "text-blue-400 bg-blue-500/20 border-blue-500/30" };
-    return { name: "Observer", color: "text-zinc-400 bg-zinc-500/20 border-zinc-500/30" };
+    return { name: "Observer", color: "text-slate-500 dark:text-zinc-400 bg-zinc-500/20 border-zinc-500/30" };
   };
 
   const userRank = getRankBadge(user?.points || 0);
@@ -136,21 +136,21 @@ export default function DashboardPage() {
             <h1 className="text-4xl font-bold text-white mb-2">
               Good morning, {user?.displayName?.split(' ')[0] || "Citizen"}!
             </h1>
-            <p className="text-lg text-zinc-300">
+            <p className="text-lg text-slate-600 dark:text-zinc-300">
               Your reports have positively impacted <span className="text-white font-bold">{((user?.issuesReported || 0) * 12) + ((user?.issuesVerified || 0) * 5)} residents</span> this month.
             </p>
           </div>
           
           <div className="flex items-center gap-4 bg-black/40 backdrop-blur-md p-4 rounded-2xl border border-white/10">
             <div className="text-right">
-              <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Civic Score</p>
+              <p className="text-sm font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-widest">Civic Score</p>
               <p className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-200">
                 <AnimatedCounter value={user?.points || 0} /> ✨
               </p>
             </div>
             <div className="h-12 w-px bg-white/10" />
             <div>
-              <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest mb-1">Rank</p>
+              <p className="text-sm font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-widest mb-1">Rank</p>
               <span className={cn("px-3 py-1 rounded-full text-xs font-bold border", userRank.color)}>
                 {userRank.name}
               </span>
@@ -182,10 +182,10 @@ export default function DashboardPage() {
           ].map((stat, i) => (
             <motion.div key={stat.label} variants={itemVariants}>
               <GlowCard className="rounded-xl h-full border border-white/5">
-                <div className="relative h-full overflow-hidden bg-zinc-900/50 backdrop-blur-xl transition-all hover:bg-zinc-800/50 group">
+                <div className="relative h-full overflow-hidden bg-white dark:bg-zinc-900/50 backdrop-blur-xl transition-all hover:bg-slate-100 dark:bg-zinc-800/50 group">
                   <div className="p-6">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-zinc-400">{stat.label}</p>
+                      <p className="text-sm font-medium text-slate-500 dark:text-zinc-400">{stat.label}</p>
                       <div className={`p-2 rounded-lg ${stat.color} group-hover:scale-110 transition-transform`}>
                         <stat.icon className={`h-5 w-5 ${stat.color.split(' ')[0]}`} />
                       </div>
@@ -214,9 +214,9 @@ export default function DashboardPage() {
       <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-12">
         <div className="lg:col-span-8">
           <div className="grid gap-4 sm:grid-cols-3">
-            <GlowCard className="p-4 rounded-xl border border-white/5 bg-zinc-900/50 hover:bg-zinc-800/50 transition-all flex items-center justify-between">
+            <GlowCard className="p-4 rounded-xl border border-white/5 bg-white dark:bg-zinc-900/50 hover:bg-slate-100 dark:bg-zinc-800/50 transition-all flex items-center justify-between">
               <div>
-                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-1">Followers</p>
+                <p className="text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-widest mb-1">Followers</p>
                 <div className="flex items-baseline gap-2">
                   <p className="text-2xl font-bold text-white">{followers.length}</p>
                   <span className="text-xs font-bold text-blue-400">+3 this week</span>
@@ -226,9 +226,9 @@ export default function DashboardPage() {
                 <Users className="w-5 h-5 text-blue-400" />
               </div>
             </GlowCard>
-            <GlowCard className="p-4 rounded-xl border border-white/5 bg-zinc-900/50 hover:bg-zinc-800/50 transition-all flex items-center justify-between">
+            <GlowCard className="p-4 rounded-xl border border-white/5 bg-white dark:bg-zinc-900/50 hover:bg-slate-100 dark:bg-zinc-800/50 transition-all flex items-center justify-between">
               <div>
-                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-1">Following</p>
+                <p className="text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-widest mb-1">Following</p>
                 <p className="text-2xl font-bold text-white">{following.length}</p>
               </div>
               <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center">
@@ -236,9 +236,9 @@ export default function DashboardPage() {
               </div>
             </GlowCard>
             <Link href="/feed">
-              <GlowCard className="p-4 rounded-xl border border-white/5 bg-zinc-900/50 hover:bg-zinc-800/50 transition-all flex items-center justify-between group h-full">
+              <GlowCard className="p-4 rounded-xl border border-white/5 bg-white dark:bg-zinc-900/50 hover:bg-slate-100 dark:bg-zinc-800/50 transition-all flex items-center justify-between group h-full">
                 <div>
-                  <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-1">Unread Feed</p>
+                  <p className="text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-widest mb-1">Unread Feed</p>
                   <p className="text-2xl font-bold text-white group-hover:text-amber-400 transition-colors">{unreadFeedCount}</p>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center">
@@ -250,12 +250,12 @@ export default function DashboardPage() {
         </div>
 
         <div className="lg:col-span-4">
-          <GlowCard className="p-4 rounded-xl border border-white/5 bg-zinc-900/50 h-full flex flex-col justify-center">
+          <GlowCard className="p-4 rounded-xl border border-white/5 bg-white dark:bg-zinc-900/50 h-full flex flex-col justify-center">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-blue-400" /> Stories from your community
               </h3>
-              <Link href="/feed" className="text-xs text-zinc-400 hover:text-white flex items-center">
+              <Link href="/feed" className="text-xs text-slate-500 dark:text-zinc-400 hover:text-white flex items-center">
                 See all <ChevronRight className="w-3 h-3 ml-1" />
               </Link>
             </div>
@@ -265,7 +265,7 @@ export default function DashboardPage() {
                   <StoryRing key={group.user.id} user={group.user} hasUnviewed={group.hasUnviewed} size="sm" onClick={() => router.push('/feed')} />
                 ))
               ) : (
-                <p className="text-xs text-zinc-500 font-medium">No new stories right now.</p>
+                <p className="text-xs text-slate-500 dark:text-zinc-500 font-medium">No new stories right now.</p>
               )}
             </div>
           </GlowCard>
@@ -280,9 +280,9 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-lg font-bold text-white">Recent Activity</h3>
-                  <p className="text-sm text-zinc-400">Latest updates from your city</p>
+                  <p className="text-sm text-slate-500 dark:text-zinc-400">Latest updates from your city</p>
                 </div>
-                <Button variant="ghost" size="sm" className="text-zinc-400 hover:text-white" onClick={() => router.push('/issues')}>
+                <Button variant="ghost" size="sm" className="text-slate-500 dark:text-zinc-400 hover:text-white" onClick={() => router.push('/issues')}>
                   View all
                 </Button>
               </div>
@@ -311,7 +311,7 @@ export default function DashboardPage() {
         <div className="lg:col-span-5 xl:col-span-4 space-y-6">
           
           {/* Action Hub */}
-          <Card className="p-6 bg-zinc-900 border-white/5 space-y-4">
+          <Card className="p-6 bg-white dark:bg-zinc-900 border-white/5 space-y-4">
             <h3 className="text-lg font-bold text-white mb-4">Quick Actions</h3>
             <div className="grid grid-cols-1 gap-3">
               <Button onClick={() => router.push('/report')} className="w-full justify-start h-14 bg-primary hover:bg-primary/90 text-white text-lg rounded-xl">
@@ -327,7 +327,7 @@ export default function DashboardPage() {
           </Card>
 
           {/* Who's Active Now */}
-          <Card className="p-6 bg-zinc-900 border-white/5 space-y-4">
+          <Card className="p-6 bg-white dark:bg-zinc-900 border-white/5 space-y-4">
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" /> Who&apos;s Active Now
             </h3>
@@ -342,20 +342,20 @@ export default function DashboardPage() {
                     <Link href={`/profile/${u.id}`} className="text-sm font-bold text-zinc-200 hover:text-blue-400 hover:underline">
                       {u.displayName}
                     </Link>
-                    <p className="text-xs text-zinc-500">
-                      reported <span className="text-zinc-400 capitalize">{u.category}</span> issue in <span className="text-zinc-400">{u.ward}</span>
+                    <p className="text-xs text-slate-500 dark:text-zinc-500">
+                      reported <span className="text-slate-500 dark:text-zinc-400 capitalize">{u.category}</span> issue in <span className="text-slate-500 dark:text-zinc-400">{u.ward}</span>
                     </p>
                   </div>
                 </div>
               ))}
               {activeUsers.length === 0 && !isLoading && (
-                <p className="text-xs text-zinc-500">No recent activity.</p>
+                <p className="text-xs text-slate-500 dark:text-zinc-500">No recent activity.</p>
               )}
             </div>
           </Card>
 
           {/* Mini Map */}
-          <Card className="overflow-hidden bg-zinc-900 border-white/5 p-1 relative group">
+          <Card className="overflow-hidden bg-white dark:bg-zinc-900 border-white/5 p-1 relative group">
             <div className="h-[300px] w-full relative rounded-xl overflow-hidden pointer-events-none">
               {/* Overlay to make it look like a snapshot */}
               <div className="absolute inset-0 z-10 bg-gradient-to-t from-zinc-900/80 via-transparent to-transparent pointer-events-none" />
@@ -384,16 +384,16 @@ export default function DashboardPage() {
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {MOCK_CATEGORIES.map((cat, i) => (
-            <Card key={i} className="p-4 bg-zinc-900 border-white/5 hover:border-white/20 transition-all group cursor-pointer">
+            <Card key={i} className="p-4 bg-white dark:bg-zinc-900 border-white/5 hover:border-white/20 transition-all group cursor-pointer">
               <div className="flex justify-between items-start mb-4">
                 <div className={cn("p-2 rounded-lg", cat.color.replace('bg-', 'bg-opacity-20 bg-'))}>
                   <cat.icon className={cn("w-5 h-5", cat.text)} />
                 </div>
-                <span className="text-xs font-bold text-zinc-500 group-hover:text-zinc-300 transition-colors">{cat.trend}</span>
+                <span className="text-xs font-bold text-slate-500 dark:text-zinc-500 group-hover:text-slate-600 dark:text-zinc-300 transition-colors">{cat.trend}</span>
               </div>
               <p className="text-2xl font-bold text-white mb-1"><AnimatedCounter value={cat.count} /></p>
-              <p className="text-xs text-zinc-400 font-bold uppercase tracking-wider mb-3">{cat.label}</p>
-              <Progress value={(cat.count / cat.total) * 100} className="h-1.5 bg-zinc-800" indicatorClassName={cat.color} />
+              <p className="text-xs text-slate-500 dark:text-zinc-400 font-bold uppercase tracking-wider mb-3">{cat.label}</p>
+              <Progress value={(cat.count / cat.total) * 100} className="h-1.5 bg-slate-100 dark:bg-zinc-800" indicatorClassName={cat.color} />
             </Card>
           ))}
         </div>
@@ -417,7 +417,7 @@ export default function DashboardPage() {
 
         <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-none snap-x">
           {MOCK_PREDICTIONS.map((pred, i) => (
-            <Card key={i} className="min-w-[300px] p-5 bg-zinc-900/80 border-white/5 shrink-0 snap-start hover:border-blue-500/30 transition-all cursor-default group">
+            <Card key={i} className="min-w-[300px] p-5 bg-white dark:bg-zinc-900/80 border-white/5 shrink-0 snap-start hover:border-blue-500/30 transition-all cursor-default group">
               <div className="flex justify-between items-start mb-4">
                 <div className={cn("p-2 rounded-xl bg-black/40 border border-white/5")}>
                   <pred.icon className={cn("w-5 h-5", 
@@ -434,7 +434,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               <h3 className="font-bold text-white mb-1 group-hover:text-blue-400 transition-colors">{pred.title}</h3>
-              <div className="flex items-center gap-3 text-xs text-zinc-400 font-medium mt-3">
+              <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-zinc-400 font-medium mt-3">
                 <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5"/> {pred.time}</span>
                 <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5"/> {pred.ward}</span>
               </div>

@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
 
     if (!files || files.length === 0) {
       return NextResponse.json(
-        { error: "No media files provided" },
+        { success: false, error: "No media files provided" },
         { status: 400 }
       );
     }
@@ -24,11 +24,11 @@ export async function POST(req: NextRequest) {
     }
 
     const analysis = await analyzeIssueFromMedia(mediaBase64Array, mimeTypes);
-    return NextResponse.json({ success: true, analysis });
+    return NextResponse.json({ success: true, data: analysis, analysis }); // Kept analysis for backward compat
   } catch (error: any) {
     console.error("API Error - Analyze Issue:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to analyze issue" },
+      { success: false, error: error.message || "Failed to analyze issue" },
       { status: 500 }
     );
   }

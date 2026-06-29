@@ -16,7 +16,7 @@ export default function LandingPage() {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-white selection:bg-blue-500/30 overflow-hidden">
+    <main className="min-h-screen bg-slate-50 dark:bg-zinc-950 text-white selection:bg-blue-500/30 overflow-hidden">
       {/* SECTION 1: HERO */}
       <section className="relative min-h-screen flex items-center justify-center pt-20 pb-32 px-4 overflow-hidden">
         {/* Background Effects */}
@@ -34,7 +34,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm font-medium text-zinc-300 mb-8 backdrop-blur-md"
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm font-medium text-slate-600 dark:text-zinc-300 mb-8 backdrop-blur-md"
           >
             <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
             🚀 Built for Google Cloud Hackathon 2024
@@ -54,7 +54,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="max-w-2xl mx-auto text-lg md:text-xl text-zinc-400 mb-10 leading-relaxed"
+            className="max-w-2xl mx-auto text-lg md:text-xl text-slate-500 dark:text-zinc-400 mb-10 leading-relaxed"
           >
             Report issues, verify problems, predict crises — all powered by Google Gemini. CivicMind turns every citizen into a community hero.
           </motion.p>
@@ -81,7 +81,7 @@ export default function LandingPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.8 }}
-            className="mt-8 text-xs font-semibold text-zinc-500 uppercase tracking-widest"
+            className="mt-8 text-xs font-semibold text-slate-500 dark:text-zinc-500 uppercase tracking-widest"
           >
             Powered by Google Gemini • Google Maps • Firebase
           </motion.p>
@@ -94,27 +94,27 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          className="max-w-5xl mx-auto rounded-2xl bg-zinc-900/80 border border-white/10 backdrop-blur-xl shadow-2xl overflow-hidden"
+          className="max-w-5xl mx-auto rounded-2xl bg-white dark:bg-zinc-900/80 border border-white/10 backdrop-blur-xl shadow-2xl overflow-hidden"
         >
-          <div className="p-4 bg-zinc-800/50 border-b border-white/5 text-center">
-            <p className="text-sm font-semibold text-zinc-400">Trusted by communities across India</p>
+          <div className="p-4 bg-slate-100 dark:bg-zinc-800/50 border-b border-white/5 text-center">
+            <p className="text-sm font-semibold text-slate-500 dark:text-zinc-400">Trusted by communities across India</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-white/5 p-8">
             <div className="text-center p-4">
               <h3 className="text-4xl font-black text-white mb-2"><AnimatedCounter value={2847} />+</h3>
-              <p className="text-sm font-medium text-zinc-400">Issues Reported</p>
+              <p className="text-sm font-medium text-slate-500 dark:text-zinc-400">Issues Reported</p>
             </div>
             <div className="text-center p-4">
               <h3 className="text-4xl font-black text-white mb-2"><AnimatedCounter value={1923} />+</h3>
-              <p className="text-sm font-medium text-zinc-400">Issues Resolved</p>
+              <p className="text-sm font-medium text-slate-500 dark:text-zinc-400">Issues Resolved</p>
             </div>
             <div className="text-center p-4">
               <h3 className="text-4xl font-black text-white mb-2"><AnimatedCounter value={342} />+</h3>
-              <p className="text-sm font-medium text-zinc-400">Active Citizens</p>
+              <p className="text-sm font-medium text-slate-500 dark:text-zinc-400">Active Citizens</p>
             </div>
             <div className="text-center p-4">
               <h3 className="text-4xl font-black text-white mb-2"><AnimatedCounter value={4.2} /></h3>
-              <p className="text-sm font-medium text-zinc-400">Days Avg Resolution</p>
+              <p className="text-sm font-medium text-slate-500 dark:text-zinc-400">Days Avg Resolution</p>
             </div>
           </div>
         </motion.div>
@@ -125,7 +125,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-20">
             <h2 className="text-3xl md:text-5xl font-bold mb-6">How CivicMind Works</h2>
-            <p className="text-xl text-zinc-400 max-w-2xl mx-auto">From reporting a pothole to resolving community crises, the AI handles the heavy lifting.</p>
+            <p className="text-xl text-slate-500 dark:text-zinc-400 max-w-2xl mx-auto">From reporting a pothole to resolving community crises, the AI handles the heavy lifting.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 relative">
@@ -161,13 +161,13 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ delay: i * 0.2 }}
-                className="relative bg-zinc-900/50 border border-white/5 p-8 rounded-3xl backdrop-blur-sm text-center"
+                className="relative bg-white dark:bg-zinc-900/50 border border-white/5 p-8 rounded-3xl backdrop-blur-sm text-center"
               >
                 <div className={`w-16 h-16 mx-auto mb-6 rounded-2xl border flex items-center justify-center ${step.bg}`}>
                   <step.icon className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold mb-4">{step.title}</h3>
-                <p className="text-zinc-400 leading-relaxed">{step.desc}</p>
+                <p className="text-slate-500 dark:text-zinc-400 leading-relaxed">{step.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -179,7 +179,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold mb-6">Powerful Capabilities</h2>
-            <p className="text-xl text-zinc-400">Everything you need to orchestrate a smarter city.</p>
+            <p className="text-xl text-slate-500 dark:text-zinc-400">Everything you need to orchestrate a smarter city.</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -198,13 +198,13 @@ export default function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
               >
-                <GlowCard className="h-full rounded-3xl p-8 border border-white/5 bg-zinc-900/50">
+                <GlowCard className="h-full rounded-3xl p-8 border border-white/5 bg-white dark:bg-zinc-900/50">
                   <div className="relative z-10 flex flex-col h-full group">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-violet-500/20 border border-white/10 flex items-center justify-center mb-6 transition-transform group-hover:scale-110 group-hover:bg-blue-500/30">
                       <feature.icon className="w-6 h-6 text-blue-400" />
                     </div>
                     <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-                    <p className="text-zinc-400 leading-relaxed">{feature.desc}</p>
+                    <p className="text-slate-500 dark:text-zinc-400 leading-relaxed">{feature.desc}</p>
                   </div>
                 </GlowCard>
               </motion.div>
@@ -216,7 +216,7 @@ export default function LandingPage() {
       {/* SECTION 5: TECH STACK */}
       <section className="py-20 border-y border-white/5 bg-black/50">
         <div className="max-w-6xl mx-auto px-4 text-center">
-          <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest mb-10">Built on Google&apos;s Best Technologies</p>
+          <p className="text-sm font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-widest mb-10">Built on Google&apos;s Best Technologies</p>
           <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
             {/* We use Lucide icons as fallbacks/approximations for the brands */}
             <div className="flex items-center gap-3"><Brain className="w-8 h-8 text-blue-400" /><span className="text-xl font-bold">Gemini 1.5 Pro</span></div>
@@ -234,7 +234,7 @@ export default function LandingPage() {
         
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <h2 className="text-4xl md:text-6xl font-black mb-8">Ready to become a Civic Hero?</h2>
-          <p className="text-xl text-zinc-400 mb-12 max-w-2xl mx-auto">Join your community. Make an impact. Track real change.</p>
+          <p className="text-xl text-slate-500 dark:text-zinc-400 mb-12 max-w-2xl mx-auto">Join your community. Make an impact. Track real change.</p>
           
           <Link href="/login">
             <button className="group h-16 inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-10 text-xl font-bold text-black transition-all hover:scale-105 hover:bg-zinc-200 shadow-2xl shadow-white/20">
@@ -242,12 +242,12 @@ export default function LandingPage() {
               <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </button>
           </Link>
-          <p className="mt-6 text-sm text-zinc-500 font-medium">No credit card required • Instant access</p>
+          <p className="mt-6 text-sm text-slate-500 dark:text-zinc-500 font-medium">No credit card required • Instant access</p>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="py-8 border-t border-white/10 bg-zinc-950 text-center text-zinc-500 text-sm">
+      <footer className="py-8 border-t border-white/10 bg-slate-50 dark:bg-zinc-950 text-center text-slate-500 dark:text-zinc-500 text-sm">
         <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500 to-violet-600" />

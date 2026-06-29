@@ -186,18 +186,18 @@ export default function AnalyticsPage() {
 
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-zinc-950 p-4 md:p-8 space-y-8 overflow-y-auto custom-scrollbar">
+    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 dark:bg-zinc-950 p-4 md:p-8 space-y-8 overflow-y-auto custom-scrollbar">
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-white tracking-tight">Operations Dashboard</h1>
-          <p className="text-zinc-400">City-wide analytics and predictive intelligence for {user?.city}</p>
+          <p className="text-slate-500 dark:text-zinc-400">City-wide analytics and predictive intelligence for {user?.city}</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" className="bg-zinc-900 border-white/10 hover:bg-zinc-800" onClick={() => toast.success("Report PDF generated!")}>
+          <Button variant="outline" className="bg-white dark:bg-zinc-900 border-white/10 hover:bg-slate-100 dark:bg-zinc-800" onClick={() => toast.success("Report PDF generated!")}>
             <Download className="w-4 h-4 mr-2 text-blue-400" /> Export Report
           </Button>
-          <Button variant="outline" className="bg-zinc-900 border-white/10 hover:bg-zinc-800" onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success("Link copied!"); }}>
+          <Button variant="outline" className="bg-white dark:bg-zinc-900 border-white/10 hover:bg-slate-100 dark:bg-zinc-800" onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success("Link copied!"); }}>
             <Share2 className="w-4 h-4 mr-2 text-blue-400" /> Share
           </Button>
         </div>
@@ -228,7 +228,7 @@ export default function AnalyticsPage() {
               <Card className={cn("p-6 backdrop-blur-xl border-white/5", kpi.bg, kpi.border)}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-zinc-400 mb-1">{kpi.title}</p>
+                    <p className="text-sm font-medium text-slate-500 dark:text-zinc-400 mb-1">{kpi.title}</p>
                     <h3 className="text-3xl font-bold text-white">{kpi.value}</h3>
                   </div>
                   <div className={cn("p-3 rounded-full bg-black/20", kpi.color)}>
@@ -245,7 +245,7 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Line Chart */}
-        <Card className="p-6 bg-zinc-900/50 border-white/5 lg:col-span-2">
+        <Card className="p-6 bg-white dark:bg-zinc-900/50 border-white/5 lg:col-span-2">
           <h3 className="text-lg font-bold text-white mb-6">Issues Over Time (Last 30 Days)</h3>
           {loading ? (
             <ChartSkeleton />
@@ -280,7 +280,7 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Category Pie Chart */}
-        <Card className="p-6 bg-zinc-900/50 border-white/5">
+        <Card className="p-6 bg-white dark:bg-zinc-900/50 border-white/5">
           <h3 className="text-lg font-bold text-white mb-6">Distribution by Category</h3>
           {loading ? (
             <ChartSkeleton />
@@ -310,7 +310,7 @@ export default function AnalyticsPage() {
               {/* Custom Legend for Pie */}
               <div className="absolute inset-0 pointer-events-none flex items-center justify-center flex-col">
                 <span className="text-3xl font-bold text-white">{kpis.total}</span>
-                <span className="text-xs text-zinc-500 uppercase tracking-wider">Total</span>
+                <span className="text-xs text-slate-500 dark:text-zinc-500 uppercase tracking-wider">Total</span>
               </div>
             </div>
           )}
@@ -324,7 +324,7 @@ export default function AnalyticsPage() {
         className="relative"
       >
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-transparent blur-3xl -z-10" />
-        <Card className="p-6 bg-zinc-950/80 border-purple-500/30 overflow-hidden relative">
+        <Card className="p-6 bg-slate-50 dark:bg-zinc-950/80 border-purple-500/30 overflow-hidden relative">
           
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
             <div className="flex items-center gap-3">
@@ -336,7 +336,7 @@ export default function AnalyticsPage() {
                   AI Predictive Intelligence
                   <Badge variant="outline" className="bg-purple-500/10 text-purple-400 border-purple-500/30">BETA</Badge>
                 </h2>
-                <p className="text-sm text-zinc-400 mt-1">Analyzing historical patterns to predict community issues before they escalate.</p>
+                <p className="text-sm text-slate-500 dark:text-zinc-400 mt-1">Analyzing historical patterns to predict community issues before they escalate.</p>
               </div>
             </div>
             
@@ -354,7 +354,7 @@ export default function AnalyticsPage() {
           {predicting ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[1, 2, 3].map(i => (
-                <div key={i} className="h-48 rounded-2xl bg-zinc-900/50 animate-pulse border border-white/5" />
+                <div key={i} className="h-48 rounded-2xl bg-white dark:bg-zinc-900/50 animate-pulse border border-white/5" />
               ))}
             </div>
           ) : predictions.length > 0 ? (
@@ -363,7 +363,7 @@ export default function AnalyticsPage() {
                 const Icon = CATEGORY_ICONS[pred.category] || CATEGORY_ICONS.other;
                 const isHighRisk = pred.probability >= 70;
                 return (
-                  <Card key={i} className="bg-zinc-900/80 border-white/5 p-5 flex flex-col justify-between hover:border-purple-500/30 transition-colors group">
+                  <Card key={i} className="bg-white dark:bg-zinc-900/80 border-white/5 p-5 flex flex-col justify-between hover:border-purple-500/30 transition-colors group">
                     <div>
                       <div className="flex justify-between items-start mb-4">
                         <div className={cn(
@@ -372,7 +372,7 @@ export default function AnalyticsPage() {
                         )}>
                           {pred.probability}%
                         </div>
-                        <Badge variant="outline" className="bg-black/50 text-zinc-400 border-white/10">{pred.timeframe}</Badge>
+                        <Badge variant="outline" className="bg-black/50 text-slate-500 dark:text-zinc-400 border-white/10">{pred.timeframe}</Badge>
                       </div>
                       
                       <h4 className="text-lg font-bold text-white mb-2">{pred.title}</h4>
@@ -381,20 +381,20 @@ export default function AnalyticsPage() {
                         <Badge className={cn("capitalize bg-opacity-20", isHighRisk ? "bg-red-500 text-red-400" : "bg-blue-500 text-blue-400")}>
                           <Icon className="w-3 h-3 mr-1" /> {pred.category}
                         </Badge>
-                        <Badge variant="secondary" className="bg-zinc-800 text-zinc-300">
-                          <MapPin className="w-3 h-3 mr-1 text-zinc-500" /> {pred.ward}
+                        <Badge variant="secondary" className="bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300">
+                          <MapPin className="w-3 h-3 mr-1 text-slate-500 dark:text-zinc-500" /> {pred.ward}
                         </Badge>
                       </div>
 
-                      <p className="text-sm text-zinc-400 mb-6 italic border-l-2 border-white/10 pl-3 py-1">
+                      <p className="text-sm text-slate-500 dark:text-zinc-400 mb-6 italic border-l-2 border-white/10 pl-3 py-1">
                         &quot;{pred.basis}&quot;
                       </p>
 
                       <div className="space-y-2 mb-6">
-                        <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Recommended Actions</p>
+                        <p className="text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-widest">Recommended Actions</p>
                         <ul className="space-y-1.5">
                           {pred.preventiveActions.map((action: string, j: number) => (
-                            <li key={j} className="text-sm text-zinc-300 flex gap-2 items-start">
+                            <li key={j} className="text-sm text-slate-600 dark:text-zinc-300 flex gap-2 items-start">
                               <span className="text-purple-400 mt-0.5">•</span> {action}
                             </li>
                           ))}
@@ -403,7 +403,7 @@ export default function AnalyticsPage() {
                     </div>
 
                     <Button 
-                      className={cn("w-full transition-all", isHighRisk ? "bg-red-600 hover:bg-red-700" : "bg-zinc-800 hover:bg-zinc-700")}
+                      className={cn("w-full transition-all", isHighRisk ? "bg-red-600 hover:bg-red-700" : "bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:bg-zinc-700")}
                       onClick={handleNotify}
                     >
                       <Bell className="w-4 h-4 mr-2" /> Notify Department
@@ -413,7 +413,7 @@ export default function AnalyticsPage() {
               })}
             </div>
           ) : (
-            <div className="text-center py-12 text-zinc-500 border border-dashed border-white/10 rounded-2xl">
+            <div className="text-center py-12 text-slate-500 dark:text-zinc-500 border border-dashed border-white/10 rounded-2xl">
               No immediate risks forecasted for this period.
             </div>
           )}
@@ -424,9 +424,9 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Ward Heatmap (Horizontal Bar Chart) */}
-        <Card className="p-6 bg-zinc-900/50 border-white/5">
+        <Card className="p-6 bg-white dark:bg-zinc-900/50 border-white/5">
           <h3 className="text-lg font-bold text-white mb-2">Issue Density by Ward</h3>
-          <p className="text-sm text-zinc-500 mb-6">Top 10 highest volume areas</p>
+          <p className="text-sm text-slate-500 dark:text-zinc-500 mb-6">Top 10 highest volume areas</p>
           <div className="h-[350px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart layout="vertical" data={wardData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
@@ -446,13 +446,13 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Performance Metrics Table */}
-        <Card className="p-6 bg-zinc-900/50 border-white/5 flex flex-col">
+        <Card className="p-6 bg-white dark:bg-zinc-900/50 border-white/5 flex flex-col">
           <h3 className="text-lg font-bold text-white mb-2">Department Performance</h3>
-          <p className="text-sm text-zinc-500 mb-6">Average response time by division</p>
+          <p className="text-sm text-slate-500 dark:text-zinc-500 mb-6">Average response time by division</p>
           
           <div className="flex-1 bg-black/20 rounded-xl border border-white/5 overflow-hidden">
             <table className="w-full text-left text-sm">
-              <thead className="bg-white/5 text-zinc-400">
+              <thead className="bg-white/5 text-slate-500 dark:text-zinc-400">
                 <tr>
                   <th className="px-4 py-3 font-medium">Department</th>
                   <th className="px-4 py-3 font-medium text-right">Avg Response</th>
@@ -463,16 +463,16 @@ export default function AnalyticsPage() {
                 {[
                   { dept: "Electricity & Lighting", time: "1.2 Days", rate: "92%", color: "text-yellow-400" },
                   { dept: "Water & Sanitation", time: "2.4 Days", rate: "85%", color: "text-blue-400" },
-                  { dept: "Roads & Traffic", time: "5.1 Days", rate: "68%", color: "text-zinc-400" },
+                  { dept: "Roads & Traffic", time: "5.1 Days", rate: "68%", color: "text-slate-500 dark:text-zinc-400" },
                   { dept: "Waste Management", time: "1.5 Days", rate: "89%", color: "text-purple-400" },
                   { dept: "Public Safety", time: "0.8 Days", rate: "96%", color: "text-red-400" },
                 ].map((row, i) => (
                   <tr key={i} className="hover:bg-white/5 transition-colors">
-                    <td className="px-4 py-4 font-medium text-zinc-300 flex items-center gap-2">
+                    <td className="px-4 py-4 font-medium text-slate-600 dark:text-zinc-300 flex items-center gap-2">
                       <div className={cn("w-2 h-2 rounded-full bg-current", row.color)} />
                       {row.dept}
                     </td>
-                    <td className="px-4 py-4 text-right text-zinc-300">{row.time}</td>
+                    <td className="px-4 py-4 text-right text-slate-600 dark:text-zinc-300">{row.time}</td>
                     <td className="px-4 py-4 text-right text-green-400">{row.rate}</td>
                   </tr>
                 ))}

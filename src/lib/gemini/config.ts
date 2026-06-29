@@ -2,15 +2,16 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 if (!process.env.GEMINI_API_KEY) {
   console.warn("GEMINI_API_KEY is not set in the environment variables.");
+  console.error("CRITICAL: You must set GEMINI_API_KEY in your environment variables to use AI features.");
 }
 
 export const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
-export const geminiPro = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
-export const geminiFlash = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+export const geminiPro = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+export const geminiFlash = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 export function getVisionModel() {
-  return genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+  return genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 }
 
 export function formatGeminiError(error: any): string {
@@ -25,4 +26,11 @@ export function formatGeminiError(error: any): string {
     return "The AI service is currently experiencing high demand. Please try again in a few moments.";
   }
   return error?.message || "An unexpected error occurred during AI processing.";
+}
+
+export function cleanJSON(text: string): string {
+  return text
+    .replace(/```json\n?/g, '')
+    .replace(/```\n?/g, '')
+    .trim();
 }

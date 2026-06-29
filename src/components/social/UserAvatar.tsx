@@ -75,7 +75,7 @@ export function UserAvatar({
           style={{ backgroundColor: !user?.photoURL ? getUsernameColor(user?.username || user?.displayName || "u") : undefined }}
         >
           {loading ? (
-            <div className="w-full h-full bg-zinc-800 animate-pulse" />
+            <div className="w-full h-full bg-slate-100 dark:bg-zinc-800 animate-pulse" />
           ) : user?.photoURL ? (
             <Image 
               src={user.photoURL} 
@@ -91,7 +91,7 @@ export function UserAvatar({
 
         {/* Verified Badge */}
         {showVerified && user?.isVerified && !loading && (
-          <div className="absolute -bottom-1 -right-1 bg-zinc-900 rounded-full p-0.5">
+          <div className="absolute -bottom-1 -right-1 bg-white dark:bg-zinc-900 rounded-full p-0.5">
             <CheckCircle2 className="w-4 h-4 text-blue-500 fill-blue-500/20" />
           </div>
         )}
@@ -100,7 +100,7 @@ export function UserAvatar({
       {showUsername && user && !loading && (
         <div className="mt-2 text-center">
           <p className="text-sm font-semibold text-white line-clamp-1">{user.displayName}</p>
-          <p className="text-xs text-zinc-500 line-clamp-1">@{user.username || 'user'}</p>
+          <p className="text-xs text-slate-500 dark:text-zinc-500 line-clamp-1">@{user.username || 'user'}</p>
         </div>
       )}
     </div>

@@ -13,6 +13,7 @@ import Link from "next/link";
 import { UserAvatar } from "@/components/social/UserAvatar";
 import { FollowButton } from "@/components/social/FollowButton";
 import { Users } from "lucide-react";
+import { EmptyState } from "@/components/shared/EmptyState";
 
 export function Leaderboard() {
   const { user: currentUser } = useAuthStore();
@@ -48,7 +49,7 @@ export function Leaderboard() {
   };
 
   return (
-    <div className="bg-zinc-900/50 border border-white/[0.04] rounded-xl p-6 flex flex-col h-[500px]">
+    <div className="bg-white dark:bg-zinc-900/50 border border-white/[0.04] rounded-xl p-6 flex flex-col h-[500px]">
       <h2 className="text-h3 text-zinc-100 mb-4 flex items-center gap-2">
         <Trophy className="w-5 h-5 text-yellow-500" />
         Civic Leaderboard
@@ -76,10 +77,10 @@ export function Leaderboard() {
                   className={`flex items-center gap-4 p-3 rounded-xl border transition-all ${
                     isCurrentUser 
                       ? 'bg-blue-500/10 border-blue-500/30' 
-                      : 'bg-zinc-800/30 border-transparent hover:bg-zinc-800/50'
+                      : 'bg-slate-100 dark:bg-zinc-800/30 border-transparent hover:bg-slate-100 dark:bg-zinc-800/50'
                   }`}
                 >
-                  <div className="flex-shrink-0 w-8 text-center font-bold text-zinc-500">
+                  <div className="flex-shrink-0 w-8 text-center font-bold text-slate-500 dark:text-zinc-500">
                     #{index + 1}
                   </div>
                   
@@ -89,7 +90,7 @@ export function Leaderboard() {
                       <div className="absolute -top-2 -right-2 z-10">
                         <Trophy className={`w-5 h-5 ${
                           index === 0 ? 'text-yellow-400' : 
-                          index === 1 ? 'text-zinc-300' : 'text-amber-600'
+                          index === 1 ? 'text-slate-600 dark:text-zinc-300' : 'text-amber-600'
                         }`} />
                       </div>
                     )}
@@ -100,7 +101,7 @@ export function Leaderboard() {
                       {leader.displayName} {isCurrentUser && "(You)"}
                     </Link>
                     {leader.username && (
-                      <span className="text-xs text-zinc-500 truncate">@{leader.username}</span>
+                      <span className="text-xs text-slate-500 dark:text-zinc-500 truncate">@{leader.username}</span>
                     )}
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-gradient-to-r ${badge.color}`}>
@@ -108,7 +109,7 @@ export function Leaderboard() {
                         {badge.name}
                       </span>
                       {!isCurrentUser && (leader as any).followersCount !== undefined && (
-                        <span className="text-[10px] font-medium text-zinc-500 flex items-center gap-1">
+                        <span className="text-[10px] font-medium text-slate-500 dark:text-zinc-500 flex items-center gap-1">
                           <Users className="w-3 h-3" />
                           {(leader as any).followersCount} followers
                         </span>
@@ -126,7 +127,7 @@ export function Leaderboard() {
                       >
                         {leader.points || 0}
                       </motion.div>
-                      <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Points</p>
+                      <p className="text-[10px] text-slate-500 dark:text-zinc-500 uppercase tracking-wider">Points</p>
                     </div>
                     {!isCurrentUser && (
                       <div className="ml-2">
@@ -141,7 +142,13 @@ export function Leaderboard() {
         </AnimatePresence>
         
         {leaders.length === 0 && (
-          <div className="text-center text-zinc-500 mt-10">No leaders yet...</div>
+          <div className="py-10">
+            <EmptyState
+              icon={Trophy}
+              title="No leaders yet"
+              description="Be the first to report an issue or participate in the community to climb the leaderboard."
+            />
+          </div>
         )}
       </div>
     </div>

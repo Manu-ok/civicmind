@@ -99,12 +99,12 @@ export default function SettingsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-zinc-950 pb-20 pt-16 md:pt-0">
+    <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 pb-20 pt-16 md:pt-0">
       {/* Header */}
-      <div className="border-b border-white/[0.06] bg-zinc-950/50 backdrop-blur-xl sticky top-0 z-10 hidden md:block">
+      <div className="border-b border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-zinc-950/50 backdrop-blur-xl sticky top-0 z-10 hidden md:block">
         <div className="mx-auto max-w-4xl px-8 py-6">
           <h1 className="text-2xl font-bold text-white">Settings</h1>
-          <p className="text-sm text-zinc-400 mt-1">Manage your account preferences and settings.</p>
+          <p className="text-sm text-slate-500 dark:text-zinc-400 mt-1">Manage your account preferences and settings.</p>
         </div>
       </div>
       
@@ -147,13 +147,13 @@ export default function SettingsPage() {
                   id="name" 
                   value={displayName || user?.displayName || ""} 
                   onChange={(e) => setDisplayName(e.target.value)}
-                  className="bg-zinc-900 border-white/10 text-white" 
+                  className="bg-white dark:bg-zinc-900 border-white/10 text-white" 
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email Address</Label>
-                <Input id="email" type="email" value={user?.email || ""} disabled className="bg-zinc-900 border-white/10 text-zinc-500 opacity-70" />
-                <p className="text-xs text-zinc-500">Email cannot be changed.</p>
+                <Input id="email" type="email" value={user?.email || ""} disabled className="bg-white dark:bg-zinc-900 border-white/10 text-slate-500 dark:text-zinc-500 opacity-70" />
+                <p className="text-xs text-slate-500 dark:text-zinc-500">Email cannot be changed.</p>
               </div>
               <Button onClick={handleSaveAccount} className="bg-white text-zinc-950 hover:bg-zinc-200">Save Changes</Button>
             </div>
@@ -169,7 +169,7 @@ export default function SettingsPage() {
                 id="city" 
                 value={city || user?.city || ""} 
                 onChange={(e) => setCity(e.target.value)}
-                className="bg-zinc-900 border-white/10 text-white" 
+                className="bg-white dark:bg-zinc-900 border-white/10 text-white" 
               />
             </div>
             <div className="space-y-2">
@@ -178,7 +178,7 @@ export default function SettingsPage() {
                 id="ward" 
                 value={ward || user?.ward || ""} 
                 onChange={(e) => setWard(e.target.value)}
-                className="bg-zinc-900 border-white/10 text-white" 
+                className="bg-white dark:bg-zinc-900 border-white/10 text-white" 
               />
             </div>
           </div>
@@ -230,7 +230,7 @@ export default function SettingsPage() {
               onClick={() => setTheme('dark')}
               icon={Moon}
               title="Dark"
-              previewClass="bg-zinc-950 border-zinc-800"
+              previewClass="bg-slate-50 dark:bg-zinc-950 border-slate-200 dark:border-zinc-800"
             />
             <ThemeCard 
               active={theme === 'system'} 
@@ -245,22 +245,22 @@ export default function SettingsPage() {
         {/* PRIVACY & DATA */}
         <SettingsSection title="Privacy & Data" icon={Shield} description="Manage your data and privacy preferences.">
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-zinc-900/50">
+            <div className="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white dark:bg-zinc-900/50">
               <div>
                 <p className="font-medium text-white text-sm">Profile Visibility</p>
-                <p className="text-xs text-zinc-400">Make your profile visible to other users.</p>
+                <p className="text-xs text-slate-500 dark:text-zinc-400">Make your profile visible to other users.</p>
               </div>
               <Button variant="outline" size="sm" onClick={handleToggleVisibility}>
                 {user?.isPublicProfile ? 'Public' : 'Private'}
               </Button>
             </div>
             
-            <div className="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-zinc-900/50">
+            <div className="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white dark:bg-zinc-900/50">
               <div className="flex items-center gap-3">
                 <Download className="w-5 h-5 text-blue-400" />
                 <div>
                   <p className="font-medium text-white text-sm">Export My Data</p>
-                  <p className="text-xs text-zinc-400">Download a copy of all your reports and activity.</p>
+                  <p className="text-xs text-slate-500 dark:text-zinc-400">Download a copy of all your reports and activity.</p>
                 </div>
               </div>
               <Button variant="secondary" size="sm" onClick={handleExportData}>Request</Button>
@@ -273,7 +273,7 @@ export default function SettingsPage() {
           <h2 className="text-lg font-semibold text-red-500 flex items-center gap-2 mb-2">
             <Trash2 className="w-5 h-5" /> Danger Zone
           </h2>
-          <p className="text-sm text-zinc-400 mb-6">Permanently delete your account and all associated data. This action cannot be undone.</p>
+          <p className="text-sm text-slate-500 dark:text-zinc-400 mb-6">Permanently delete your account and all associated data. This action cannot be undone.</p>
           <Button 
             variant="destructive" 
             onClick={handleDeleteAccount}
@@ -290,12 +290,12 @@ export default function SettingsPage() {
 
 function SettingsSection({ title, description, icon: Icon, children }: { title: string, description: string, icon: any, children: React.ReactNode }) {
   return (
-    <section className="rounded-3xl border border-white/10 bg-zinc-900/50 p-6 backdrop-blur-xl">
+    <section className="rounded-3xl border border-white/10 bg-white dark:bg-zinc-900/50 p-6 backdrop-blur-xl">
       <div className="mb-6 border-b border-white/5 pb-4">
         <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-          <Icon className="w-5 h-5 text-zinc-400" /> {title}
+          <Icon className="w-5 h-5 text-slate-500 dark:text-zinc-400" /> {title}
         </h2>
-        <p className="text-sm text-zinc-400 mt-1">{description}</p>
+        <p className="text-sm text-slate-500 dark:text-zinc-400 mt-1">{description}</p>
       </div>
       {children}
     </section>
@@ -307,11 +307,11 @@ function ToggleRow({ label, description, checked, onChange }: { label: string, d
     <div className="flex items-center justify-between py-2">
       <div>
         <p className="font-medium text-white text-sm">{label}</p>
-        <p className="text-xs text-zinc-400">{description}</p>
+        <p className="text-xs text-slate-500 dark:text-zinc-400">{description}</p>
       </div>
       <button 
         onClick={onChange}
-        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-900 ${checked ? 'bg-blue-500' : 'bg-zinc-700'}`}
+        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-900 ${checked ? 'bg-blue-500' : 'bg-slate-200 dark:bg-zinc-700'}`}
       >
         <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${checked ? 'translate-x-6' : 'translate-x-1'}`} />
       </button>
@@ -324,7 +324,7 @@ function ThemeCard({ active, onClick, icon: Icon, title, previewClass }: { activ
     <button 
       onClick={onClick}
       className={`group flex flex-col items-center gap-3 rounded-xl border p-4 transition-all ${
-        active ? 'border-blue-500 bg-blue-500/10' : 'border-white/10 bg-zinc-900 hover:bg-zinc-800'
+        active ? 'border-blue-500 bg-blue-500/10' : 'border-white/10 bg-white dark:bg-zinc-900 hover:bg-slate-100 dark:bg-zinc-800'
       }`}
     >
       <div className={`h-12 w-full rounded-md border ${previewClass} relative overflow-hidden flex items-center justify-center`}>
@@ -335,8 +335,8 @@ function ThemeCard({ active, onClick, icon: Icon, title, previewClass }: { activ
         )}
       </div>
       <div className="flex items-center gap-2">
-        <Icon className={`w-4 h-4 ${active ? 'text-blue-400' : 'text-zinc-500'}`} />
-        <span className={`text-sm font-medium ${active ? 'text-white' : 'text-zinc-400'}`}>{title}</span>
+        <Icon className={`w-4 h-4 ${active ? 'text-blue-400' : 'text-slate-500 dark:text-zinc-500'}`} />
+        <span className={`text-sm font-medium ${active ? 'text-white' : 'text-slate-500 dark:text-zinc-400'}`}>{title}</span>
       </div>
     </button>
   );

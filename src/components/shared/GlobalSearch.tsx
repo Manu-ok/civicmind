@@ -104,11 +104,11 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: -20 }}
           transition={{ duration: 0.2 }}
-          className="relative w-full max-w-2xl bg-zinc-950 border border-white/10 rounded-2xl shadow-2xl overflow-hidden mx-4"
+          className="relative w-full max-w-2xl bg-slate-50 dark:bg-zinc-950 border border-white/10 rounded-2xl shadow-2xl overflow-hidden mx-4"
         >
           {/* Input Header */}
-          <div className="flex items-center px-4 py-4 border-b border-white/10 bg-zinc-900/50">
-            <Search className="w-5 h-5 text-zinc-400 mr-3" />
+          <div className="flex items-center px-4 py-4 border-b border-white/10 bg-white dark:bg-zinc-900/50">
+            <Search className="w-5 h-5 text-slate-500 dark:text-zinc-400 mr-3" />
             <input
               ref={inputRef}
               value={query}
@@ -118,14 +118,14 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
               className="flex-1 bg-transparent border-0 text-white placeholder-zinc-500 focus:outline-none focus:ring-0 text-lg"
             />
             <div className="flex items-center gap-1">
-              <kbd className="hidden sm:inline-flex px-2 py-1 text-xs font-medium text-zinc-400 bg-zinc-800 rounded-md border border-white/10">ESC</kbd>
+              <kbd className="hidden sm:inline-flex px-2 py-1 text-xs font-medium text-slate-500 dark:text-zinc-400 bg-slate-100 dark:bg-zinc-800 rounded-md border border-white/10">ESC</kbd>
             </div>
           </div>
 
           {/* Results Area */}
           <div className="max-h-[60vh] overflow-y-auto custom-scrollbar p-2">
             {totalResults === 0 ? (
-              <div className="py-12 text-center text-zinc-500">
+              <div className="py-12 text-center text-slate-500 dark:text-zinc-500">
                 <Search className="w-8 h-8 mx-auto mb-3 opacity-20" />
                 <p>No results found for &quot;{query}&quot;</p>
               </div>
@@ -134,7 +134,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                 {/* Quick Actions */}
                 {quickActions.length > 0 && (
                   <div className="mb-4">
-                    <div className="px-3 py-2 text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                    <div className="px-3 py-2 text-xs font-semibold text-slate-500 dark:text-zinc-500 uppercase tracking-wider">
                       Quick Actions
                     </div>
                     {quickActions.map((action, idx) => (
@@ -143,7 +143,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                         onMouseEnter={() => setSelectedIndex(idx)}
                         onClick={() => { action.action(); onClose(); }}
                         className={`flex items-center px-4 py-3 cursor-pointer rounded-xl transition-colors ${
-                          selectedIndex === idx ? "bg-blue-500/10 text-blue-400" : "text-zinc-300 hover:bg-white/5"
+                          selectedIndex === idx ? "bg-blue-500/10 text-blue-400" : "text-slate-600 dark:text-zinc-300 hover:bg-white/5"
                         }`}
                       >
                         <action.icon className="w-5 h-5 mr-3 opacity-70" />
@@ -156,7 +156,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                 {/* Issues */}
                 {filteredIssues.length > 0 && (
                   <div>
-                    <div className="px-3 py-2 text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                    <div className="px-3 py-2 text-xs font-semibold text-slate-500 dark:text-zinc-500 uppercase tracking-wider">
                       Issues
                     </div>
                     {filteredIssues.map((issue, idx) => {
@@ -167,7 +167,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                           onMouseEnter={() => setSelectedIndex(actualIndex)}
                           onClick={() => { router.push(`/issues/${issue.id}`); onClose(); }}
                           className={`flex items-start px-4 py-3 cursor-pointer rounded-xl transition-colors ${
-                            selectedIndex === actualIndex ? "bg-zinc-800/80 text-white" : "text-zinc-400 hover:bg-white/5"
+                            selectedIndex === actualIndex ? "bg-slate-100 dark:bg-zinc-800/80 text-white" : "text-slate-500 dark:text-zinc-400 hover:bg-white/5"
                           }`}
                         >
                           <div className="mt-0.5 mr-3">
@@ -192,15 +192,15 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
             )}
           </div>
           
-          <div className="px-4 py-3 border-t border-white/5 bg-zinc-950 flex items-center justify-between text-xs text-zinc-500">
+          <div className="px-4 py-3 border-t border-white/5 bg-slate-50 dark:bg-zinc-950 flex items-center justify-between text-xs text-slate-500 dark:text-zinc-500">
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 bg-zinc-800 rounded border border-white/10 text-[10px]">↑</kbd>
-                <kbd className="px-1.5 py-0.5 bg-zinc-800 rounded border border-white/10 text-[10px]">↓</kbd>
+                <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-zinc-800 rounded border border-white/10 text-[10px]">↑</kbd>
+                <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-zinc-800 rounded border border-white/10 text-[10px]">↓</kbd>
                 <span className="ml-1">to navigate</span>
               </span>
               <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 bg-zinc-800 rounded border border-white/10 text-[10px]">↵</kbd>
+                <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-zinc-800 rounded border border-white/10 text-[10px]">↵</kbd>
                 <span className="ml-1">to select</span>
               </span>
             </div>

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Issue, SocialUser } from '../types';
 
 export function generateShareCardHTML(issue: Issue, user: SocialUser): string {
@@ -53,7 +54,7 @@ export function generateShareCardHTML(issue: Issue, user: SocialUser): string {
       
       <div style="display: flex; align-items: center; gap: 24px; border-top: 1px solid #334155; padding-top: 40px;">
         ${user.photoURL ? 
-          `<img src="${user.photoURL}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 4px solid #334155;" />` : 
+          `<Image src="${user.photoURL}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 4px solid #334155;" />` : 
           `<div style="width: 80px; height: 80px; border-radius: 50%; background: #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold;">${user.displayName.charAt(0)}</div>`
         }
         <div style="display: flex; flex-direction: column; gap: 4px;">

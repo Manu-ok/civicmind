@@ -48,7 +48,7 @@ export function SwipeToBack({ children }: { children: React.ReactNode }) {
       
       {/* Background layer to show underneath while swiping */}
       <div className="absolute inset-0 bg-black z-0 flex items-center p-4">
-        <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center opacity-50">
+        <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center opacity-50">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
             <path d="m15 18-6-6 6-6"/>
           </svg>

@@ -26,7 +26,7 @@ export default function CirclesPage() {
           <h1 className="text-3xl md:text-4xl font-black text-white flex items-center gap-3">
             <Users className="w-8 h-8 text-blue-500" /> Your Circles
           </h1>
-          <p className="text-zinc-400 mt-2">Connect with your community and stay updated on local issues.</p>
+          <p className="text-slate-500 dark:text-zinc-400 mt-2">Connect with your community and stay updated on local issues.</p>
         </div>
         
         <button 
@@ -48,12 +48,12 @@ export default function CirclesPage() {
           <section>
             <h2 className="text-xl font-black text-white mb-6">Circles you&apos;ve joined</h2>
             {myCircles.length === 0 ? (
-              <div className="bg-zinc-950 border border-white/5 border-dashed rounded-3xl p-10 text-center">
-                <div className="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="bg-slate-50 dark:bg-zinc-950 border border-white/5 border-dashed rounded-3xl p-10 text-center">
+                <div className="w-16 h-16 bg-white dark:bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Users className="w-8 h-8 text-zinc-600" />
                 </div>
                 <h3 className="text-lg font-bold text-white mb-2">You haven&apos;t joined any circles yet</h3>
-                <p className="text-zinc-500 mb-6 max-w-md mx-auto">Discover official community groups or start your own to get connected.</p>
+                <p className="text-slate-500 dark:text-zinc-500 mb-6 max-w-md mx-auto">Discover official community groups or start your own to get connected.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -75,19 +75,19 @@ export default function CirclesPage() {
               <h2 className="text-xl font-black text-white">Discover in your city</h2>
               
               <div className="relative">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-zinc-500" />
                 <input 
                   type="text" 
                   placeholder="Search circles or wards..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-zinc-900 border border-white/5 rounded-full pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:border-blue-500 w-full md:w-64"
+                  className="bg-white dark:bg-zinc-900 border border-white/5 rounded-full pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:border-blue-500 w-full md:w-64"
                 />
               </div>
             </div>
 
             {filteredDiscover.length === 0 ? (
-              <div className="text-center py-10 text-zinc-500 font-medium">
+              <div className="text-center py-10 text-slate-500 dark:text-zinc-500 font-medium">
                 No circles found matching your search.
               </div>
             ) : (

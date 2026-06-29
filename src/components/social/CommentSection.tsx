@@ -69,9 +69,9 @@ export function CommentSection({ issueId, isExpanded = true, compact = false }: 
           <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
         </div>
       ) : comments.length === 0 ? (
-        <div className="text-center py-10 text-zinc-500 border border-white/5 border-dashed rounded-2xl">
+        <div className="text-center py-10 text-slate-500 dark:text-zinc-500 border border-white/5 border-dashed rounded-2xl">
           <MessageSquare className="w-8 h-8 mx-auto mb-2 text-zinc-700" />
-          <p className="text-sm font-bold text-zinc-400">No comments yet</p>
+          <p className="text-sm font-bold text-slate-500 dark:text-zinc-400">No comments yet</p>
           <p className="text-xs">Be the first to share your thoughts!</p>
         </div>
       ) : (
@@ -104,7 +104,7 @@ export function CommentSection({ issueId, isExpanded = true, compact = false }: 
             <div className="text-center mt-4">
               <button 
                 onClick={loadMoreComments}
-                className="text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-900 px-4 py-2 rounded-full"
+                className="text-xs font-bold text-slate-500 dark:text-zinc-400 hover:text-white transition-colors bg-white dark:bg-zinc-900 px-4 py-2 rounded-full"
               >
                 Load more comments
               </button>

@@ -64,7 +64,7 @@ export function StatusTimeline({ issue }: StatusTimelineProps) {
     <div className="py-4">
       <div className="relative">
         {/* Continuous background line */}
-        <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-zinc-800" />
+        <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-slate-100 dark:bg-zinc-800" />
         
         {/* Animated fill line */}
         <div className="absolute left-6 top-6 bottom-6 w-0.5 flex flex-col justify-start overflow-hidden">
@@ -97,8 +97,8 @@ export function StatusTimeline({ issue }: StatusTimelineProps) {
                     ${step.completed 
                       ? "bg-blue-500 border-blue-500 text-white shadow-[0_0_15px_rgba(59,130,246,0.3)]" 
                       : step.isCurrent 
-                        ? "bg-zinc-900 border-blue-500 text-blue-500" 
-                        : "bg-zinc-900 border-zinc-700 text-zinc-500"
+                        ? "bg-white dark:bg-zinc-900 border-blue-500 text-blue-500" 
+                        : "bg-white dark:bg-zinc-900 border-slate-300 dark:border-zinc-700 text-slate-500 dark:text-zinc-500"
                     }
                   `}
                 >
@@ -112,10 +112,10 @@ export function StatusTimeline({ issue }: StatusTimelineProps) {
                   transition={{ delay: index * 0.1 + 0.2 }}
                   className="pt-2 flex-1"
                 >
-                  <h4 className={`text-sm font-bold ${step.completed || step.isCurrent ? "text-zinc-100" : "text-zinc-500"}`}>
+                  <h4 className={`text-sm font-bold ${step.completed || step.isCurrent ? "text-zinc-100" : "text-slate-500 dark:text-zinc-500"}`}>
                     {step.title}
                   </h4>
-                  <p className={`text-xs mt-1 ${step.completed || step.isCurrent ? "text-zinc-400" : "text-zinc-600"}`}>
+                  <p className={`text-xs mt-1 ${step.completed || step.isCurrent ? "text-slate-500 dark:text-zinc-400" : "text-zinc-600"}`}>
                     {step.description}
                   </p>
                 </motion.div>

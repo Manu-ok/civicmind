@@ -81,12 +81,12 @@ export function useFCM() {
           await updateDoc(userRef, {
             fcmTokens: arrayUnion(token)
           });
-          console.log("FCM Token saved to user document.");
+
         }
 
         // Listen for foreground messages
         onMessage(messaging, (payload: MessagePayload) => {
-          console.log("Received foreground message:", payload);
+
           if (payload.notification) {
             toast(payload.notification.body || "New Notification", {
               icon: '🔔',

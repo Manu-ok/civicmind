@@ -22,7 +22,7 @@ export function MobileNav() {
   ];
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-[100] border-t border-white/[0.06] bg-zinc-950/90 backdrop-blur-2xl md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-[100] border-t border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-zinc-950/90 backdrop-blur-2xl md:hidden">
       <div className="flex items-center justify-around px-2 py-1.5 h-16">
         {mobileNavItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
@@ -58,7 +58,7 @@ export function MobileNav() {
                 <item.icon
                   className={cn(
                     "relative z-10 h-5 w-5 transition-colors",
-                    isActive ? "text-blue-400" : "text-zinc-500 group-hover:text-zinc-300"
+                    isActive ? "text-blue-400" : "text-slate-500 dark:text-zinc-500 group-hover:text-slate-600 dark:text-zinc-300"
                   )}
                 />
                 <AnimatePresence>
@@ -78,7 +78,7 @@ export function MobileNav() {
               <span
                 className={cn(
                   "relative z-10 text-[10px] font-medium transition-colors mt-0.5",
-                  isActive ? "text-blue-400" : "text-zinc-500 group-hover:text-zinc-300"
+                  isActive ? "text-blue-400" : "text-slate-500 dark:text-zinc-500 group-hover:text-slate-600 dark:text-zinc-300"
                 )}
               >
                 {item.label}

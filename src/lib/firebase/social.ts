@@ -56,19 +56,18 @@ export async function checkUsernameAvailability(username: string): Promise<Usern
 }
 
 export async function claimUsername(userId: string, username: string): Promise<void> {
-  const batch = writeBatch(db);
   const usernameRef = doc(db, 'usernames', username);
   const userRef = doc(db, 'users', userId);
 
-  const usernameDoc = await getDoc(usernameRef);
-  if (usernameDoc.exists()) {
-    throw new Error("Username taken");
-  }
+  await runTransaction(db, async (transaction) => {
+    const usernameDoc = await transaction.get(usernameRef);
+    if (usernameDoc.exists()) {
+      throw new Error("Username taken");
+    }
 
-  batch.set(usernameRef, { uid: userId, createdAt: serverTimestamp() });
-  batch.update(userRef, { username, hasCompletedOnboarding: true });
-
-  await batch.commit();
+    transaction.set(usernameRef, { uid: userId, createdAt: serverTimestamp() });
+    transaction.update(userRef, { username, hasCompletedOnboarding: true });
+  });
 }
 
 export async function releaseUsername(userId: string, oldUsername: string): Promise<void> {
@@ -156,6 +155,19 @@ export async function followUser(followerId: string, followingId: string): Promi
   batch.set(feedItemRef, feedItem);
 
   await batch.commit();
+
+  await createNotification(followingId, {
+    title: "New Follower",
+    message: `${followerData.displayName || "Someone"} started following you`,
+    type: "new_follower",
+    actorId: followerId,
+    actorUsername: followerData.username || "",
+    actorName: followerData.displayName || "",
+    actorPhotoUrl: followerData.photoURL || "",
+    isRead: false,
+    createdAt: Timestamp.now(),
+    read: false
+  } as any);
 }
 
 export async function unfollowUser(followerId: string, followingId: string): Promise<void> {

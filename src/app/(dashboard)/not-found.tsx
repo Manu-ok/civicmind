@@ -15,8 +15,8 @@ export default function NotFound() {
         className="relative mb-8"
       >
         <div className="absolute -inset-10 rounded-full bg-blue-500/10 blur-3xl" />
-        <div className="relative flex h-32 w-32 items-center justify-center rounded-full border border-white/10 bg-zinc-900/50 shadow-2xl">
-          <Search className="h-12 w-12 text-zinc-500" />
+        <div className="relative flex h-32 w-32 items-center justify-center rounded-full border border-white/10 bg-white dark:bg-zinc-900/50 shadow-2xl">
+          <Search className="h-12 w-12 text-slate-500 dark:text-zinc-500" />
           <AlertTriangle className="absolute bottom-4 right-4 h-8 w-8 text-amber-500" />
         </div>
       </motion.div>
@@ -34,7 +34,7 @@ export default function NotFound() {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="mb-4 text-xl font-medium text-zinc-300"
+        className="mb-4 text-xl font-medium text-slate-600 dark:text-zinc-300"
       >
         Page Not Found
       </motion.h2>
@@ -43,7 +43,7 @@ export default function NotFound() {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.3 }}
-        className="mb-8 max-w-md text-zinc-400"
+        className="mb-8 max-w-md text-slate-500 dark:text-zinc-400"
       >
         This page got lost like an unresolved civic issue! We&apos;ve dispatched our digital team to investigate.
       </motion.p>

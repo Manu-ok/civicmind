@@ -1,7 +1,8 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -31,6 +32,7 @@ import { useAuth } from "@/lib/hooks/useAuth";
 import { useFeedStats } from "@/lib/hooks/useFeedStats";
 import { useStories } from "@/lib/hooks/useStories";
 import { StoryRing } from "@/components/social/StoryRing";
+import { Logo } from "@/components/shared/Logo";
 import { cn } from "@/lib/utils";
 
 // ── nav config ──────────────────────────────────────────────────────
@@ -65,13 +67,24 @@ const navGroups = [
 // ── sidebar ─────────────────────────────────────────────────────────
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { sidebarOpen, toggleSidebar } = useUIStore();
   const { theme, setTheme } = useTheme();
-  const { user } = useAuthStore();
+  const { user, clearAuth } = useAuthStore();
   const { signOut } = useAuth();
   const { unreadCount } = useFeedStats();
   const { myStories } = useStories();
   const hasUnviewedStories = myStories.length > 0 && myStories.some(s => !s.viewedBy.includes(user?.id || ''));
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      clearAuth();
+      router.push('/login');
+    } catch (error) {
+      toast.error('Failed to sign out');
+    }
+  };
 
   return (
     <>
@@ -90,7 +103,7 @@ export default function Sidebar() {
 
       {/* ── SIDEBAR ──────────────────────────────────── */}
       <motion.aside
-        className="fixed inset-y-0 left-0 z-50 flex flex-col border-r border-white/[0.06] bg-zinc-950/95 backdrop-blur-2xl md:bg-zinc-950/80"
+        className="fixed inset-y-0 left-0 z-50 flex flex-col border-r border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-zinc-950/95 backdrop-blur-2xl md:bg-slate-50 dark:bg-zinc-950/80"
         initial={false}
         animate={{ 
           width: typeof window !== "undefined" && window.innerWidth < 768 ? 256 : (sidebarOpen ? 256 : 72),
@@ -99,27 +112,12 @@ export default function Sidebar() {
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
         {/* ── logo ─────────────────────────────────────────── */}
-        <div className="flex h-16 items-center gap-3 border-b border-white/[0.06] px-4">
-          <motion.div
-            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-violet-600 shadow-lg shadow-blue-500/20"
-            animate={{ scale: [1, 1.06, 1] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <Shield className="h-5 w-5 text-white" />
-          </motion.div>
-          <AnimatePresence>
-            {sidebarOpen && (
-              <motion.span
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.15 }}
-                className="bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-lg font-bold tracking-tight text-transparent"
-              >
-                CivicMind AI
-              </motion.span>
-            )}
-          </AnimatePresence>
+        <div className={cn("flex h-16 items-center border-b border-slate-200 dark:border-white/[0.06]", sidebarOpen ? "px-4" : "justify-center px-0")}>
+          {sidebarOpen ? (
+            <Logo variant="full" size="md" animated clickable />
+          ) : (
+            <Logo variant="icon" size="sm" animated clickable />
+          )}
         </div>
 
         {/* ── navigation ───────────────────────────────────── */}
@@ -127,12 +125,12 @@ export default function Sidebar() {
           {navGroups.map((group) => (
             <div key={group.title} className="space-y-1">
               {sidebarOpen && (
-                <div className="px-3 text-xs font-bold uppercase tracking-wider text-zinc-500 mb-2 mt-2">
+                <div className="px-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-500 mb-2 mt-2">
                   {group.title}
                 </div>
               )}
               {group.items.map((item) => {
-                const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
                 // Provide the feed badge if this is the Feed item
                 const badge = item.href === "/feed" && unreadCount > 0 
                   ? (unreadCount > 99 ? "99+" : unreadCount) 
@@ -152,9 +150,9 @@ export default function Sidebar() {
         </nav>
 
         {/* ── bottom section ───────────────────────────────── */}
-        <div className="border-t border-white/[0.06] p-3 space-y-2">
+        <div className="border-t border-slate-200 dark:border-white/[0.06] p-3 space-y-2">
           {/* User row */}
-          <Link href={`/profile/${user?.username || 'user'}`} className={cn("flex items-center gap-3 rounded-xl p-2 hover:bg-white/[0.04] transition-colors cursor-pointer", sidebarOpen ? "" : "justify-center")}>
+          <Link href={user?.username ? `/profile/${user.username}` : '/onboarding'} className={cn("flex items-center gap-3 rounded-xl p-2 hover:bg-white/[0.04] transition-colors cursor-pointer", sidebarOpen ? "" : "justify-center")}>
             <div className="shrink-0 scale-75 origin-left">
               <StoryRing 
                 user={user as any} 
@@ -170,7 +168,7 @@ export default function Sidebar() {
                   className="min-w-0 flex-1 -ml-2"
                 >
                   <p className="truncate text-sm font-bold text-white leading-none mb-1">{user?.displayName || "User"}</p>
-                  <p className="truncate text-xs text-zinc-500 leading-none mb-1.5">@{user?.username || "user"}</p>
+                  <p className="truncate text-xs text-slate-500 dark:text-zinc-500 leading-none mb-1.5">@{user?.username || "user"}</p>
                   <div className="flex items-center gap-1 text-[10px] font-bold text-amber-400 bg-amber-500/10 w-fit px-1.5 py-0.5 rounded-md">
                     <Sparkles className="h-3 w-3" />
                     <span>{user?.points ?? 0} pts</span>
@@ -184,7 +182,7 @@ export default function Sidebar() {
           <div className={cn("flex gap-1", sidebarOpen ? "" : "flex-col items-center")}>
             <motion.button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/[0.06] hover:text-zinc-200"
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 dark:text-zinc-400 transition-colors hover:bg-white/[0.06] hover:text-zinc-200"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               title="Toggle theme"
@@ -193,8 +191,8 @@ export default function Sidebar() {
             </motion.button>
 
             <motion.button
-              onClick={signOut}
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-red-500/10 hover:text-red-400"
+              onClick={handleSignOut}
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 dark:text-zinc-400 transition-colors hover:bg-red-500/10 hover:text-red-400"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               title="Sign out"
@@ -206,7 +204,7 @@ export default function Sidebar() {
           {/* Collapse toggle */}
           <motion.button
             onClick={toggleSidebar}
-            className="flex w-full items-center justify-center rounded-lg py-1.5 text-zinc-500 transition-colors hover:bg-white/[0.04] hover:text-zinc-300"
+            className="flex w-full items-center justify-center rounded-lg py-1.5 text-slate-500 dark:text-zinc-500 transition-colors hover:bg-white/[0.04] hover:text-slate-600 dark:text-zinc-300"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
@@ -237,10 +235,10 @@ function NavItem({
     <Link href={item.href} className="group relative block">
       <motion.div
         className={cn(
-          "relative flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors duration-200",
+          "relative flex items-center min-h-[44px] gap-3 rounded-xl px-3 py-2.5 transition-colors duration-200",
           isActive
             ? "text-white"
-            : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200",
+            : "text-slate-500 dark:text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200",
           !showText ? "justify-center" : ""
         )}
         whileHover={{ scale: 1.02 }}
@@ -312,9 +310,9 @@ function NavItem({
 
       {/* Collapsed tooltip */}
       {collapsed && (
-        <div className="pointer-events-none absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 rounded-lg border border-white/[0.08] bg-zinc-900 px-3 py-1.5 text-xs font-medium text-zinc-200 opacity-0 shadow-xl transition-opacity group-hover:opacity-100">
+        <div className="pointer-events-none absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 rounded-lg border border-white/[0.08] bg-white dark:bg-zinc-900 px-3 py-1.5 text-xs font-medium text-zinc-200 opacity-0 shadow-xl transition-opacity group-hover:opacity-100">
           {item.label}
-          <div className="absolute left-0 top-1/2 -translate-x-1 -translate-y-1/2 rotate-45 border-b border-l border-white/[0.08] bg-zinc-900 h-2 w-2" />
+          <div className="absolute left-0 top-1/2 -translate-x-1 -translate-y-1/2 rotate-45 border-b border-l border-white/[0.08] bg-white dark:bg-zinc-900 h-2 w-2" />
         </div>
       )}
     </Link>

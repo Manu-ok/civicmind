@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import toast from "react-hot-toast";
 import { cn } from "@/lib/utils";
 
 import { Issue, User } from "@/lib/types";
@@ -20,7 +21,7 @@ import { MiniMap } from "@/components/map/MiniMap";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Card } from "@/components/ui/card";
-import toast from "react-hot-toast";
+
 import { StatusTimeline } from "./StatusTimeline";
 import { ShareCard } from "@/components/social/ShareCard";
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
@@ -94,7 +95,7 @@ export function IssueDetail({ issue }: { issue: Issue }) {
         
         {/* Gallery */}
         <div className="space-y-4">
-          <div className="relative aspect-video rounded-2xl overflow-hidden bg-zinc-900 border border-white/10 group">
+          <div className="relative aspect-video rounded-2xl overflow-hidden bg-white dark:bg-zinc-900 border border-white/10 group">
             {issue.mediaUrls && issue.mediaUrls.length > 0 ? (
               <AnimatePresence mode="wait">
                 <motion.div
@@ -179,11 +180,11 @@ export function IssueDetail({ issue }: { issue: Issue }) {
           </div>
 
           <div className="flex flex-col gap-3 py-4 border-y border-white/5">
-            <div className="flex items-center gap-3 text-zinc-300">
+            <div className="flex items-center gap-3 text-slate-600 dark:text-zinc-300">
               <MapPin className="w-5 h-5 text-primary" />
-              <span>{issue.location.address} <span className="text-zinc-500">({issue.location.ward})</span></span>
+              <span>{issue.location.address} <span className="text-slate-500 dark:text-zinc-500">({issue.location.ward})</span></span>
             </div>
-            <div className="flex items-center gap-3 text-zinc-300">
+            <div className="flex items-center gap-3 text-slate-600 dark:text-zinc-300">
               <Clock className="w-5 h-5 text-primary" />
               <span>Reported {formatDistanceToNow(
                 issue.reportedAt?.toDate?.() || new Date(issue.reportedAt || Date.now()), 
@@ -193,9 +194,9 @@ export function IssueDetail({ issue }: { issue: Issue }) {
           </div>
 
           <div className="flex items-center justify-between mt-auto pt-4">
-            <div className="w-full rounded-2xl bg-zinc-900/50 border border-white/5 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:bg-zinc-900">
+            <div className="w-full rounded-2xl bg-white dark:bg-zinc-900/50 border border-white/5 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:bg-white dark:bg-zinc-900">
               <div className="flex items-center gap-4">
-                <Link href={reporter?.username ? `/profile/${reporter.username}` : '#'} className="relative w-12 h-12 rounded-full bg-zinc-800 overflow-hidden border-2 border-white/10 shrink-0 hover:border-blue-500/50 transition-colors">
+                <Link href={reporter?.username ? `/profile/${reporter.username}` : '#'} className="relative w-12 h-12 rounded-full bg-slate-100 dark:bg-zinc-800 overflow-hidden border-2 border-white/10 shrink-0 hover:border-blue-500/50 transition-colors">
                   {reporter?.photoURL ? (
                     <Image src={reporter.photoURL} alt={reporter.displayName} fill className="object-cover" />
                   ) : (
@@ -209,10 +210,10 @@ export function IssueDetail({ issue }: { issue: Issue }) {
                     {reporter?.displayName || "Anonymous Citizen"}
                     {(reporter as any)?.isVerified && <CheckCircle2 className="w-4 h-4 text-blue-500" />}
                   </Link>
-                  <p className="text-sm text-zinc-400">@{reporter?.username || 'user'}</p>
-                  <div className="flex items-center gap-3 mt-1 text-xs text-zinc-500 font-medium">
+                  <p className="text-sm text-slate-500 dark:text-zinc-400">@{reporter?.username || 'user'}</p>
+                  <div className="flex items-center gap-3 mt-1 text-xs text-slate-500 dark:text-zinc-500 font-medium">
                     <span>{reporter?.issuesReported || 0} issues reported</span>
-                    <span className="w-1 h-1 rounded-full bg-zinc-700" />
+                    <span className="w-1 h-1 rounded-full bg-slate-200 dark:bg-zinc-700" />
                     <span>{(reporter as any)?.followersCount || 0} followers</span>
                   </div>
                 </div>
@@ -237,23 +238,23 @@ export function IssueDetail({ issue }: { issue: Issue }) {
                 <ReactionBar 
                   type="issue" 
                   issueId={issue.id} 
-                  currentReaction={null} // TODO: hook up to real current user reaction state if available
+                  currentReaction={null}
                   reactionCounts={issue.reactionCounts || {}} 
-                  onReact={() => {}} 
+                  onReact={() => toast("Reactions coming soon! 🚀")} 
                 />
               </div>
               <div className="flex gap-2 shrink-0 ml-auto">
-                <Button onClick={() => setIsShareOpen(true)} variant="outline" className="border-white/10 hover:bg-white/5 bg-zinc-900 text-white font-bold h-10 rounded-xl px-4">
+                <Button onClick={() => setIsShareOpen(true)} variant="outline" className="border-white/10 hover:bg-white/5 bg-white dark:bg-zinc-900 text-white font-bold h-10 rounded-xl px-4">
                   <Share2 className="w-4 h-4 mr-2" /> Share
                 </Button>
-                <Button onClick={handleUpvote} disabled={hasUpvoted} className={cn("h-10 rounded-xl font-bold transition-all shadow-xl px-4", hasUpvoted ? "bg-zinc-800 text-zinc-400 border border-white/5" : "bg-indigo-500 hover:bg-indigo-600 text-white shadow-indigo-500/20")}>
+                <Button onClick={handleUpvote} disabled={hasUpvoted} className={cn("h-10 rounded-xl font-bold transition-all shadow-xl px-4", hasUpvoted ? "bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 border border-white/5" : "bg-indigo-500 hover:bg-indigo-600 text-white shadow-indigo-500/20")}>
                   <ThumbsUp className={cn("w-4 h-4 mr-2", hasUpvoted && "fill-current")} />
                   {hasUpvoted ? "Upvoted" : "Upvote"}
                 </Button>
               </div>
             </div>
             {user?.role === "admin" && (
-                <Button onClick={() => setIsAdminModalOpen(true)} variant="outline" className="bg-zinc-900 text-blue-400 border-blue-500/20 hover:bg-blue-500/20">
+                <Button onClick={() => setIsAdminModalOpen(true)} variant="outline" className="bg-white dark:bg-zinc-900 text-blue-400 border-blue-500/20 hover:bg-blue-500/20">
                   Update Status (Admin)
                 </Button>
               )}
@@ -290,14 +291,14 @@ export function IssueDetail({ issue }: { issue: Issue }) {
                     variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0.4 } } }}
                     className="p-4 rounded-xl bg-black/20 border border-white/5"
                   >
-                    <p className="text-xs text-zinc-500 mb-1">Confidence</p>
+                    <p className="text-xs text-slate-500 dark:text-zinc-500 mb-1">Confidence</p>
                     <p className="text-lg font-bold text-blue-400">{issue.aiAnalysis.confidence}%</p>
                   </motion.div>
                   <motion.div 
                     variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0.4 } } }}
                     className="p-4 rounded-xl bg-black/20 border border-white/5"
                   >
-                    <p className="text-xs text-zinc-500 mb-1">Priority</p>
+                    <p className="text-xs text-slate-500 dark:text-zinc-500 mb-1">Priority</p>
                     <p className="text-lg font-bold text-orange-400">
                       <AnimatedCounter value={issue.priorityScore || 0} />/100
                     </p>
@@ -306,9 +307,9 @@ export function IssueDetail({ issue }: { issue: Issue }) {
                     variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0.4 } } }}
                     className="p-4 rounded-xl bg-black/20 border border-white/5 col-span-2"
                   >
-                    <p className="text-xs text-zinc-500 mb-1">Assigned Dept</p>
+                    <p className="text-xs text-slate-500 dark:text-zinc-500 mb-1">Assigned Dept</p>
                     <p className="text-sm font-bold text-zinc-200 flex items-center gap-1">
-                      <Building className="w-4 h-4 text-zinc-400"/> {issue.aiAnalysis.department}
+                      <Building className="w-4 h-4 text-slate-500 dark:text-zinc-400"/> {issue.aiAnalysis.department}
                     </p>
                   </motion.div>
                 </div>
@@ -318,7 +319,7 @@ export function IssueDetail({ issue }: { issue: Issue }) {
                     <p className="text-sm font-bold text-red-400 flex items-center gap-1 mb-1">
                       <ShieldAlert className="w-4 h-4"/> Risk Assessment
                     </p>
-                    <p className="text-sm text-zinc-300 bg-red-500/10 p-3 rounded-lg border border-red-500/20">
+                    <p className="text-sm text-slate-600 dark:text-zinc-300 bg-red-500/10 p-3 rounded-lg border border-red-500/20">
                       {issue.aiAnalysis.riskAssessment}
                     </p>
                   </motion.div>
@@ -326,7 +327,7 @@ export function IssueDetail({ issue }: { issue: Issue }) {
                     <p className="text-sm font-bold text-purple-400 flex items-center gap-1 mb-1">
                       <Target className="w-4 h-4"/> Estimated Impact
                     </p>
-                    <p className="text-sm text-zinc-300 bg-purple-500/10 p-3 rounded-lg border border-purple-500/20">
+                    <p className="text-sm text-slate-600 dark:text-zinc-300 bg-purple-500/10 p-3 rounded-lg border border-purple-500/20">
                       {issue.aiAnalysis.estimatedImpact}
                     </p>
                   </motion.div>
@@ -337,7 +338,7 @@ export function IssueDetail({ issue }: { issue: Issue }) {
 
           {/* AI Resolution Plan */}
           {issue.resolutionPlan && (
-            <Card className="p-6 bg-zinc-900/50 border-white/5">
+            <Card className="p-6 bg-white dark:bg-zinc-900/50 border-white/5">
               <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                 <Activity className="w-6 h-6 text-green-400" />
                 AI Resolution Plan
@@ -346,11 +347,11 @@ export function IssueDetail({ issue }: { issue: Issue }) {
               <div className="relative pl-4 space-y-8 before:absolute before:inset-0 before:ml-[21px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-zinc-800 before:to-transparent">
                 {issue.resolutionPlan.steps.map((step, idx) => (
                   <div key={idx} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                    <div className="flex items-center justify-center w-6 h-6 rounded-full border-2 border-green-500 bg-zinc-950 text-green-500 text-xs font-bold shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-[0_0_10px_rgba(34,197,94,0.3)] z-10">
+                    <div className="flex items-center justify-center w-6 h-6 rounded-full border-2 border-green-500 bg-slate-50 dark:bg-zinc-950 text-green-500 text-xs font-bold shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-[0_0_10px_rgba(34,197,94,0.3)] z-10">
                       {idx + 1}
                     </div>
-                    <div className="w-[calc(100%-2.5rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl bg-zinc-900 border border-white/5 shadow-xl">
-                      <p className="text-sm text-zinc-300">{step}</p>
+                    <div className="w-[calc(100%-2.5rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl bg-white dark:bg-zinc-900 border border-white/5 shadow-xl">
+                      <p className="text-sm text-slate-600 dark:text-zinc-300">{step}</p>
                     </div>
                   </div>
                 ))}
@@ -397,10 +398,10 @@ export function IssueDetail({ issue }: { issue: Issue }) {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {/* 3 placeholder cards for related issues */}
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="bg-zinc-900/50 border border-white/5 rounded-xl p-3 hover:bg-zinc-900 transition-colors cursor-pointer">
-                    <div className="aspect-video bg-zinc-800 rounded-lg mb-3" />
+                  <div key={i} className="bg-white dark:bg-zinc-900/50 border border-white/5 rounded-xl p-3 hover:bg-white dark:bg-zinc-900 transition-colors cursor-pointer">
+                    <div className="aspect-video bg-slate-100 dark:bg-zinc-800 rounded-lg mb-3" />
                     <p className="text-sm font-bold text-white line-clamp-2 leading-tight mb-1">Other issue reported by this user</p>
-                    <p className="text-xs text-zinc-500">2 days ago</p>
+                    <p className="text-xs text-slate-500 dark:text-zinc-500">2 days ago</p>
                   </div>
                 ))}
               </div>
@@ -412,17 +413,17 @@ export function IssueDetail({ issue }: { issue: Issue }) {
         {/* RIGHT COLUMN: Verifications & Map */}
         <div className="space-y-8">
 
-          <Card className="p-6 bg-zinc-900/50 border-white/5">
+          <Card className="p-6 bg-white dark:bg-zinc-900/50 border-white/5">
             <h3 className="font-bold text-lg text-white mb-2">Status Tracking</h3>
             <StatusTimeline issue={issue} />
           </Card>
           
-          <Card className="p-1 bg-zinc-900/50 border-white/5 overflow-hidden group relative">
+          <Card className="p-1 bg-white dark:bg-zinc-900/50 border-white/5 overflow-hidden group relative">
              <div className="relative h-48 w-full pointer-events-none">
                 {issue.location.lat && issue.location.lng ? (
                   <MiniMap initialLocation={{ lat: issue.location.lat, lng: issue.location.lng }} onLocationChange={() => {}} />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-zinc-950">
+                  <div className="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-zinc-950">
                     <MapPin className="w-8 h-8 text-zinc-700" />
                   </div>
                 )}
@@ -441,7 +442,7 @@ export function IssueDetail({ issue }: { issue: Issue }) {
              )}
           </Card>
 
-          <Card className="p-6 bg-zinc-900/50 border-white/5">
+          <Card className="p-6 bg-white dark:bg-zinc-900/50 border-white/5">
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-bold text-lg text-white flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-blue-400" />
@@ -463,9 +464,9 @@ export function IssueDetail({ issue }: { issue: Issue }) {
                         <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-xs font-bold">
                           {v.userDisplayName.charAt(0)}
                         </div>
-                        <span className="text-sm font-medium text-zinc-300">{v.userDisplayName}</span>
+                        <span className="text-sm font-medium text-slate-600 dark:text-zinc-300">{v.userDisplayName}</span>
                       </div>
-                      <span className="text-xs text-zinc-500">{formatDistanceToNow(
+                      <span className="text-xs text-slate-500 dark:text-zinc-500">{formatDistanceToNow(
                         v.timestamp?.toDate?.() || new Date(v.timestamp || Date.now()), 
                         { addSuffix: true }
                       )}</span>
@@ -488,38 +489,38 @@ export function IssueDetail({ issue }: { issue: Issue }) {
               ) : (
                 <div className="text-center py-8 px-4 rounded-xl border border-dashed border-white/10">
                   <ShieldAlert className="w-8 h-8 text-zinc-600 mx-auto mb-2" />
-                  <p className="text-sm text-zinc-400">No verifications yet.</p>
-                  <p className="text-xs text-zinc-500 mt-1">Be the first to verify this issue and earn points!</p>
+                  <p className="text-sm text-slate-500 dark:text-zinc-400">No verifications yet.</p>
+                  <p className="text-xs text-slate-500 dark:text-zinc-500 mt-1">Be the first to verify this issue and earn points!</p>
                 </div>
               )}
             </div>
           </Card>
 
           {/* People who reported nearby issues */}
-          <Card className="p-6 bg-zinc-900/50 border-white/5">
-            <h3 className="font-bold text-sm text-zinc-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+          <Card className="p-6 bg-white dark:bg-zinc-900/50 border-white/5">
+            <h3 className="font-bold text-sm text-slate-500 dark:text-zinc-400 uppercase tracking-wider mb-4 flex items-center gap-2">
               <Users className="w-4 h-4" />
               Active in {issue.location.ward}
             </h3>
             <div className="flex flex-col gap-4">
               <div className="flex -space-x-3">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <Link href="#" key={i} className="relative w-10 h-10 rounded-full border-2 border-zinc-950 bg-zinc-800 hover:-translate-y-1 transition-transform z-10 hover:z-20 flex items-center justify-center">
-                    <UserIcon className="w-4 h-4 text-zinc-500" />
-                  </Link>
+                  <button onClick={() => toast("User profiles coming soon! 🚀")} key={i} className="relative w-10 h-10 rounded-full border-2 border-zinc-950 bg-slate-100 dark:bg-zinc-800 hover:-translate-y-1 transition-transform z-10 hover:z-20 flex items-center justify-center">
+                    <UserIcon className="w-4 h-4 text-slate-500 dark:text-zinc-500" />
+                  </button>
                 ))}
-                <div className="relative w-10 h-10 rounded-full border-2 border-zinc-950 bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-400 z-0">
+                <div className="relative w-10 h-10 rounded-full border-2 border-zinc-950 bg-slate-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-slate-500 dark:text-zinc-400 z-0">
                   +42
                 </div>
               </div>
-              <p className="text-sm text-zinc-300">
+              <p className="text-sm text-slate-600 dark:text-zinc-300">
                 <span className="font-bold text-white">47 citizens</span> have reported issues nearby this week.
               </p>
             </div>
           </Card>
 
           {/* Social Share Stats */}
-          <Card className="p-6 bg-zinc-900/50 border-white/5 overflow-hidden relative">
+          <Card className="p-6 bg-white dark:bg-zinc-900/50 border-white/5 overflow-hidden relative">
             <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
               <Share2 className="w-24 h-24" />
             </div>
@@ -527,19 +528,19 @@ export function IssueDetail({ issue }: { issue: Issue }) {
             <div className="space-y-4 relative z-10">
               <div>
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="text-zinc-400">Community Reactions</span>
+                  <span className="text-slate-500 dark:text-zinc-400">Community Reactions</span>
                   <span className="font-bold text-white">{Object.values(issue.reactionCounts || {}).reduce((a, b) => a + b, 0)}</span>
                 </div>
-                <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                   <div className="h-full bg-gradient-to-r from-orange-500 to-amber-500 w-[65%]" />
                 </div>
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="text-zinc-400">Shares & Forwards</span>
+                  <span className="text-slate-500 dark:text-zinc-400">Shares & Forwards</span>
                   <span className="font-bold text-white">{issue.shareCount || 0}</span>
                 </div>
-                <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                   <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 w-[40%]" />
                 </div>
               </div>
@@ -557,17 +558,17 @@ export function IssueDetail({ issue }: { issue: Issue }) {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-zinc-900 border border-white/10 rounded-2xl p-6 max-w-md w-full shadow-2xl"
+              className="bg-white dark:bg-zinc-900 border border-white/10 rounded-2xl p-6 max-w-md w-full shadow-2xl"
             >
               <h3 className="text-xl font-bold text-white mb-4">Update Status (Admin)</h3>
               
               <div className="space-y-4">
                 <div>
-                  <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2 block">New Status</label>
+                  <label className="text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-wider mb-2 block">New Status</label>
                   <select 
                     value={newStatus}
                     onChange={(e) => setNewStatus(e.target.value)}
-                    className="w-full bg-zinc-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500"
+                    className="w-full bg-slate-50 dark:bg-zinc-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500"
                   >
                     <option value="pending">Pending</option>
                     <option value="verified">Verified</option>
@@ -594,18 +595,18 @@ export function IssueDetail({ issue }: { issue: Issue }) {
         {showStreetView && issue.location.lat && issue.location.lng && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/80 backdrop-blur-md" onClick={() => setShowStreetView(false)} />
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative w-full max-w-5xl h-[80vh] bg-zinc-950 border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-zinc-900/50">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative w-full max-w-5xl h-[80vh] bg-slate-50 dark:bg-zinc-950 border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-white dark:bg-zinc-900/50">
                 <div className="flex items-center gap-2">
                   <Navigation className="w-5 h-5 text-blue-400" />
                   <h3 className="font-bold text-white">Street View</h3>
-                  <span className="text-sm text-zinc-400 hidden sm:inline-block ml-2">- {issue.location.address}</span>
+                  <span className="text-sm text-slate-500 dark:text-zinc-400 hidden sm:inline-block ml-2">- {issue.location.address}</span>
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => setShowStreetView(false)} className="text-zinc-400 hover:text-white rounded-full">
+                <Button variant="ghost" size="icon" onClick={() => setShowStreetView(false)} className="text-slate-500 dark:text-zinc-400 hover:text-white rounded-full">
                   <X className="w-5 h-5" />
                 </Button>
               </div>
-              <div className="flex-1 w-full bg-zinc-900">
+              <div className="flex-1 w-full bg-white dark:bg-zinc-900">
                 <iframe
                   width="100%"
                   height="100%"

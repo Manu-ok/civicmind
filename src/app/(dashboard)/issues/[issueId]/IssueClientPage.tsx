@@ -38,7 +38,7 @@ export default function IssueClientPage({ issueId }: { issueId: string }) {
     return (
       <div className="w-full h-[60vh] flex flex-col items-center justify-center">
         <Loader2 className="w-8 h-8 text-primary animate-spin mb-4" />
-        <p className="text-zinc-400">Loading issue details...</p>
+        <p className="text-slate-500 dark:text-zinc-400">Loading issue details...</p>
       </div>
     );
   }
@@ -50,10 +50,10 @@ export default function IssueClientPage({ issueId }: { issueId: string }) {
           <AlertTriangle className="w-8 h-8 text-red-500" />
         </div>
         <h2 className="text-2xl font-bold text-white mb-2">Issue Not Found</h2>
-        <p className="text-zinc-400 max-w-md mb-6">
+        <p className="text-slate-500 dark:text-zinc-400 max-w-md mb-6">
           The issue you&apos;re looking for doesn&apos;t exist, has been deleted, or you don&apos;t have permission to view it.
         </p>
-        <Button onClick={() => router.push('/issues')} variant="outline" className="border-white/10 bg-zinc-900">
+        <Button onClick={() => router.push('/issues')} variant="outline" className="border-white/10 bg-white dark:bg-zinc-900">
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to Issues Feed
         </Button>
       </div>
@@ -65,7 +65,7 @@ export default function IssueClientPage({ issueId }: { issueId: string }) {
       <Button 
         onClick={() => router.back()} 
         variant="ghost" 
-        className="mb-6 text-zinc-400 hover:text-white"
+        className="mb-6 text-slate-500 dark:text-zinc-400 hover:text-white"
       >
         <ArrowLeft className="w-4 h-4 mr-2" /> Back
       </Button>

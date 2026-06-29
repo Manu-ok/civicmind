@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 function AuthLoadingScreen() {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-50 dark:bg-zinc-950">
       {/* Animated background orbs */}
       <motion.div
         className="absolute top-1/4 left-1/3 h-72 w-72 rounded-full bg-blue-500/10 blur-3xl"
@@ -73,7 +73,7 @@ function AuthLoadingScreen() {
         >
           CivicMind AI
         </motion.h1>
-        <p className="text-sm text-zinc-500">Loading your experience...</p>
+        <p className="text-sm text-slate-500 dark:text-zinc-500">Loading your experience...</p>
       </motion.div>
     </div>
   );

@@ -29,7 +29,7 @@ export default function PageWrapper({ children }: { children: React.ReactNode })
           <nav className="mb-6 flex items-center gap-1.5 text-sm" aria-label="Breadcrumb">
             <Link
               href="/dashboard"
-              className="flex items-center gap-1 text-zinc-500 transition-colors hover:text-zinc-300"
+              className="flex items-center gap-1 text-slate-500 dark:text-zinc-500 transition-colors hover:text-slate-600 dark:text-zinc-300"
             >
               <Home className="h-3.5 w-3.5" />
             </Link>
@@ -43,11 +43,11 @@ export default function PageWrapper({ children }: { children: React.ReactNode })
                 <span key={href} className="flex items-center gap-1.5">
                   <ChevronRight className="h-3 w-3 text-zinc-700" />
                   {isLast ? (
-                    <span className="font-medium text-zinc-300">{label}</span>
+                    <span className="font-medium text-slate-600 dark:text-zinc-300">{label}</span>
                   ) : (
                     <Link
                       href={href}
-                      className="text-zinc-500 transition-colors hover:text-zinc-300"
+                      className="text-slate-500 dark:text-zinc-500 transition-colors hover:text-slate-600 dark:text-zinc-300"
                     >
                       {label}
                     </Link>

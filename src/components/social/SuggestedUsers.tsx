@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 import { useState, useEffect } from "react";
 import { SocialUser } from "@/lib/types";
@@ -37,14 +38,14 @@ export function SuggestedUsers() {
 
   if (loading && users.length === 0) {
     return (
-      <div className="bg-zinc-950 border border-white/5 rounded-3xl p-5 animate-pulse">
-        <div className="h-5 bg-zinc-900 rounded w-1/2 mb-4" />
+      <div className="bg-slate-50 dark:bg-zinc-950 border border-white/5 rounded-3xl p-5 animate-pulse">
+        <div className="h-5 bg-white dark:bg-zinc-900 rounded w-1/2 mb-4" />
         {[...Array(5)].map((_, i) => (
           <div key={i} className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-zinc-900 shrink-0" />
+            <div className="w-10 h-10 rounded-full bg-white dark:bg-zinc-900 shrink-0" />
             <div className="flex-1 space-y-2">
-              <div className="h-4 bg-zinc-900 rounded w-3/4" />
-              <div className="h-3 bg-zinc-900 rounded w-1/2" />
+              <div className="h-4 bg-white dark:bg-zinc-900 rounded w-3/4" />
+              <div className="h-3 bg-white dark:bg-zinc-900 rounded w-1/2" />
             </div>
           </div>
         ))}
@@ -55,7 +56,7 @@ export function SuggestedUsers() {
   if (users.length === 0) return null;
 
   return (
-    <div className="bg-zinc-950 border border-white/5 rounded-3xl p-5">
+    <div className="bg-slate-50 dark:bg-zinc-950 border border-white/5 rounded-3xl p-5">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-black text-white flex items-center gap-2">
           <Users className="w-4 h-4 text-blue-500" /> People You May Know
@@ -63,7 +64,7 @@ export function SuggestedUsers() {
         <button 
           onClick={loadSuggestions} 
           disabled={refreshing}
-          className="p-1 text-zinc-500 hover:text-white transition-colors disabled:opacity-50"
+          className="p-1 text-slate-500 dark:text-zinc-500 hover:text-white transition-colors disabled:opacity-50"
         >
           <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin text-blue-500" : ""}`} />
         </button>
@@ -81,11 +82,11 @@ export function SuggestedUsers() {
               onClick={() => router.push(`/profile/${u.username}`)}
             >
               <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
-                <div className="relative w-10 h-10 rounded-full bg-zinc-900 shrink-0 overflow-hidden border border-white/5">
+                <div className="relative w-10 h-10 rounded-full bg-white dark:bg-zinc-900 shrink-0 overflow-hidden border border-white/5">
                   {u.photoURL ? (
-                    <img src={u.photoURL} alt="" className="w-full h-full object-cover" />
+                    <Image fill src={u.photoURL} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center font-bold text-zinc-500 text-sm">
+                    <div className="w-full h-full flex items-center justify-center font-bold text-slate-500 dark:text-zinc-500 text-sm">
                       {u.displayName.charAt(0)}
                     </div>
                   )}
@@ -94,7 +95,7 @@ export function SuggestedUsers() {
                   <div className="font-bold text-white text-sm truncate flex items-center gap-1 group-hover:underline">
                     {u.displayName} {u.isVerified && <CheckCircle2 className="w-3 h-3 text-blue-500 shrink-0" />}
                   </div>
-                  <div className="text-xs text-zinc-500 truncate">@{u.username}</div>
+                  <div className="text-xs text-slate-500 dark:text-zinc-500 truncate">@{u.username}</div>
                   {u.followersCount > 0 && (
                     <div className="text-[10px] text-zinc-600 font-medium mt-0.5">
                       {u.followersCount} followers

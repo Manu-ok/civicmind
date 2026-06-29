@@ -1,7 +1,7 @@
 import { 
   collection, doc, getDoc, getDocs, setDoc, updateDoc, 
   query, where, orderBy, onSnapshot, increment, arrayUnion, 
-  Timestamp, limit
+  Timestamp, limit, serverTimestamp
 } from "firebase/firestore";
 import { db } from "./config";
 import { Issue, User, Verification, AnalyticsData } from "../types";
@@ -14,12 +14,22 @@ import { distributeIssueToFollowerFeeds } from "./social";
 export async function createIssue(issueData: Omit<Issue, "id">): Promise<string> {
   try {
     const newDocRef = doc(collection(db, "issues"));
-    const issue: Issue = { ...issueData, id: newDocRef.id };
+    const issue: any = { 
+      ...issueData, 
+      id: newDocRef.id,
+      createdAt: serverTimestamp(),
+      reportedAt: serverTimestamp()
+    };
     await setDoc(newDocRef, issue);
 
     // Distribute to followers
     distributeIssueToFollowerFeeds(issue.reportedBy, issue).catch(e => {
       console.error("Failed to distribute issue to followers:", e);
+    });
+
+    // Award 15 points
+    updateUserPoints(issue.reportedBy, 15).catch(e => {
+      console.error("Failed to award points:", e);
     });
 
     return newDocRef.id;
@@ -144,6 +154,10 @@ export async function addVerification(issueId: string, verification: Verificatio
       verifications: arrayUnion(verification),
       verificationCount: increment(1)
     });
+    
+    updateUserPoints(verification.userId, 10).catch(e => {
+      console.error("Failed to award verification points:", e);
+    });
   } catch (error: any) {
     console.error("Error adding verification:", error);
     throw new Error(error.message || "Failed to add verification.");
@@ -162,6 +176,17 @@ export async function incrementUpvotes(issueId: string): Promise<void> {
 // ===================
 // USER FUNCTIONS
 // ===================
+
+export async function updateUserPoints(userId: string, points: number): Promise<void> {
+  if (!userId) return;
+  try {
+    await updateDoc(doc(db, "users", userId), {
+      points: increment(points)
+    });
+  } catch (error: any) {
+    console.error("Error updating user points:", error);
+  }
+}
 
 export async function createUserProfile(uid: string, data: User): Promise<void> {
   try {
@@ -245,7 +270,7 @@ export async function getAnalytics(city: string): Promise<AnalyticsData | null> 
 
 export async function updateAnalytics(city: string, issueData: any): Promise<void> {
   try {
-    console.log("Updating analytics for issue:", issueData.id);
+
     await setDoc(doc(db, "analytics", city), { lastUpdated: Timestamp.now() }, { merge: true });
   } catch (error: any) {
     console.error("Error updating analytics:", error);

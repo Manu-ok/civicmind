@@ -14,6 +14,7 @@ import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { MarkerClusterer, DefaultRenderer } from "@googlemaps/markerclusterer";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 // Custom cluster renderer
 const clusterRenderer = {
@@ -199,18 +200,18 @@ export function CivicMap() {
 
   if (!API_KEY) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-zinc-950 p-6">
+      <div className="flex-1 flex flex-col items-center justify-center bg-slate-50 dark:bg-zinc-950 p-6">
         <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-center max-w-md">
           <MapIcon className="w-12 h-12 text-red-500 mx-auto mb-3" />
           <h3 className="text-xl font-bold text-white mb-2">Google Maps API Key Missing</h3>
-          <p className="text-zinc-400 text-sm">Please add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to your .env.local file to enable the interactive map.</p>
+          <p className="text-slate-500 dark:text-zinc-400 text-sm">Please add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to your .env.local file to enable the interactive map.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative w-full h-full flex-1 overflow-hidden bg-zinc-950">
+    <div className="relative w-full h-full flex-1 overflow-hidden bg-slate-50 dark:bg-zinc-950">
       <APIProvider apiKey={API_KEY}>
         <Map
           defaultCenter={center}
@@ -226,7 +227,7 @@ export function CivicMap() {
           {userLat && userLng && (
             <IssuePin 
               isActive={false} 
-              onClick={() => {}} 
+              onClick={() => toast("This is your location!")} 
               issue={{ 
                 id: 'user-loc', 
                 location: { lat: userLat, lng: userLng, address: '', ward: '', city: '' },
@@ -253,7 +254,7 @@ export function CivicMap() {
             <Button 
               size="icon" 
               variant="secondary" 
-              className="bg-zinc-900/90 backdrop-blur border border-white/10 hover:bg-zinc-800 rounded-full shadow-lg"
+              className="bg-white dark:bg-zinc-900/90 backdrop-blur border border-white/10 hover:bg-slate-100 dark:bg-zinc-800 rounded-full shadow-lg"
               onClick={() => setMapType(mapType === "roadmap" ? "satellite" : "roadmap")}
               title="Toggle Map Type"
             >
@@ -262,7 +263,7 @@ export function CivicMap() {
             <Button 
               size="icon" 
               variant={showHeatmap ? "default" : "secondary"}
-              className={cn("rounded-full shadow-lg", showHeatmap ? "bg-orange-500 hover:bg-orange-600" : "bg-zinc-900/90 backdrop-blur border border-white/10 hover:bg-zinc-800")}
+              className={cn("rounded-full shadow-lg", showHeatmap ? "bg-orange-500 hover:bg-orange-600" : "bg-white dark:bg-zinc-900/90 backdrop-blur border border-white/10 hover:bg-slate-100 dark:bg-zinc-800")}
               onClick={() => setShowHeatmap(!showHeatmap)}
               title="Toggle Heatmap"
             >

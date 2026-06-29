@@ -160,7 +160,7 @@ export function IssueForm() {
       }
 
       if (result?.success) {
-        const data = result.analysis;
+        const data = result.data || result.analysis;
         setValue("title", data.title || "");
         setValue("description", data.description || "");
         setValue("category", data.category || "other");
@@ -199,9 +199,11 @@ export function IssueForm() {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ newIssue: values, nearbyIssues })
       });
-      const data = await res.json();
-      if (data.success && data.result.isDuplicate) {
-        setDuplicateCheck(data.result);
+      const result = await res.json();
+      const duplicateData = result.data || result.result;
+      
+      if (result.success && duplicateData?.isDuplicate) {
+        setDuplicateCheck(duplicateData);
       }
       setStep(4);
       generatePlan();
@@ -335,7 +337,7 @@ export function IssueForm() {
       
       {/* Stepper */}
       <div className="flex items-center justify-between mb-8 relative">
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-zinc-800 rounded-full z-0" />
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-slate-100 dark:bg-zinc-800 rounded-full z-0" />
         <div 
           className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-primary rounded-full z-0 transition-all duration-500" 
           style={{ width: `${((step - 1) / (STEPS.length - 1)) * 100}%` }}
@@ -344,7 +346,7 @@ export function IssueForm() {
           <div key={s.id} className="relative z-10 flex flex-col items-center">
             <div className={cn(
               "w-10 h-10 rounded-full flex items-center justify-center font-bold border-4 border-background transition-colors duration-300",
-              step >= s.id ? "bg-primary text-primary-foreground" : "bg-zinc-800 text-muted-foreground"
+              step >= s.id ? "bg-primary text-primary-foreground" : "bg-slate-100 dark:bg-zinc-800 text-muted-foreground"
             )}>
               {s.id}
             </div>
@@ -394,14 +396,14 @@ export function IssueForm() {
             
             {/* ================= STEP 1: MEDIA ================= */}
             {step === 1 && (
-              <Card className="p-6 bg-zinc-900/50 border-white/5">
+              <Card className="p-6 bg-white dark:bg-zinc-900/50 border-white/5">
                 <div className="space-y-6">
                   
                   <div 
                     {...getRootProps()} 
                     className={cn(
                       "border-2 border-dashed rounded-2xl p-8 transition-all cursor-pointer",
-                      isDragActive ? "border-primary bg-primary/5" : "border-zinc-800 hover:border-zinc-700 bg-zinc-900/50",
+                      isDragActive ? "border-primary bg-primary/5" : "border-slate-200 dark:border-zinc-800 hover:border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900/50",
                       errors.mediaUrls && "border-destructive bg-destructive/5"
                     )}
                   >
@@ -409,7 +411,7 @@ export function IssueForm() {
                     {values.mediaUrls.length > 0 ? (
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         {values.mediaUrls.map((url, idx) => (
-                          <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden bg-zinc-900">
+                          <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
                             <Image src={url} alt={`Upload ${idx}`} fill className="object-cover" />
                             <button 
                               type="button"
@@ -421,7 +423,7 @@ export function IssueForm() {
                           </div>
                         ))}
                         {values.mediaUrls.length < 5 && (
-                          <div className="flex items-center justify-center aspect-square rounded-xl border-2 border-dashed border-zinc-800 hover:border-zinc-700 text-zinc-500 hover:text-zinc-400 transition-colors">
+                          <div className="flex items-center justify-center aspect-square rounded-xl border-2 border-dashed border-slate-200 dark:border-zinc-800 hover:border-slate-300 dark:border-zinc-700 text-slate-500 dark:text-zinc-500 hover:text-slate-500 dark:text-zinc-400 transition-colors">
                             <Upload className="w-6 h-6" />
                           </div>
                         )}
@@ -433,16 +435,16 @@ export function IssueForm() {
                         </div>
                         <div>
                           <p className="text-lg font-medium text-zinc-200">Drag & drop media here</p>
-                          <p className="text-sm text-zinc-500">or click to browse (up to 5 files)</p>
+                          <p className="text-sm text-slate-500 dark:text-zinc-500">or click to browse (up to 5 files)</p>
                         </div>
                       </div>
                     )}
                   </div>
 
                   <div className="flex items-center gap-4">
-                    <div className="h-px bg-zinc-800 flex-1" />
+                    <div className="h-px bg-slate-100 dark:bg-zinc-800 flex-1" />
                     <span className="text-xs text-zinc-600 font-bold uppercase tracking-widest">OR</span>
-                    <div className="h-px bg-zinc-800 flex-1" />
+                    <div className="h-px bg-slate-100 dark:bg-zinc-800 flex-1" />
                   </div>
 
                   <VoiceReporter onComplete={handleVoiceComplete} />
@@ -474,7 +476,7 @@ export function IssueForm() {
                       <Input 
                         value={values.title || ""} 
                         onChange={(e) => setValue("title", e.target.value)}
-                        className="bg-zinc-950/50 border-white/10"
+                        className="bg-slate-50 dark:bg-zinc-950/50 border-white/10"
                       />
                     </div>
                     <div className="space-y-2">
@@ -482,15 +484,15 @@ export function IssueForm() {
                       <Textarea 
                         value={values.description || ""} 
                         onChange={(e) => setValue("description", e.target.value)}
-                        className="bg-zinc-950/50 border-white/10 min-h-[100px]"
+                        className="bg-slate-50 dark:bg-zinc-950/50 border-white/10 min-h-[100px]"
                       />
                     </div>
                   </div>
                 </Card>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card className="p-5 bg-zinc-900/50 border-white/5 space-y-4">
-                    <Label className="text-zinc-400">Detected Category</Label>
+                  <Card className="p-5 bg-white dark:bg-zinc-900/50 border-white/5 space-y-4">
+                    <Label className="text-slate-500 dark:text-zinc-400">Detected Category</Label>
                     <div className="grid grid-cols-2 gap-2">
                       {["road", "water", "electricity", "waste", "safety", "other"].map((cat) => (
                         <div 
@@ -498,7 +500,7 @@ export function IssueForm() {
                           onClick={() => setValue("category", cat)}
                           className={cn(
                             "px-3 py-2 rounded-lg border cursor-pointer capitalize text-sm text-center transition-colors",
-                            values.category === cat ? "bg-primary/20 border-primary text-primary" : "bg-zinc-950 border-white/5 hover:border-white/20 text-zinc-400"
+                            values.category === cat ? "bg-primary/20 border-primary text-primary" : "bg-slate-50 dark:bg-zinc-950 border-white/5 hover:border-white/20 text-slate-500 dark:text-zinc-400"
                           )}
                         >
                           {cat}
@@ -507,8 +509,8 @@ export function IssueForm() {
                     </div>
                   </Card>
 
-                  <Card className="p-5 bg-zinc-900/50 border-white/5 space-y-4">
-                    <Label className="text-zinc-400">Assessed Severity</Label>
+                  <Card className="p-5 bg-white dark:bg-zinc-900/50 border-white/5 space-y-4">
+                    <Label className="text-slate-500 dark:text-zinc-400">Assessed Severity</Label>
                     <div className="grid grid-cols-2 gap-2">
                       {["critical", "high", "medium", "low"].map((sev) => (
                         <div 
@@ -521,7 +523,7 @@ export function IssueForm() {
                                sev === 'high' ? 'bg-orange-500/20 border-orange-500 text-orange-500' :
                                sev === 'medium' ? 'bg-yellow-500/20 border-yellow-500 text-yellow-500' :
                                'bg-green-500/20 border-green-500 text-green-500')
-                              : "bg-zinc-950 border-white/5 hover:border-white/20 text-zinc-400"
+                              : "bg-slate-50 dark:bg-zinc-950 border-white/5 hover:border-white/20 text-slate-500 dark:text-zinc-400"
                           )}
                         >
                           {sev}
@@ -546,10 +548,10 @@ export function IssueForm() {
                       <div className="flex-1 space-y-4">
                         <div>
                           <h3 className="font-bold text-red-400 text-lg">Possible Duplicate Detected</h3>
-                          <p className="text-sm text-zinc-300 mt-1">{duplicateCheck.reason}</p>
+                          <p className="text-sm text-slate-600 dark:text-zinc-300 mt-1">{duplicateCheck.reason}</p>
                         </div>
                         <div className="p-4 bg-black/40 rounded-xl border border-red-500/20">
-                          <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Existing Issue</p>
+                          <p className="text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-widest mb-1">Existing Issue</p>
                           <p className="font-medium text-white">Already reported {duplicateCheck.confidence}% match</p>
                         </div>
                         <div className="flex gap-3 pt-2">
@@ -565,7 +567,7 @@ export function IssueForm() {
                   </Card>
                 ) : (
                   <>
-                    <Card className="p-1 bg-zinc-900/50 border-white/5 overflow-hidden">
+                    <Card className="p-1 bg-white dark:bg-zinc-900/50 border-white/5 overflow-hidden">
                       <MiniMap 
                         onLocationChange={(loc) => {
                           setValue("lat", loc.lat);
@@ -582,17 +584,17 @@ export function IssueForm() {
                         <Input 
                           value={values.address || ""} 
                           onChange={(e) => setValue("address", e.target.value)}
-                          className="bg-zinc-950 border-white/10"
+                          className="bg-slate-50 dark:bg-zinc-950 border-white/10"
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label>Ward / Area</Label>
-                          <Input value={values.ward || ""} readOnly className="bg-zinc-900 border-white/5 text-zinc-400" />
+                          <Input value={values.ward || ""} readOnly className="bg-white dark:bg-zinc-900 border-white/5 text-slate-500 dark:text-zinc-400" />
                         </div>
                         <div className="space-y-2">
                           <Label>City</Label>
-                          <Input value={values.city || ""} readOnly className="bg-zinc-900 border-white/5 text-zinc-400" />
+                          <Input value={values.city || ""} readOnly className="bg-white dark:bg-zinc-900 border-white/5 text-slate-500 dark:text-zinc-400" />
                         </div>
                       </div>
                     </div>
@@ -604,26 +606,26 @@ export function IssueForm() {
             {/* ================= STEP 4: REVIEW ================= */}
             {step === 4 && !duplicateCheck && (
               <div className="space-y-6">
-                <Card className="p-6 bg-zinc-900/50 border-white/5">
+                <Card className="p-6 bg-white dark:bg-zinc-900/50 border-white/5">
                   <h3 className="font-bold text-xl mb-6 flex items-center gap-2">
                     <CheckCircle2 className="w-6 h-6 text-green-400" /> Final Review
                   </h3>
                   
                   <div className="space-y-6">
                     <div>
-                      <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Issue</p>
+                      <p className="text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-widest mb-1">Issue</p>
                       <p className="text-lg font-medium text-white">{values.title}</p>
-                      <p className="text-sm text-zinc-400 mt-1">{values.description}</p>
+                      <p className="text-sm text-slate-500 dark:text-zinc-400 mt-1">{values.description}</p>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Location</p>
-                        <p className="text-sm text-zinc-300 flex items-center gap-1"><MapPin className="w-3.5 h-3.5"/> {values.address}</p>
+                        <p className="text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-widest mb-1">Location</p>
+                        <p className="text-sm text-slate-600 dark:text-zinc-300 flex items-center gap-1"><MapPin className="w-3.5 h-3.5"/> {values.address}</p>
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Department</p>
-                        <p className="text-sm text-zinc-300 flex items-center gap-1"><Building className="w-3.5 h-3.5"/> {values.department || "Municipal Corp"}</p>
+                        <p className="text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-widest mb-1">Department</p>
+                        <p className="text-sm text-slate-600 dark:text-zinc-300 flex items-center gap-1"><Building className="w-3.5 h-3.5"/> {values.department || "Municipal Corp"}</p>
                       </div>
                     </div>
 
@@ -634,7 +636,7 @@ export function IssueForm() {
                         </p>
                         <ul className="space-y-2">
                           {resolutionPlan.steps.map((s, i) => (
-                            <li key={i} className="text-sm text-zinc-300 flex gap-2">
+                            <li key={i} className="text-sm text-slate-600 dark:text-zinc-300 flex gap-2">
                               <span className="text-blue-400 font-bold">{i+1}.</span> {s}
                             </li>
                           ))}
@@ -650,7 +652,7 @@ export function IssueForm() {
             {!duplicateCheck && (
               <div className="flex gap-4 pt-6 mt-6 border-t border-white/5">
                 {step > 1 && (
-                  <Button variant="outline" className="flex-1 border-white/10 bg-zinc-900" onClick={() => setStep(step - 1)}>
+                  <Button variant="outline" className="flex-1 border-white/10 bg-white dark:bg-zinc-900" onClick={() => setStep(step - 1)}>
                     Back
                   </Button>
                 )}

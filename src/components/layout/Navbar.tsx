@@ -15,6 +15,7 @@ import { useAuthStore } from "@/lib/stores/authStore";
 import { NotificationCenter } from "../shared/NotificationCenter";
 import { GlobalSearch } from "../shared/GlobalSearch";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { Logo } from "@/components/shared/Logo";
 import Image from "next/image";
 
 // ── route → title mapping ───────────────────────────────────────────
@@ -93,25 +94,28 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-white/[0.06] bg-zinc-950/80 px-4 backdrop-blur-2xl md:px-6">
+      <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-zinc-950/80 px-4 backdrop-blur-2xl md:px-6">
         {/* ── Hamburger ──────────────────────────────────────── */}
         <motion.button
           onClick={toggleSidebar}
-          className="hidden h-9 w-9 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/[0.06] hover:text-zinc-200 md:flex"
+          className="hidden h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-slate-500 dark:text-zinc-400 transition-colors hover:bg-white/[0.06] hover:text-zinc-200 md:flex"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
           <Menu className="h-5 w-5" />
         </motion.button>
 
-        {/* ── Page Title ─────────────────────────────────────── */}
-        <div className="flex-1">
+        {/* ── Page Title / Mobile Logo ───────────────────────── */}
+        <div className="flex-1 flex items-center justify-center md:justify-start">
+          <div className="md:hidden mr-3">
+             <Logo variant="icon" size="sm" animated clickable />
+          </div>
           <motion.h1
             key={pageTitle}
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
-            className="text-lg font-semibold text-white"
+            className="hidden md:block text-lg font-semibold text-white"
           >
             {pageTitle}
           </motion.h1>
@@ -120,13 +124,13 @@ export default function Navbar() {
         {/* ── Search trigger ─────────────────────────────────── */}
         <motion.button
           onClick={() => setSearchOpen(true)}
-          className="flex h-9 items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 text-sm text-zinc-500 transition-all hover:border-white/[0.1] hover:bg-white/[0.05]"
+          className="flex h-11 min-h-[44px] items-center gap-2 rounded-xl border border-slate-200 dark:border-white/[0.06] bg-white/[0.03] px-3 text-sm text-slate-500 dark:text-zinc-500 transition-all hover:border-white/[0.1] hover:bg-white/[0.05]"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
           <Search className="h-4 w-4" />
           <span className="hidden sm:inline">Search issues...</span>
-          <kbd className="ml-2 hidden rounded border border-white/[0.08] bg-white/[0.04] px-1.5 py-0.5 text-[10px] font-medium text-zinc-500 sm:inline-block">
+          <kbd className="ml-2 hidden rounded border border-white/[0.08] bg-white/[0.04] px-1.5 py-0.5 text-[10px] font-medium text-slate-500 dark:text-zinc-500 sm:inline-block">
             ⌘K
           </kbd>
         </motion.button>
@@ -135,13 +139,13 @@ export default function Navbar() {
         <div ref={cityRef} className="relative hidden md:block">
           <motion.button
             onClick={() => setCityMenuOpen(!cityMenuOpen)}
-            className="flex h-9 items-center gap-1.5 rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 text-sm text-zinc-300 transition-all hover:border-white/[0.1]"
+            className="flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 dark:border-white/[0.06] bg-white/[0.03] px-3 text-sm text-slate-600 dark:text-zinc-300 transition-all hover:border-white/[0.1]"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
             <MapPin className="h-3.5 w-3.5 text-blue-400" />
             <span>{selectedCity}</span>
-            <ChevronDown className={`h-3.5 w-3.5 text-zinc-500 transition-transform ${cityMenuOpen ? "rotate-180" : ""}`} />
+            <ChevronDown className={`h-3.5 w-3.5 text-slate-500 dark:text-zinc-500 transition-transform ${cityMenuOpen ? "rotate-180" : ""}`} />
           </motion.button>
 
           <AnimatePresence>
@@ -151,14 +155,14 @@ export default function Navbar() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 4, scale: 0.98 }}
                 transition={{ duration: 0.15 }}
-                className="absolute right-0 top-full mt-2 w-44 overflow-hidden rounded-xl border border-white/[0.08] bg-zinc-900/95 shadow-2xl shadow-black/40 backdrop-blur-xl"
+                className="absolute right-0 top-full mt-2 w-44 overflow-hidden rounded-xl border border-white/[0.08] bg-white dark:bg-zinc-900/95 shadow-2xl shadow-black/40 backdrop-blur-xl"
               >
                 {cities.map((city) => (
                   <button
                     key={city}
                     onClick={() => { setSelectedCity(city); setCityMenuOpen(false); }}
                     className={`flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors ${
-                      selectedCity === city ? "bg-blue-500/10 text-blue-400" : "text-zinc-300 hover:bg-white/[0.04]"
+                      selectedCity === city ? "bg-blue-500/10 text-blue-400" : "text-slate-600 dark:text-zinc-300 hover:bg-white/[0.04]"
                     }`}
                   >
                     {selectedCity === city && <div className="h-1.5 w-1.5 rounded-full bg-blue-400" />}
@@ -197,11 +201,11 @@ export default function Navbar() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 4, scale: 0.98 }}
                 transition={{ duration: 0.15 }}
-                className="absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-xl border border-white/[0.08] bg-zinc-900/95 shadow-2xl shadow-black/40 backdrop-blur-xl"
+                className="absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-xl border border-white/[0.08] bg-white dark:bg-zinc-900/95 shadow-2xl shadow-black/40 backdrop-blur-xl"
               >
-                <div className="border-b border-white/[0.06] px-4 py-3">
+                <div className="border-b border-slate-200 dark:border-white/[0.06] px-4 py-3">
                   <p className="text-sm font-medium text-zinc-200">{user?.displayName}</p>
-                  <p className="text-xs text-zinc-500">{user?.email}</p>
+                  <p className="text-xs text-slate-500 dark:text-zinc-500">{user?.email}</p>
                 </div>
                 <div className="py-1">
                   {[
@@ -212,26 +216,26 @@ export default function Navbar() {
                     <button
                       key={item.label}
                       onClick={item.action}
-                      className="flex w-full items-center px-4 py-2 text-sm text-zinc-300 transition-colors hover:bg-white/[0.04]"
+                      className="flex w-full items-center px-4 py-2 text-sm text-slate-600 dark:text-zinc-300 transition-colors hover:bg-white/[0.04]"
                     >
                       {item.label}
                     </button>
                   ))}
                   
                   {/* Demo Admin Toggle */}
-                  <div className="border-t border-white/[0.06] mt-1 pt-1">
+                  <div className="border-t border-slate-200 dark:border-white/[0.06] mt-1 pt-1">
                     <button
                       onClick={() => useAuthStore.getState().toggleAdminMode()}
-                      className="flex w-full items-center justify-between px-4 py-2 text-sm text-zinc-300 transition-colors hover:bg-white/[0.04]"
+                      className="flex w-full items-center justify-between px-4 py-2 text-sm text-slate-600 dark:text-zinc-300 transition-colors hover:bg-white/[0.04]"
                     >
                       <span>Admin Mode (Demo)</span>
-                      <div className={`w-8 h-4 rounded-full flex items-center p-0.5 transition-colors ${user?.role === 'admin' ? 'bg-blue-500' : 'bg-zinc-700'}`}>
+                      <div className={`w-8 h-4 rounded-full flex items-center p-0.5 transition-colors ${user?.role === 'admin' ? 'bg-blue-500' : 'bg-slate-200 dark:bg-zinc-700'}`}>
                         <div className={`w-3 h-3 rounded-full bg-white transition-transform ${user?.role === 'admin' ? 'translate-x-4' : 'translate-x-0'}`} />
                       </div>
                     </button>
                   </div>
                 </div>
-                <div className="border-t border-white/[0.06] py-1">
+                <div className="border-t border-slate-200 dark:border-white/[0.06] py-1">
                   <button
                     onClick={signOut}
                     className="flex w-full items-center px-4 py-2 text-sm text-red-400 transition-colors hover:bg-red-500/10"

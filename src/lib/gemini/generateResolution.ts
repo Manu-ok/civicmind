@@ -1,4 +1,4 @@
-import { geminiPro, formatGeminiError } from "./config";
+import { geminiPro, formatGeminiError, cleanJSON } from "./config";
 import { Issue, ResolutionPlan } from "../types";
 
 export async function generateResolutionPlan(issue: Partial<Issue>): Promise<ResolutionPlan> {
@@ -39,8 +39,10 @@ Respond in this EXACT JSON format:
       },
     });
 
-    const text = result.response.text();
-    return JSON.parse(text) as ResolutionPlan;
+    const text = cleanJSON(result.response.text());
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error("Invalid JSON response from AI");
+    return JSON.parse(jsonMatch[0]) as ResolutionPlan;
   } catch (error) {
     throw new Error(formatGeminiError(error));
   }

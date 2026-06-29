@@ -78,8 +78,8 @@ export default function FeedPage() {
                 onClick={() => { setActiveTab(tab.id as TabType); window.scrollTo(0, 0); }}
                 className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all ${
                   activeTab === tab.id 
-                    ? "bg-zinc-900 text-white" 
-                    : "text-zinc-500 hover:bg-zinc-900/50 hover:text-zinc-300"
+                    ? "bg-white dark:bg-zinc-900 text-white" 
+                    : "text-slate-500 dark:text-zinc-500 hover:bg-white dark:bg-zinc-900/50 hover:text-slate-600 dark:text-zinc-300"
                 }`}
               >
                 {activeTab === tab.id && <motion.div layoutId="navIndicator" className="w-1 h-5 bg-blue-500 rounded-full absolute left-0" />}
@@ -89,13 +89,13 @@ export default function FeedPage() {
           </div>
 
           <div className="mb-8">
-            <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <h3 className="text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-wider mb-4 flex items-center gap-2">
               <Hash className="w-4 h-4" /> Trending in {user?.city || 'City'}
             </h3>
             <div className="flex flex-col gap-3">
               {['Potholes', 'Streetlights', 'Garbage', 'Water Supply', 'Traffic'].map((tag, i) => (
                 <div key={tag} className="flex items-center justify-between group cursor-pointer">
-                  <span className="text-sm font-bold text-zinc-400 group-hover:text-blue-400 transition-colors">#{tag}</span>
+                  <span className="text-sm font-bold text-slate-500 dark:text-zinc-400 group-hover:text-blue-400 transition-colors">#{tag}</span>
                   <span className="text-xs text-zinc-600">{120 - (i * 15)}</span>
                 </div>
               ))}
@@ -103,16 +103,16 @@ export default function FeedPage() {
           </div>
 
           <div>
-            <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <h3 className="text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-wider mb-4 flex items-center gap-2">
               <CircleDashed className="w-4 h-4" /> Your Circles
             </h3>
             <div className="flex flex-col gap-3 mb-3">
               {['Green Guardians', 'Traffic Watch', 'Clean City Initiative'].map((circle) => (
                 <div key={circle} className="flex items-center gap-3 group cursor-pointer">
-                  <div className="w-8 h-8 rounded-xl bg-zinc-900 border border-white/5 flex items-center justify-center shrink-0 group-hover:border-blue-500/50 transition-colors">
-                    <Users className="w-4 h-4 text-zinc-500 group-hover:text-blue-500 transition-colors" />
+                  <div className="w-8 h-8 rounded-xl bg-white dark:bg-zinc-900 border border-white/5 flex items-center justify-center shrink-0 group-hover:border-blue-500/50 transition-colors">
+                    <Users className="w-4 h-4 text-slate-500 dark:text-zinc-500 group-hover:text-blue-500 transition-colors" />
                   </div>
-                  <span className="text-sm font-bold text-zinc-300 group-hover:text-white transition-colors truncate">{circle}</span>
+                  <span className="text-sm font-bold text-slate-600 dark:text-zinc-300 group-hover:text-white transition-colors truncate">{circle}</span>
                 </div>
               ))}
             </div>
@@ -137,7 +137,7 @@ export default function FeedPage() {
                 key={tab.id}
                 onClick={() => { setActiveTab(tab.id as TabType); window.scrollTo(0, 0); }}
                 className={`relative px-4 py-2 text-sm font-bold whitespace-nowrap transition-colors ${
-                  activeTab === tab.id ? "text-white" : "text-zinc-500"
+                  activeTab === tab.id ? "text-white" : "text-slate-500 dark:text-zinc-500"
                 }`}
               >
                 {tab.label}
@@ -183,8 +183,8 @@ export default function FeedPage() {
             {storiesLoading && storyGroups.length === 0 && (
               [...Array(4)].map((_, i) => (
                 <div key={i} className="flex flex-col items-center gap-1.5 shrink-0">
-                  <div className="w-14 h-14 rounded-full bg-zinc-900 animate-pulse border-2 border-background" />
-                  <div className="w-10 h-2 bg-zinc-900 animate-pulse rounded" />
+                  <div className="w-14 h-14 rounded-full bg-white dark:bg-zinc-900 animate-pulse border-2 border-background" />
+                  <div className="w-10 h-2 bg-white dark:bg-zinc-900 animate-pulse rounded" />
                 </div>
               ))
             )}
@@ -204,7 +204,7 @@ export default function FeedPage() {
         <div className="hidden xl:flex flex-col w-[300px] shrink-0 sticky top-24 h-[calc(100vh-6rem)] gap-6">
           
           {/* Who to Follow */}
-          <div className="bg-zinc-950 border border-white/5 rounded-3xl p-5">
+          <div className="bg-slate-50 dark:bg-zinc-950 border border-white/5 rounded-3xl p-5">
             <h3 className="text-sm font-black text-white mb-4">Who to Follow</h3>
             <div className="flex flex-col gap-4">
               {[
@@ -214,12 +214,12 @@ export default function FeedPage() {
               ].map(u => (
                 <div key={u.username} className="flex items-center justify-between group cursor-pointer">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-full bg-zinc-900 shrink-0" />
+                    <div className="w-10 h-10 rounded-full bg-white dark:bg-zinc-900 shrink-0" />
                     <div className="min-w-0">
                       <div className="font-bold text-white text-sm truncate flex items-center gap-1 group-hover:underline">
                         {u.name} {u.verified && <CheckCircle2 className="w-3 h-3 text-blue-500" />}
                       </div>
-                      <div className="text-xs text-zinc-500 truncate">@{u.username}</div>
+                      <div className="text-xs text-slate-500 dark:text-zinc-500 truncate">@{u.username}</div>
                     </div>
                   </div>
                   <button className="shrink-0 bg-white text-black px-3 py-1.5 rounded-full text-xs font-bold hover:bg-zinc-200 transition-colors">
@@ -234,21 +234,21 @@ export default function FeedPage() {
           </div>
 
           {/* Ward Activity Mini-Feed */}
-          <div className="bg-zinc-950 border border-white/5 rounded-3xl p-5">
+          <div className="bg-slate-50 dark:bg-zinc-950 border border-white/5 rounded-3xl p-5">
             <h3 className="text-sm font-black text-white mb-4 flex items-center gap-2">
               <Activity className="w-4 h-4 text-emerald-500" /> Ward Activity
             </h3>
-            <div className="relative before:absolute before:inset-0 before:ml-2 before:-translate-x-px before:h-full before:w-0.5 before:bg-zinc-900">
+            <div className="relative before:absolute before:inset-0 before:ml-2 before:-translate-x-px before:h-full before:w-0.5 before:bg-white dark:bg-zinc-900">
               {[
                 { time: "10m ago", text: "New pothole reported on MG Road" },
                 { time: "2h ago", text: "Streetlight fixed in Sector 4" },
                 { time: "5h ago", text: "50+ signatures on park petition" }
               ].map((act, i) => (
                 <div key={i} className="relative flex items-start gap-4 mb-4 last:mb-0">
-                  <div className="w-4 h-4 rounded-full bg-zinc-950 border-4 border-zinc-800 shrink-0 mt-1 z-10" />
+                  <div className="w-4 h-4 rounded-full bg-slate-50 dark:bg-zinc-950 border-4 border-slate-200 dark:border-zinc-800 shrink-0 mt-1 z-10" />
                   <div>
                     <div className="text-xs font-bold text-zinc-600 mb-0.5">{act.time}</div>
-                    <div className="text-sm font-medium text-zinc-300">{act.text}</div>
+                    <div className="text-sm font-medium text-slate-600 dark:text-zinc-300">{act.text}</div>
                   </div>
                 </div>
               ))}

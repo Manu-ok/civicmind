@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/lib/stores/authStore";
+import { Logo } from "@/components/shared/Logo";
 
 export function AppLoader() {
   const { loading, user } = useAuthStore();
@@ -23,7 +24,7 @@ export function AppLoader() {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, scale: 1.05 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-zinc-950"
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-50 dark:bg-zinc-950"
         >
           {/* Logo animation */}
           <div className="relative flex flex-col items-center">
@@ -34,27 +35,20 @@ export function AppLoader() {
               className="absolute -inset-8 rounded-full bg-blue-500/20 blur-2xl"
             />
             
-            <motion.h1
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.8 }}
-              className="relative bg-gradient-to-r from-blue-400 to-violet-500 bg-clip-text text-5xl font-black text-transparent tracking-tighter"
-            >
-              CivicMind AI
-            </motion.h1>
+            <Logo variant="stacked" size="xl" animated className="relative z-10" />
 
             <motion.p
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.8 }}
-              className="mt-4 text-sm font-medium tracking-widest text-zinc-500 uppercase"
+              className="mt-4 text-sm font-medium tracking-widest text-slate-500 dark:text-zinc-500 uppercase"
             >
               Empowering Citizens
             </motion.p>
           </div>
 
           {/* Progress bar */}
-          <div className="absolute bottom-12 w-64 h-1 bg-zinc-900 rounded-full overflow-hidden">
+          <div className="absolute bottom-12 w-64 h-1 bg-white dark:bg-zinc-900 rounded-full overflow-hidden">
             <motion.div
               initial={{ x: "-100%" }}
               animate={{ x: loading ? "0%" : "100%" }}

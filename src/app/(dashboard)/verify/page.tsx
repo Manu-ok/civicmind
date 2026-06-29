@@ -151,20 +151,20 @@ export default function VerifyPage() {
           <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
             <ShieldCheck className="w-8 h-8 text-blue-400" /> Community Verification
           </h1>
-          <p className="text-zinc-400">Help validate reported issues in your area to earn Civic XP.</p>
+          <p className="text-slate-500 dark:text-zinc-400">Help validate reported issues in your area to earn Civic XP.</p>
         </div>
 
-        <Card className="p-4 bg-zinc-900/50 border-white/5 w-full md:w-80">
+        <Card className="p-4 bg-white dark:bg-zinc-900/50 border-white/5 w-full md:w-80">
           <div className="flex justify-between items-end mb-2">
             <div>
-              <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest">Weekly Goal</p>
+              <p className="text-xs text-slate-500 dark:text-zinc-500 font-bold uppercase tracking-widest">Weekly Goal</p>
               <p className="font-bold text-white"><span className="text-blue-400">{verificationsThisWeek}</span> / 5 Verified</p>
             </div>
             <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold">
               +{verificationsThisWeek * 10}
             </div>
           </div>
-          <Progress value={xpProgress} className="h-2 bg-zinc-800" indicatorClassName="bg-blue-500" />
+          <Progress value={xpProgress} className="h-2 bg-slate-100 dark:bg-zinc-800" indicatorClassName="bg-blue-500" />
         </Card>
       </div>
 
@@ -179,8 +179,8 @@ export default function VerifyPage() {
         ) : issues.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {issues.map(issue => (
-              <Card key={issue.id} className="bg-zinc-900 border-white/5 overflow-hidden flex flex-col group">
-                <div className="h-40 bg-zinc-800 relative">
+              <Card key={issue.id} className="bg-white dark:bg-zinc-900 border-white/5 overflow-hidden flex flex-col group">
+                <div className="h-40 bg-slate-100 dark:bg-zinc-800 relative">
                   {issue.mediaUrls?.[0] ? (
                     <Image src={issue.mediaUrls[0]} alt="Issue" fill className="object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                   ) : (
@@ -200,10 +200,10 @@ export default function VerifyPage() {
                 
                 <div className="p-4 flex-1 flex flex-col">
                   <h3 className="font-bold text-zinc-100 line-clamp-1 mb-1">{issue.title}</h3>
-                  <p className="text-sm text-zinc-400 line-clamp-2 mb-4">{issue.description}</p>
+                  <p className="text-sm text-slate-500 dark:text-zinc-400 line-clamp-2 mb-4">{issue.description}</p>
                   
                   <div className="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
-                    <span className="text-xs text-zinc-500 font-medium">
+                    <span className="text-xs text-slate-500 dark:text-zinc-500 font-medium">
                       {formatDistanceToNow(
                         issue.reportedAt?.toDate?.() || new Date(issue.reportedAt || Date.now()), 
                         { addSuffix: true }
@@ -222,10 +222,10 @@ export default function VerifyPage() {
             ))}
           </div>
         ) : (
-          <Card className="p-8 border-dashed border-white/10 bg-zinc-900/30 text-center">
+          <Card className="p-8 border-dashed border-white/10 bg-white dark:bg-zinc-900/30 text-center">
             <ShieldCheck className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
             <h3 className="text-lg font-bold text-white mb-2">You&apos;re all caught up!</h3>
-            <p className="text-zinc-400">There are no pending issues in your area that need verification right now.</p>
+            <p className="text-slate-500 dark:text-zinc-400">There are no pending issues in your area that need verification right now.</p>
           </Card>
         )}
       </div>
@@ -233,10 +233,10 @@ export default function VerifyPage() {
       {/* Verification Modal */}
       {selectedIssue && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <Card className="w-full max-w-lg bg-zinc-950 border-white/10 overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="p-4 border-b border-white/5 flex justify-between items-center bg-zinc-900/50">
+          <Card className="w-full max-w-lg bg-slate-50 dark:bg-zinc-950 border-white/10 overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white dark:bg-zinc-900/50">
               <h3 className="font-bold text-lg text-white">Verify Issue</h3>
-              <button onClick={() => { setSelectedIssue(null); clearFile(); }} className="text-zinc-400 hover:text-white">
+              <button onClick={() => { setSelectedIssue(null); clearFile(); }} className="text-slate-500 dark:text-zinc-400 hover:text-white">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -245,15 +245,15 @@ export default function VerifyPage() {
               <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
                 <p className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">Target Issue</p>
                 <p className="font-bold text-white text-lg">{selectedIssue.title}</p>
-                <p className="text-sm text-zinc-300 mt-1 flex items-center gap-1"><MapPin className="w-3.5 h-3.5"/> {selectedIssue.location.address}</p>
+                <p className="text-sm text-slate-600 dark:text-zinc-300 mt-1 flex items-center gap-1"><MapPin className="w-3.5 h-3.5"/> {selectedIssue.location.address}</p>
               </div>
 
               <div className="space-y-3">
-                <label className="text-sm font-bold text-zinc-300">Upload Proof Photo</label>
-                <p className="text-xs text-zinc-500">Take a clear, recent photo of the issue at the location to earn your Civic XP. AI will automatically validate your submission.</p>
+                <label className="text-sm font-bold text-slate-600 dark:text-zinc-300">Upload Proof Photo</label>
+                <p className="text-xs text-slate-500 dark:text-zinc-500">Take a clear, recent photo of the issue at the location to earn your Civic XP. AI will automatically validate your submission.</p>
                 
                 {verifyPreview ? (
-                  <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-zinc-900 border border-white/10">
+                  <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-white dark:bg-zinc-900 border border-white/10">
                     <Image src={verifyPreview} alt="Preview" fill unoptimized className="object-cover" />
                     <button 
                       onClick={clearFile}
@@ -265,19 +265,19 @@ export default function VerifyPage() {
                 ) : (
                   <div 
                     {...getRootProps()} 
-                    className={`border-2 border-dashed rounded-xl p-8 transition-colors cursor-pointer text-center flex flex-col items-center justify-center aspect-video ${isDragActive ? "border-blue-500 bg-blue-500/10" : "border-zinc-800 hover:border-zinc-700 bg-zinc-900/50"}`}
+                    className={`border-2 border-dashed rounded-xl p-8 transition-colors cursor-pointer text-center flex flex-col items-center justify-center aspect-video ${isDragActive ? "border-blue-500 bg-blue-500/10" : "border-slate-200 dark:border-zinc-800 hover:border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900/50"}`}
                   >
                     <input {...getInputProps()} />
-                    <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center mb-3 text-zinc-400">
+                    <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center mb-3 text-slate-500 dark:text-zinc-400">
                       <Camera className="w-6 h-6" />
                     </div>
-                    <p className="text-sm font-medium text-zinc-300">Tap to capture or upload</p>
+                    <p className="text-sm font-medium text-slate-600 dark:text-zinc-300">Tap to capture or upload</p>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="p-4 border-t border-white/5 bg-zinc-900/50 flex justify-end gap-3">
+            <div className="p-4 border-t border-white/5 bg-white dark:bg-zinc-900/50 flex justify-end gap-3">
               <Button variant="ghost" onClick={() => { setSelectedIssue(null); clearFile(); }}>Cancel</Button>
               <Button 
                 onClick={handleVerifySubmit} 

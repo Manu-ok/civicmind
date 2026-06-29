@@ -37,7 +37,7 @@ function FeedItemRow({ event, isRecent }: { event: ActivityEvent; isRecent: bool
       className={`p-4 rounded-xl border transition-all duration-500 ${
         isRecent 
           ? 'bg-blue-500/10 border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.1)]' 
-          : 'bg-zinc-800/30 border-white/[0.04]'
+          : 'bg-slate-100 dark:bg-zinc-800/30 border-white/[0.04]'
       }`}
     >
       <div className="flex items-start gap-3">
@@ -58,7 +58,7 @@ function FeedItemRow({ event, isRecent }: { event: ActivityEvent; isRecent: bool
           </p>
           <div className="flex items-center gap-2 mt-1">
             <span className={`inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-bold ${
-              event.type === 'resolved' ? 'text-green-400' : 'text-zinc-500'
+              event.type === 'resolved' ? 'text-green-400' : 'text-slate-500 dark:text-zinc-500'
             }`}>
               {event.type === 'resolved' ? (
                 <><CheckCircle2 className="w-3 h-3" /> Resolved</>
@@ -66,7 +66,7 @@ function FeedItemRow({ event, isRecent }: { event: ActivityEvent; isRecent: bool
                 <>New Report</>
               )}
             </span>
-            <span className="text-xs text-zinc-500 font-medium">
+            <span className="text-xs text-slate-500 dark:text-zinc-500 font-medium">
               • {formatDistanceToNow(event.timestamp, { addSuffix: true })}
             </span>
           </div>
@@ -132,12 +132,12 @@ export function ActivityFeed() {
       case "roads": return <AlertTriangle className="w-4 h-4 text-orange-400" />;
       case "safety": return <ShieldAlert className="w-4 h-4 text-red-400" />;
       case "waste": return <Trash2 className="w-4 h-4 text-emerald-400" />;
-      default: return <MapPin className="w-4 h-4 text-zinc-400" />;
+      default: return <MapPin className="w-4 h-4 text-slate-500 dark:text-zinc-400" />;
     }
   };
 
   return (
-    <div className="bg-zinc-900/50 border border-white/[0.04] rounded-xl p-6 flex flex-col h-[500px]">
+    <div className="bg-white dark:bg-zinc-900/50 border border-white/[0.04] rounded-xl p-6 flex flex-col h-[500px]">
       <h2 className="text-h3 text-zinc-100 mb-4 flex items-center gap-2">
         <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
         Live Activity Feed
@@ -155,7 +155,7 @@ export function ActivityFeed() {
         </AnimatePresence>
         
         {events.length === 0 && (
-          <div className="text-center text-zinc-500 mt-10">Waiting for live activity...</div>
+          <div className="text-center text-slate-500 dark:text-zinc-500 mt-10">Waiting for live activity...</div>
         )}
       </div>
     </div>

@@ -71,16 +71,24 @@ export function FollowButton({
 }: FollowButtonProps) {
   const { user } = useAuthStore();
   const router = useRouter();
-  const { isFollowing, loading, toggleFollow } = useFollow(targetUserId, initialIsFollowing);
+  const { isFollowing: remoteIsFollowing, toggleFollow } = useFollow(targetUserId, initialIsFollowing);
+  
+  const [localIsFollowing, setLocalIsFollowing] = useState(initialIsFollowing ?? false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [justFollowed, setJustFollowed] = useState(false);
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (!isLoading) {
+      setLocalIsFollowing(remoteIsFollowing);
+    }
+  }, [remoteIsFollowing, isLoading]);
 
   if (user?.id === targetUserId) {
     return null;
   }
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -90,19 +98,27 @@ export function FollowButton({
       return;
     }
 
-    if (loading) return;
+    if (isLoading) return;
 
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(async () => {
+    const previous = localIsFollowing;
+    setLocalIsFollowing(!previous); // Optimistic
+    setIsLoading(true);
+
+    if (!previous) {
+      setJustFollowed(true);
+      setTimeout(() => setJustFollowed(false), 1000);
+    }
+
+    try {
       const newState = await toggleFollow();
-      if (newState !== undefined) {
-        if (newState) {
-          setJustFollowed(true);
-          setTimeout(() => setJustFollowed(false), 1000);
-        }
-        if (onFollowChange) onFollowChange(newState);
+      if (newState !== undefined && onFollowChange) {
+        onFollowChange(newState);
       }
-    }, 200);
+    } catch {
+      setLocalIsFollowing(previous); // Revert
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const sizeClasses = {
@@ -111,14 +127,14 @@ export function FollowButton({
     lg: "min-h-[44px] text-base px-6",
   };
 
-  const isUnfollowHoverState = isFollowing && isHovered;
+  const isUnfollowHoverState = localIsFollowing && isHovered;
 
   return (
     <motion.button
       onClick={handleClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      disabled={loading}
+      disabled={isLoading}
       whileTap={{ scale: 0.95 }}
       animate={{ scale: justFollowed ? [1, 0.95, 1.05, 1] : 1 }}
       transition={{ duration: 0.3 }}
@@ -127,17 +143,17 @@ export function FollowButton({
         sizeClasses[size],
         
         // Not following
-        !isFollowing && variant === "default" && "bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 text-white shadow-md shadow-blue-900/20",
-        !isFollowing && variant === "outline" && "bg-transparent border-2 border-blue-500 text-blue-500 hover:bg-blue-500/10",
-        !isFollowing && variant === "minimal" && "bg-transparent text-blue-500 hover:bg-blue-500/10",
+        !localIsFollowing && variant === "default" && "bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 text-white shadow-md shadow-blue-900/20",
+        !localIsFollowing && variant === "outline" && "bg-transparent border-2 border-blue-500 text-blue-500 hover:bg-blue-500/10",
+        !localIsFollowing && variant === "minimal" && "bg-transparent text-blue-500 hover:bg-blue-500/10",
         
         // Following (Normal)
-        isFollowing && !isUnfollowHoverState && "bg-zinc-800 text-white hover:bg-zinc-700",
+        localIsFollowing && !isUnfollowHoverState && "bg-slate-100 dark:bg-zinc-800 text-white hover:bg-slate-200 dark:bg-zinc-700",
         
         // Following (Hover - Unfollow Intent)
-        isUnfollowHoverState && "bg-zinc-800 text-red-500 hover:bg-zinc-700",
+        isUnfollowHoverState && "bg-slate-100 dark:bg-zinc-800 text-red-500 hover:bg-slate-200 dark:bg-zinc-700",
 
-        loading && "opacity-70 cursor-not-allowed",
+        isLoading && "opacity-70 cursor-not-allowed",
         className
       )}
     >
@@ -145,7 +161,7 @@ export function FollowButton({
 
       {/* Animated Background for sliding gradient */}
       <AnimatePresence>
-        {!isFollowing && variant === "default" && (
+        {!localIsFollowing && variant === "default" && (
           <motion.div
             initial={{ x: "-100%" }}
             animate={{ x: 0 }}
@@ -157,11 +173,11 @@ export function FollowButton({
       </AnimatePresence>
 
       <div className="relative z-10 flex items-center justify-center min-w-[80px]">
-        {loading ? (
+        {isLoading ? (
           <Loader2 className="animate-spin absolute w-4 h-4" />
         ) : (
           <AnimatePresence mode="wait">
-            {isFollowing ? (
+            {localIsFollowing ? (
               <motion.div
                 key="following"
                 initial={{ rotateX: 90, opacity: 0 }}

@@ -1,6 +1,7 @@
 "use client";
+import Image from "next/image";
 
-import { useState, useRef, use } from "react";
+import { useState, useRef, use, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { useProfile } from "@/lib/hooks/useProfile";
@@ -42,6 +43,15 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
   const [activeTab, setActiveTab] = useState("issues");
   const [filterMode, setFilterMode] = useState("all"); // all, reported, verified, resolved
 
+  const [localFollowerCount, setLocalFollowerCount] = useState(profile?.followersCount || 0);
+
+  // Sync with profile when it loads
+  useEffect(() => {
+    if (profile) {
+      setLocalFollowerCount(profile.followersCount || 0);
+    }
+  }, [profile]);
+
   const [isNetworkModalOpen, setIsNetworkModalOpen] = useState(false);
   const [networkModalTab, setNetworkModalTab] = useState<"followers" | "following">("followers");
 
@@ -59,11 +69,11 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
   if (error || !profile) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background text-center px-4">
-        <div className="w-20 h-20 bg-zinc-900 rounded-full flex items-center justify-center mb-6">
+        <div className="w-20 h-20 bg-white dark:bg-zinc-900 rounded-full flex items-center justify-center mb-6">
           <MapPin className="w-10 h-10 text-zinc-600" />
         </div>
         <h1 className="text-2xl font-bold text-white mb-2">Profile not found</h1>
-        <p className="text-zinc-400 mb-6">This user may have changed their username or deleted their account.</p>
+        <p className="text-slate-500 dark:text-zinc-400 mb-6">This user may have changed their username or deleted their account.</p>
         <button onClick={() => router.push('/feed')} className="px-6 py-2 bg-blue-600 hover:bg-blue-500 rounded-full font-bold text-white transition-colors">
           Return to Feed
         </button>
@@ -93,7 +103,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
         <div className="relative w-full h-[180px] md:h-[300px] overflow-hidden group">
           <motion.div style={{ y: coverY }} className="absolute inset-0 w-full h-[120%] -top-[10%]">
             {profile.coverPhotoURL ? (
-              <img src={profile.coverPhotoURL} alt="Cover" className="w-full h-full object-cover" />
+              <Image fill src={profile.coverPhotoURL} alt="Cover" className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full opacity-60" style={{ background: placeholderGradient }} />
             )}
@@ -119,11 +129,11 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             className="relative group/avatar shrink-0 z-10 mx-auto md:mx-0"
           >
-            <div className={`w-[72px] h-[72px] md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-background bg-zinc-900 ${userBadge.color}`}>
+            <div className={`w-[72px] h-[72px] md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-background bg-white dark:bg-zinc-900 ${userBadge.color}`}>
               {profile.photoURL ? (
-                <img src={profile.photoURL} alt={profile.displayName} className="w-full h-full object-cover" />
+                <Image fill src={profile.photoURL} alt={profile.displayName} className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-2xl md:text-4xl font-bold text-zinc-500">
+                <div className="w-full h-full flex items-center justify-center text-2xl md:text-4xl font-bold text-slate-500 dark:text-zinc-500">
                   {profile.displayName?.charAt(0) || "U"}
                 </div>
               )}
@@ -152,7 +162,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
                   {profile.displayName}
                   {profile.isVerified && <CheckCircle2 className="w-6 h-6 text-blue-500" />}
                 </h1>
-                <p className="text-lg text-zinc-400 font-medium mb-3">@{profile.username}</p>
+                <p className="text-lg text-slate-500 dark:text-zinc-400 font-medium mb-3">@{profile.username}</p>
                 
                 {profile.verifiedReason && (
                   <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-medium rounded-lg mb-3">
@@ -166,7 +176,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
                   </p>
                 )}
 
-                <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm text-zinc-400">
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm text-slate-500 dark:text-zinc-400">
                   {(profile.ward || profile.city) && (
                     <span className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer">
                       <MapPin className="w-4 h-4" /> 
@@ -188,20 +198,27 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
               <div className="flex items-center justify-center gap-3 shrink-0">
                 {isOwnProfile ? (
                   <>
-                    <button onClick={() => router.push('/settings')} className="bg-zinc-800 hover:bg-zinc-700 text-white px-5 py-2.5 rounded-full font-bold text-sm transition-colors border border-zinc-700">
+                    <button onClick={() => router.push('/settings')} className="bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:bg-zinc-700 text-white px-5 py-2.5 rounded-full font-bold text-sm transition-colors border border-slate-300 dark:border-zinc-700">
                       Edit Profile
                     </button>
-                    <button className="bg-zinc-800 hover:bg-zinc-700 text-white w-10 h-10 rounded-full flex items-center justify-center transition-colors border border-zinc-700">
+                    <button className="bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:bg-zinc-700 text-white w-10 h-10 rounded-full flex items-center justify-center transition-colors border border-slate-300 dark:border-zinc-700">
                       <Share className="w-4 h-4" />
                     </button>
                   </>
                 ) : (
                   <>
-                    <FollowButton targetUserId={profile.id} targetUsername={profile.username} size="lg" />
-                    <button className="bg-zinc-800 text-zinc-500 w-11 h-11 rounded-full flex items-center justify-center cursor-not-allowed border border-zinc-800" title="Messaging coming soon">
+                    <FollowButton 
+                      targetUserId={profile.id} 
+                      targetUsername={profile.username} 
+                      size="lg" 
+                      onFollowChange={(isFollowing) => {
+                        setLocalFollowerCount(prev => isFollowing ? prev + 1 : Math.max(0, prev - 1));
+                      }}
+                    />
+                    <button className="bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-500 w-11 h-11 rounded-full flex items-center justify-center cursor-not-allowed border border-slate-200 dark:border-zinc-800" title="Messaging coming soon">
                       <MessageSquare className="w-5 h-5" />
                     </button>
-                    <button className="bg-zinc-800 hover:bg-zinc-700 text-white w-11 h-11 rounded-full flex items-center justify-center transition-colors border border-zinc-700">
+                    <button className="bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:bg-zinc-700 text-white w-11 h-11 rounded-full flex items-center justify-center transition-colors border border-slate-300 dark:border-zinc-700">
                       <MoreHorizontal className="w-5 h-5" />
                     </button>
                   </>
@@ -210,14 +227,14 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
             </div>
 
             {/* Stats Row */}
-            <div className="grid grid-cols-2 md:flex items-center justify-center md:justify-start gap-4 md:gap-6 mt-8 p-4 bg-zinc-900/50 rounded-2xl border border-white/5 backdrop-blur-md w-full md:w-auto">
+            <div className="grid grid-cols-2 md:flex items-center justify-center md:justify-start gap-4 md:gap-6 mt-8 p-4 bg-white dark:bg-zinc-900/50 rounded-2xl border border-white/5 backdrop-blur-md w-full md:w-auto">
               <div className="text-center cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setActiveTab('issues')}>
                 <div className="text-xl font-black text-white">
                   <AnimatedCounter value={issues.length} />
                 </div>
-                <div className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Issues</div>
+                <div className="text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-wider">Issues</div>
               </div>
-              <div className="hidden md:block w-px h-8 bg-zinc-800" />
+              <div className="hidden md:block w-px h-8 bg-slate-100 dark:bg-zinc-800" />
               <div 
                 className="text-center cursor-pointer hover:opacity-80 transition-opacity"
                 onClick={() => {
@@ -226,11 +243,11 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
                 }}
               >
                 <div className="text-xl font-black text-white">
-                  <AnimatedCounter value={profile.followersCount || 0} />
+                  <AnimatedCounter value={localFollowerCount} />
                 </div>
-                <div className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Followers</div>
+                <div className="text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-wider">Followers</div>
               </div>
-              <div className="hidden md:block w-px h-8 bg-zinc-800" />
+              <div className="hidden md:block w-px h-8 bg-slate-100 dark:bg-zinc-800" />
               <div 
                 className="text-center cursor-pointer hover:opacity-80 transition-opacity"
                 onClick={() => {
@@ -241,9 +258,9 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
                 <div className="text-xl font-black text-white">
                   <AnimatedCounter value={profile.followingCount || 0} />
                 </div>
-                <div className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Following</div>
+                <div className="text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-wider">Following</div>
               </div>
-              <div className="hidden md:block w-px h-8 bg-zinc-800" />
+              <div className="hidden md:block w-px h-8 bg-slate-100 dark:bg-zinc-800" />
               <div className="text-center cursor-pointer hover:opacity-80 transition-opacity group relative">
                 <div className="text-xl font-black text-yellow-500 flex items-center justify-center gap-1">
                   <AnimatedCounter value={profile.points || 0} />
@@ -256,7 +273,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
 
         {/* ── MUTUAL CONNECTIONS ── */}
         {!isOwnProfile && (
-          <div className="flex items-center justify-center md:justify-start gap-2 text-sm text-zinc-400 mb-8 border-b border-white/5 pb-8">
+          <div className="flex items-center justify-center md:justify-start gap-2 text-sm text-slate-500 dark:text-zinc-400 mb-8 border-b border-white/5 pb-8">
             <Users className="w-4 h-4" />
             <span>Followed by community members you might know</span>
           </div>
@@ -265,15 +282,15 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
         {/* ── STORIES ROW ── */}
         {stories.length > 0 && (
           <div className="mb-10">
-            <h3 className="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-4">Active Stories</h3>
+            <h3 className="text-sm font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-wider mb-4">Active Stories</h3>
             <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
               {stories.map(story => (
                 <div key={story.id} className="relative w-20 h-20 shrink-0 rounded-full p-1 bg-gradient-to-tr from-yellow-400 to-fuchsia-600 cursor-pointer hover:scale-105 transition-transform">
-                  <div className="w-full h-full rounded-full border-2 border-background overflow-hidden bg-zinc-800">
+                  <div className="w-full h-full rounded-full border-2 border-background overflow-hidden bg-slate-100 dark:bg-zinc-800">
                     {story.mediaUrl ? (
-                      <img src={story.mediaUrl} alt="Story" className="w-full h-full object-cover" />
+                      <Image fill src={story.mediaUrl} alt="Story" className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-zinc-800 text-xs font-bold text-white text-center p-1">
+                      <div className="w-full h-full flex items-center justify-center bg-slate-100 dark:bg-zinc-800 text-xs font-bold text-white text-center p-1">
                         Text Story
                       </div>
                     )}
@@ -296,7 +313,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
                 <IssueCard issue={issues.find(i => i.id === profile.pinnedIssueId)!} index={0} />
               </div>
             ) : (
-              <div className="h-48 rounded-2xl bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-500 text-sm">
+              <div className="h-48 rounded-2xl bg-white dark:bg-zinc-900 border border-white/5 flex items-center justify-center text-slate-500 dark:text-zinc-500 text-sm">
                 Pinned issue loading...
               </div>
             )}
@@ -310,12 +327,12 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`relative px-6 py-4 text-sm font-bold transition-colors whitespace-nowrap ${
-                activeTab === tab.id ? "text-white" : "text-zinc-500 hover:text-zinc-300"
+                activeTab === tab.id ? "text-white" : "text-slate-500 dark:text-zinc-500 hover:text-slate-600 dark:text-zinc-300"
               }`}
             >
               {tab.label}
               {tab.id === "issues" && (
-                <span className="ml-2 bg-zinc-800 text-zinc-300 py-0.5 px-2 rounded-full text-xs">{issues.length}</span>
+                <span className="ml-2 bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 py-0.5 px-2 rounded-full text-xs">{issues.length}</span>
               )}
               {activeTab === tab.id && (
                 <motion.div
@@ -347,7 +364,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
                       key={filter}
                       onClick={() => setFilterMode(filter)}
                       className={`px-4 py-1.5 rounded-full text-xs font-bold capitalize whitespace-nowrap transition-colors ${
-                        filterMode === filter ? 'bg-white text-black' : 'bg-zinc-900 text-zinc-400 hover:bg-zinc-800 border border-white/5'
+                        filterMode === filter ? 'bg-white text-black' : 'bg-white dark:bg-zinc-900 text-slate-500 dark:text-zinc-400 hover:bg-slate-100 dark:bg-zinc-800 border border-white/5'
                       }`}
                     >
                       {filter}
@@ -356,12 +373,12 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
                 </div>
 
                 {profile.isPrivate && !isFollowing && !isOwnProfile ? (
-                  <div className="py-20 text-center border border-white/5 rounded-3xl bg-zinc-900/30">
-                    <div className="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-4 border border-zinc-800">
+                  <div className="py-20 text-center border border-white/5 rounded-3xl bg-white dark:bg-zinc-900/30">
+                    <div className="w-16 h-16 bg-white dark:bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-200 dark:border-zinc-800">
                       <Shield className="w-8 h-8 text-zinc-600" />
                     </div>
                     <h3 className="text-xl font-bold text-white mb-2">This profile is private</h3>
-                    <p className="text-zinc-500 mb-6">Follow @{profile.username} to see their issues and activity.</p>
+                    <p className="text-slate-500 dark:text-zinc-500 mb-6">Follow @{profile.username} to see their issues and activity.</p>
                   </div>
                 ) : displayIssues.length > 0 ? (
                   <div className="grid gap-3 sm:gap-6 grid-cols-2 lg:grid-cols-3">
@@ -370,12 +387,12 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
                     ))}
                   </div>
                 ) : (
-                  <div className="py-20 text-center border border-white/5 rounded-3xl bg-zinc-900/30">
-                    <div className="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-4 border border-zinc-800">
+                  <div className="py-20 text-center border border-white/5 rounded-3xl bg-white dark:bg-zinc-900/30">
+                    <div className="w-16 h-16 bg-white dark:bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-200 dark:border-zinc-800">
                       <MapPin className="w-8 h-8 text-zinc-600" />
                     </div>
                     <h3 className="text-xl font-bold text-white mb-2">No issues to show</h3>
-                    <p className="text-zinc-500">
+                    <p className="text-slate-500 dark:text-zinc-500">
                       {filterMode === 'all' 
                         ? `${isOwnProfile ? "You haven't" : `@${profile.username} hasn't`} reported any issues yet.`
                         : `No ${filterMode} issues found.`}
@@ -388,7 +405,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
             {activeTab === "activity" && (
               <div className="max-w-2xl mx-auto py-8">
                 {profile.isPrivate && !isFollowing && !isOwnProfile ? (
-                  <div className="py-20 text-center border border-white/5 rounded-3xl bg-zinc-900/30">
+                  <div className="py-20 text-center border border-white/5 rounded-3xl bg-white dark:bg-zinc-900/30">
                     <Shield className="w-8 h-8 text-zinc-600 mx-auto mb-4" />
                     <h3 className="text-xl font-bold text-white mb-2">Activity is private</h3>
                   </div>
@@ -403,11 +420,11 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
                         <div className={`flex items-center justify-center w-10 h-10 rounded-full border-4 border-background shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-md ${item.color}`}>
                           <item.icon className="w-4 h-4" />
                         </div>
-                        <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-2xl border border-white/5 bg-zinc-900/50 backdrop-blur-sm hover:bg-zinc-900 transition-colors">
+                        <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-2xl border border-white/5 bg-white dark:bg-zinc-900/50 backdrop-blur-sm hover:bg-white dark:bg-zinc-900 transition-colors">
                           <div className="flex items-center justify-between mb-1">
-                            <div className="text-xs font-bold text-zinc-500">{item.time}</div>
+                            <div className="text-xs font-bold text-slate-500 dark:text-zinc-500">{item.time}</div>
                           </div>
-                          <div className="text-sm text-zinc-300">{item.action}</div>
+                          <div className="text-sm text-slate-600 dark:text-zinc-300">{item.action}</div>
                           <div className="font-bold text-white mt-1">{item.text}</div>
                         </div>
                       </div>
@@ -418,14 +435,14 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
             )}
 
             {activeTab === "verified" && (
-              <div className="py-20 text-center text-zinc-500">
+              <div className="py-20 text-center text-slate-500 dark:text-zinc-500">
                 <CheckCircle2 className="w-12 h-12 text-zinc-800 mx-auto mb-4" />
                 <p>Verified issues will appear here.</p>
               </div>
             )}
 
             {activeTab === "circles" && (
-              <div className="py-20 text-center text-zinc-500">
+              <div className="py-20 text-center text-slate-500 dark:text-zinc-500">
                 <Users className="w-12 h-12 text-zinc-800 mx-auto mb-4" />
                 <p>Community circles will appear here.</p>
               </div>

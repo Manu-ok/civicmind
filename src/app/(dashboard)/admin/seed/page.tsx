@@ -33,7 +33,7 @@ export default function SeedPage() {
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6">
         <ShieldAlert className="w-16 h-16 text-red-500 mb-4" />
         <h1 className="text-2xl font-bold text-white mb-2">Access Denied</h1>
-        <p className="text-zinc-400 max-w-md">
+        <p className="text-slate-500 dark:text-zinc-400 max-w-md">
           You do not have the required permissions to view this page. This area is restricted to administrators only.
         </p>
         <Button className="mt-6" onClick={() => router.push("/dashboard")}>
@@ -65,10 +65,10 @@ export default function SeedPage() {
     <div className="max-w-2xl mx-auto p-6 mt-10">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Database Management</h1>
-        <p className="text-zinc-400">Seed the database with realistic demo data for presentations and testing.</p>
+        <p className="text-slate-500 dark:text-zinc-400">Seed the database with realistic demo data for presentations and testing.</p>
       </div>
 
-      <Card className="bg-zinc-900/50 border-white/5 overflow-hidden relative">
+      <Card className="bg-white dark:bg-zinc-900/50 border-white/5 overflow-hidden relative">
         {/* Background glow */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] pointer-events-none" />
 
@@ -79,7 +79,7 @@ export default function SeedPage() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-white mb-1">Seed Demo Data</h2>
-              <p className="text-zinc-400 text-sm leading-relaxed">
+              <p className="text-slate-500 dark:text-zinc-400 text-sm leading-relaxed">
                 This action will populate the Firestore database with 5 demo users, 20 realistic issues mapped to Jamshedpur, base analytics data, and AI predictions.
               </p>
             </div>
@@ -121,15 +121,15 @@ export default function SeedPage() {
                   )}
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent className="bg-zinc-950 border-white/10 text-white">
+              <AlertDialogContent className="bg-slate-50 dark:bg-zinc-950 border-white/10 text-white">
                 <AlertDialogHeader>
                   <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                  <AlertDialogDescription className="text-zinc-400">
+                  <AlertDialogDescription className="text-slate-500 dark:text-zinc-400">
                     This will inject roughly 30 documents into your Firestore database. This action is safe but will clutter the database if run multiple times unnecessarily.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel className="bg-zinc-900 text-white hover:bg-zinc-800 border-white/10">Cancel</AlertDialogCancel>
+                  <AlertDialogCancel className="bg-white dark:bg-zinc-900 text-white hover:bg-slate-100 dark:bg-zinc-800 border-white/10">Cancel</AlertDialogCancel>
                   <AlertDialogAction onClick={handleSeed} className="bg-blue-600 text-white hover:bg-blue-700">
                     Yes, Seed Data
                   </AlertDialogAction>
