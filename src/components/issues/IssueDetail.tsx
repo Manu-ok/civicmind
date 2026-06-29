@@ -187,7 +187,7 @@ export function IssueDetail({ issue }: { issue: Issue }) {
             <div className="flex items-center gap-3 text-slate-600 dark:text-zinc-300">
               <Clock className="w-5 h-5 text-primary" />
               <span>Reported {formatDistanceToNow(
-                issue.reportedAt?.toDate?.() || new Date(issue.reportedAt || Date.now()), 
+                (issue.reportedAt as any)?.toDate?.() || new Date((issue.reportedAt as any) || Date.now()), 
                 { addSuffix: true }
               )}</span>
             </div>
@@ -467,7 +467,7 @@ export function IssueDetail({ issue }: { issue: Issue }) {
                         <span className="text-sm font-medium text-slate-600 dark:text-zinc-300">{v.userDisplayName}</span>
                       </div>
                       <span className="text-xs text-slate-500 dark:text-zinc-500">{formatDistanceToNow(
-                        v.timestamp?.toDate?.() || new Date(v.timestamp || Date.now()), 
+                        (v.timestamp as any)?.toDate?.() || new Date((v.timestamp as any) || Date.now()), 
                         { addSuffix: true }
                       )}</span>
                     </div>

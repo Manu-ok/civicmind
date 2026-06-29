@@ -116,7 +116,7 @@ export function IssueCard({ issue, index = 0 }: { issue: Issue; index?: number }
         <div className="flex items-center justify-between pt-4 border-t border-white/10 mt-auto">
           <span className="text-caption font-medium flex items-center gap-1 flex-wrap">
             {formatDistanceToNow(
-              issue.reportedAt?.toDate?.() || new Date(issue.reportedAt || Date.now()), 
+              (issue.reportedAt as any)?.toDate?.() || new Date((issue.reportedAt as any) || Date.now()), 
               { addSuffix: true }
             )}
             {(issue.reportedByUsername || issue.reportedByDisplayName) && (
