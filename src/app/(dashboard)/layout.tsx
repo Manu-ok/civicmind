@@ -63,7 +63,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* ── Demo Banner ────────────────────────────────────── */}
         <DemoBanner />
 
-        <main className="flex-1 pb-20 md:pb-0">
+        <main className="flex-1 pb-20 md:pb-0 overflow-x-hidden">
           <PageWrapper>{children}</PageWrapper>
         </main>
         

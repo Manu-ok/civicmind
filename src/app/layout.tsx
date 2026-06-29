@@ -62,7 +62,7 @@ export default function RootLayout({
         className={cn(
           inter.variable,
           geistMono.variable,
-          "antialiased bg-background text-foreground"
+          "antialiased bg-background text-foreground overflow-x-hidden"
         )}
       >
         <ThemeProvider

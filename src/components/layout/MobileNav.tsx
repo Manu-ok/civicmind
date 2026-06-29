@@ -22,7 +22,7 @@ export function MobileNav() {
   ];
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-[100] border-t border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-zinc-950/90 backdrop-blur-2xl md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-[100] border-t border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-zinc-950/90 backdrop-blur-2xl md:hidden pb-[max(env(safe-area-inset-bottom),0px)]">
       <div className="flex items-center justify-around px-2 py-1.5 h-16">
         {mobileNavItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
@@ -96,8 +96,6 @@ export function MobileNav() {
           );
         })}
       </div>
-      {/* Safe area for devices with gesture bars */}
-      <div className="h-[env(safe-area-inset-bottom)]" />
     </nav>
   );
 }
