@@ -205,7 +205,7 @@ export default function VerifyPage() {
                   <div className="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
                     <span className="text-xs text-slate-500 dark:text-zinc-500 font-medium">
                       {formatDistanceToNow(
-                        issue.reportedAt?.toDate?.() || new Date(issue.reportedAt || Date.now()), 
+                        (issue.reportedAt as any)?.toDate?.() || new Date((issue.reportedAt as any) || Date.now()), 
                         { addSuffix: true }
                       )}
                     </span>
