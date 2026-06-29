@@ -410,7 +410,7 @@ export async function seedDemoData(city: string = "Jamshedpur", currentUserId: s
     }
 
     // 8. Seed Analytics
-    const analyticsRef = doc(db, "analytics", city);
+    // analyticsRef is already defined at the top of the function
     const analytics: AnalyticsData = {
       totalIssues: 347,
       resolvedIssues: 218,
