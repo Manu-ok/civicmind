@@ -24,30 +24,6 @@ export default function ExplorePage() {
   const [heroes, setHeroes] = useState<SocialUser[]>([]);
 
   useEffect(() => {
-
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Search, Users, TrendingUp, CircleDashed, MapPin, CheckCircle2, ChevronRight, Flame, MessageSquare, AlertTriangle, ShieldCheck } from "lucide-react";
-import { useAuthStore } from "@/lib/stores/authStore";
-import { useRouter } from "next/navigation";
-import { UserCard } from "@/components/social/UserCard";
-import { SuggestedUsers } from "@/components/social/SuggestedUsers";
-import { getSuggestedUsers } from "@/lib/firebase/social";
-import { SocialUser } from "@/lib/types";
-
-type TabType = "people" | "trending" | "circles" | "nearby";
-
-export default function ExplorePage() {
-  const { user } = useAuthStore();
-  const router = useRouter();
-  const [activeTab, setActiveTab] = useState<TabType>("people");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
-  
-  // Data States
-  const [heroes, setHeroes] = useState<SocialUser[]>([]);
-
-  useEffect(() => {
     if (user) {
       // Mock fetch for "Heroes" using our existing suggested users logic for now
       getSuggestedUsers(user.id, user.city || '', user.ward || '').then(res => setHeroes(res.slice(0, 8)));
@@ -63,7 +39,7 @@ export default function ExplorePage() {
     ).slice(0, 3);
     
     const allIssues = [...MOCK_TRENDING, ...MOCK_DISCUSSED, ...MOCK_ALERTS];
-    const filteredIssues = allIssues.filter(i => 
+    const filteredIssues = allIssues.filter((i: any) => 
       i.title.toLowerCase().includes(query) || (i.category && i.category.toLowerCase().includes(query))
     ).slice(0, 3);
 
@@ -101,7 +77,7 @@ export default function ExplorePage() {
             {filteredIssues.length > 0 && (
               <div className="p-4 border-b border-slate-100 dark:border-white/5">
                 <h4 className="text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-wider mb-3 flex items-center gap-2"><TrendingUp className="w-4 h-4" /> Issues</h4>
-                {filteredIssues.map((issue, i) => (
+                {filteredIssues.map((issue: any, i) => (
                   <div key={i} className="mb-3 cursor-pointer hover:bg-slate-100 dark:bg-zinc-800 p-2 rounded-xl transition-colors" onMouseDown={() => router.push(`/explore`)}>
                      <div className="text-sm font-bold text-slate-900 dark:text-white truncate">{issue.title}</div>
                      <div className="text-xs text-slate-500 dark:text-zinc-500 truncate">{issue.location} • {issue.category || 'Alert'}</div>
