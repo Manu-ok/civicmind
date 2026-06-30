@@ -7,11 +7,11 @@ if (!process.env.GEMINI_API_KEY) {
 
 export const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
-export const geminiPro = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
-export const geminiFlash = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+export const geminiPro = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+export const geminiFlash = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 export function getVisionModel() {
-  return genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+  return genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 }
 
 export function formatGeminiError(error: any): string {
